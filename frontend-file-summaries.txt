@@ -1,0 +1,10 @@
+{
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including user profiles, roles, communities, proposals, and fundraising campaigns with proper caching and invalidation strategies, now including useCanFinalizeCampaign hook for checking campaign finalization eligibility.",
+  "frontend/src/components/CampaignCard.tsx": "Campaign card component displaying campaign progress, funding status, days remaining, and action buttons with proper state handling and all-or-nothing funding model indication.",
+  "frontend/src/components/CampaignDetailModal.tsx": "Modal component for viewing campaign details with tabs for campaign story, updates feed, and contributions list, including contribution and update posting functionality for authorized users, and campaign finalization button that becomes available when the funding goal is reached regardless of deadline with appropriate tooltips and status messages.",
+  "frontend/src/components/CreateCampaignModal.tsx": "Modal form for creating new fundraising campaigns with fields for title, goal amount, duration, and campaign story following Amnesty International design guidelines with proper bigint type handling for nanosecond timestamps.",
+  "frontend/src/components/CommunityPortal.tsx": "Community portal component displaying proposals and fundraising campaigns sections with role-based access control and proper guest/member/former-member handling.",
+  "frontend/index.html": "HTML entry point with proper DOCTYPE declaration for standards mode rendering, English language attribute, and React root mounting point.",
+  "frontend/tailwind.config.js": "Tailwind CSS configuration file with Amnesty International brand colors (yellow, black, grays), Oswald font family, custom box shadows, and required plugins for typography and animations.",
+  "frontend/src/index.css": "Global CSS styles with Amnesty International branding including custom CSS variables, Tailwind layers, component classes (buttons, inputs, cards), Oswald font import, and high-contrast design system with zero border-radius enforcement."
+}

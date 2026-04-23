@@ -1,0 +1,70 @@
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type UserProfile = record {name: text;};
+type ProposalState = 
+ variant {
+   active;
+   failed;
+   passed;
+   pendingFinalization;
+ };
+type ProposalOverrides = 
+ record {
+   passPct: opt nat;
+   quorum: opt nat;
+   windowNs: opt nat;
+ };
+type Proposal = 
+ record {
+   communityId: nat;
+   creator: principal;
+   description: text;
+   endNs: int;
+   id: nat;
+   no: nat;
+   passPct: nat;
+   quorum: nat;
+   startNs: int;
+   state: ProposalState;
+   title: text;
+   yes: nat;
+ };
+type Community = 
+ record {
+   admin: principal;
+   id: nat;
+   members: vec principal;
+   name: text;
+   policy: text;
+ };
+service : {
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  createCommunity: (name: text, policy: text) -> ();
+  createProposal: (communityId: nat, title: text, description: text,
+   overrides: opt ProposalOverrides) -> ();
+  enterCommunityPortal: (communityId: nat) -> (Community) query;
+  finalizeProposal: (proposalId: nat) -> ();
+  getCallerUserProfile: () -> (opt UserProfile) query;
+  getCallerUserRole: () -> (UserRole) query;
+  getCommunityById: (id: nat) -> (opt Community) query;
+  getProposalById: (proposalId: nat) -> (opt Proposal) query;
+  getUserProfile: (user: principal) -> (opt UserProfile) query;
+  initializeAccessControl: () -> ();
+  isCallerAdmin: () -> (bool) query;
+  joinCommunity: (communityId: nat) -> ();
+  leaveCommunity: (communityId: nat) -> ();
+  listAllUsers: () -> (vec record {
+                             principal;
+                             UserProfile;
+                           }) query;
+  listCommunities: () -> (vec Community) query;
+  listProposalsByCommunity: (communityId: nat) -> (vec Proposal) query;
+  removeMemberFromCommunity: (communityId: nat, memberToRemove: principal) ->
+   ();
+  saveCallerUserProfile: (profile: UserProfile) -> ();
+  voteOnProposal: (proposalId: nat, voteYes: bool) -> ();
+}
