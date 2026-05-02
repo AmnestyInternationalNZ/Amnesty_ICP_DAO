@@ -1,10 +1,43 @@
 export const idlFactory = ({ IDL }) => {
+  const KanbanCardInput = IDL.Record({
+    'eventId' : IDL.Opt(IDL.Nat),
+    'title' : IDL.Text,
+    'assignedTo' : IDL.Vec(IDL.Principal),
+    'description' : IDL.Opt(IDL.Text),
+    'docId' : IDL.Opt(IDL.Nat),
+    'dueDateUtc' : IDL.Opt(IDL.Int),
+  });
+  const KanbanCard = IDL.Record({
+    'id' : IDL.Nat,
+    'eventId' : IDL.Opt(IDL.Nat),
+    'title' : IDL.Text,
+    'assignedTo' : IDL.Vec(IDL.Principal),
+    'createdAt' : IDL.Int,
+    'createdBy' : IDL.Principal,
+    'description' : IDL.Opt(IDL.Text),
+    'updatedAt' : IDL.Int,
+    'docId' : IDL.Opt(IDL.Nat),
+    'dueDateUtc' : IDL.Opt(IDL.Int),
+  });
+  const KanbanColumn = IDL.Record({
+    'id' : IDL.Nat,
+    'title' : IDL.Text,
+    'cardIds' : IDL.Vec(IDL.Nat),
+  });
   const ShoppingItem = IDL.Record({
     'productName' : IDL.Text,
     'currency' : IDL.Text,
     'quantity' : IDL.Nat,
     'priceInCents' : IDL.Nat,
     'productDescription' : IDL.Text,
+  });
+  const CommunityEventInput = IDL.Record({
+    'title' : IDL.Text,
+    'allDay' : IDL.Bool,
+    'startUtc' : IDL.Int,
+    'description' : IDL.Opt(IDL.Text),
+    'location' : IDL.Opt(IDL.Text),
+    'endUtc' : IDL.Int,
   });
   const ProposalOverrides = IDL.Record({
     'passPct' : IDL.Opt(IDL.Nat),
@@ -57,12 +90,68 @@ export const idlFactory = ({ IDL }) => {
     'canCreateProposal' : IDL.Bool,
     'canVoteOnProposal' : IDL.Bool,
   });
+  const WorkspaceRole = IDL.Variant({
+    'owner' : IDL.Null,
+    'editor' : IDL.Null,
+    'viewer' : IDL.Null,
+  });
+  const WorkspaceAccessEntry = IDL.Record({
+    'role' : WorkspaceRole,
+    'user' : IDL.Principal,
+  });
+  const CommunityBoardPayload = IDL.Record({
+    'id' : IDL.Nat,
+    'access' : IDL.Vec(WorkspaceAccessEntry),
+    'title' : IDL.Text,
+    'communityId' : IDL.Nat,
+    'owner' : IDL.Principal,
+    'cards' : IDL.Vec(KanbanCard),
+    'createdAt' : IDL.Int,
+    'role' : WorkspaceRole,
+    'updatedAt' : IDL.Int,
+    'communityShare' : IDL.Opt(WorkspaceRole),
+    'archived' : IDL.Bool,
+    'columns' : IDL.Vec(KanbanColumn),
+  });
   const Community = IDL.Record({
     'id' : IDL.Nat,
     'members' : IDL.Vec(IDL.Principal),
     'admin' : IDL.Principal,
     'name' : IDL.Text,
     'policy' : IDL.Text,
+  });
+  const CommunityDocumentPayload = IDL.Record({
+    'id' : IDL.Nat,
+    'access' : IDL.Vec(WorkspaceAccessEntry),
+    'title' : IDL.Text,
+    'communityId' : IDL.Nat,
+    'snapshot' : IDL.Opt(IDL.Vec(IDL.Nat8)),
+    'owner' : IDL.Principal,
+    'createdAt' : IDL.Int,
+    'role' : WorkspaceRole,
+    'version' : IDL.Nat,
+    'updatedAt' : IDL.Int,
+    'updates' : IDL.Vec(IDL.Vec(IDL.Nat8)),
+    'communityShare' : IDL.Opt(WorkspaceRole),
+    'parentId' : IDL.Opt(IDL.Nat),
+    'archived' : IDL.Bool,
+  });
+  const CommunityEventPayload = IDL.Record({
+    'id' : IDL.Nat,
+    'access' : IDL.Vec(WorkspaceAccessEntry),
+    'title' : IDL.Text,
+    'communityId' : IDL.Nat,
+    'owner' : IDL.Principal,
+    'allDay' : IDL.Bool,
+    'startUtc' : IDL.Int,
+    'createdAt' : IDL.Int,
+    'role' : WorkspaceRole,
+    'description' : IDL.Opt(IDL.Text),
+    'updatedAt' : IDL.Int,
+    'communityShare' : IDL.Opt(WorkspaceRole),
+    'location' : IDL.Opt(IDL.Text),
+    'archived' : IDL.Bool,
+    'endUtc' : IDL.Int,
   });
   const ProposalState = IDL.Variant({
     'active' : IDL.Null,
@@ -91,6 +180,32 @@ export const idlFactory = ({ IDL }) => {
     }),
     'failed' : IDL.Record({ 'error' : IDL.Text }),
   });
+  const CommunityBoardSummary = IDL.Record({
+    'id' : IDL.Nat,
+    'title' : IDL.Text,
+    'communityId' : IDL.Nat,
+    'owner' : IDL.Principal,
+    'createdAt' : IDL.Int,
+    'role' : WorkspaceRole,
+    'updatedAt' : IDL.Int,
+    'cardCount' : IDL.Nat,
+    'communityShare' : IDL.Opt(WorkspaceRole),
+    'columnCount' : IDL.Nat,
+    'archived' : IDL.Bool,
+  });
+  const CommunityDocumentSummary = IDL.Record({
+    'id' : IDL.Nat,
+    'title' : IDL.Text,
+    'communityId' : IDL.Nat,
+    'owner' : IDL.Principal,
+    'createdAt' : IDL.Int,
+    'role' : WorkspaceRole,
+    'version' : IDL.Nat,
+    'updatedAt' : IDL.Int,
+    'communityShare' : IDL.Opt(WorkspaceRole),
+    'parentId' : IDL.Opt(IDL.Nat),
+    'archived' : IDL.Bool,
+  });
   const CommunityMember = IDL.Record({
     'principal' : IDL.Principal,
     'role' : CommunityRole,
@@ -112,6 +227,24 @@ export const idlFactory = ({ IDL }) => {
   });
   return IDL.Service({
     'addCampaignUpdate' : IDL.Func([IDL.Nat, IDL.Text], [], []),
+    'addCommunityBoardCard' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Nat, KanbanCardInput],
+        [KanbanCard],
+        [],
+      ),
+    'addCommunityBoardColumn' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Text],
+        [KanbanColumn],
+        [],
+      ),
+    'appendCommunityDocumentUpdate' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Vec(IDL.Nat8)],
+        [IDL.Nat],
+        [],
+      ),
+    'archiveCommunityBoard' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
+    'archiveCommunityDocument' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
+    'archiveCommunityEvent' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
     'bootstrapPlatformAdmin' : IDL.Func([], [], []),
     'canFinalizeCampaign' : IDL.Func([IDL.Nat], [IDL.Bool], ['query']),
     'contributeToCampaign' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
@@ -126,8 +259,21 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'createCommunity' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'createCommunityBoard' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Nat], []),
+    'createCommunityDocument' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Nat], []),
+    'createCommunityEvent' : IDL.Func(
+        [IDL.Nat, CommunityEventInput],
+        [IDL.Nat],
+        [],
+      ),
     'createProposal' : IDL.Func(
         [IDL.Nat, IDL.Text, IDL.Text, IDL.Opt(ProposalOverrides)],
+        [],
+        [],
+      ),
+    'deleteCommunityBoardCard' : IDL.Func([IDL.Nat, IDL.Nat, IDL.Nat], [], []),
+    'deleteCommunityBoardColumn' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Nat],
         [],
         [],
       ),
@@ -152,7 +298,22 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getCommunityAccess' : IDL.Func([IDL.Nat], [CommunityAccess], ['query']),
+    'getCommunityBoard' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Opt(CommunityBoardPayload)],
+        ['query'],
+      ),
     'getCommunityById' : IDL.Func([IDL.Nat], [IDL.Opt(Community)], ['query']),
+    'getCommunityDocument' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Opt(CommunityDocumentPayload)],
+        ['query'],
+      ),
+    'getCommunityEvent' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Opt(CommunityEventPayload)],
+        ['query'],
+      ),
     'getProposalById' : IDL.Func([IDL.Nat], [IDL.Opt(Proposal)], ['query']),
     'getStripeSessionStatus' : IDL.Func([IDL.Text], [StripeSessionStatus], []),
     'getUserProfile' : IDL.Func(
@@ -174,6 +335,21 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'listCommunities' : IDL.Func([], [IDL.Vec(Community)], ['query']),
+    'listCommunityBoards' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(CommunityBoardSummary)],
+        ['query'],
+      ),
+    'listCommunityDocuments' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(CommunityDocumentSummary)],
+        ['query'],
+      ),
+    'listCommunityEvents' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(CommunityEventPayload)],
+        ['query'],
+      ),
     'listCommunityMembers' : IDL.Func(
         [IDL.Nat],
         [IDL.Vec(CommunityMember)],
@@ -185,7 +361,64 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(Proposal)],
         ['query'],
       ),
+    'moveCommunityBoardCard' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Nat, IDL.Nat, IDL.Nat],
+        [],
+        [],
+      ),
+    'renameCommunityBoard' : IDL.Func([IDL.Nat, IDL.Nat, IDL.Text], [], []),
+    'renameCommunityBoardColumn' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Nat, IDL.Text],
+        [],
+        [],
+      ),
+    'renameCommunityDocument' : IDL.Func([IDL.Nat, IDL.Nat, IDL.Text], [], []),
+    'reorderCommunityBoardColumns' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Vec(IDL.Nat)],
+        [],
+        [],
+      ),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'saveCommunityDocumentSnapshot' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Vec(IDL.Nat8), IDL.Nat],
+        [],
+        [],
+      ),
+    'setCommunityBoardGrant' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Principal, IDL.Opt(WorkspaceRole)],
+        [],
+        [],
+      ),
+    'setCommunityBoardShare' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Opt(WorkspaceRole)],
+        [IDL.Opt(WorkspaceRole)],
+        [],
+      ),
+    'setCommunityDocumentGrant' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Principal, IDL.Opt(WorkspaceRole)],
+        [],
+        [],
+      ),
+    'setCommunityDocumentParent' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Opt(IDL.Nat)],
+        [IDL.Opt(IDL.Nat)],
+        [],
+      ),
+    'setCommunityDocumentShare' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Opt(WorkspaceRole)],
+        [IDL.Opt(WorkspaceRole)],
+        [],
+      ),
+    'setCommunityEventGrant' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Principal, IDL.Opt(WorkspaceRole)],
+        [],
+        [],
+      ),
+    'setCommunityEventShare' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Opt(WorkspaceRole)],
+        [IDL.Opt(WorkspaceRole)],
+        [],
+      ),
     'setCommunityRole' : IDL.Func(
         [IDL.Nat, IDL.Principal, IDL.Opt(CommunityRole)],
         [],
@@ -197,6 +430,16 @@ export const idlFactory = ({ IDL }) => {
         [TransformationInput],
         [TransformationOutput],
         ['query'],
+      ),
+    'updateCommunityBoardCard' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Nat, KanbanCardInput],
+        [],
+        [],
+      ),
+    'updateCommunityEvent' : IDL.Func(
+        [IDL.Nat, IDL.Nat, CommunityEventInput],
+        [],
+        [],
       ),
     'voteOnProposal' : IDL.Func([IDL.Nat, IDL.Bool], [], []),
   });

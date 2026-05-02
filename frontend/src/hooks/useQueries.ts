@@ -6,13 +6,21 @@ import {
     CampaignUpdate,
     Community,
     CommunityAccess,
+    CommunityBoardPayload,
+    CommunityBoardSummary,
+    CommunityDocumentPayload,
+    CommunityDocumentSummary,
+    CommunityEventInput,
+    CommunityEventPayload,
     CommunityMember,
     CommunityRole,
+    KanbanCardInput,
     PlatformRole,
     Proposal,
     ProposalOverrides,
     Contribution,
-    UserProfile
+    UserProfile,
+    WorkspaceRole
 } from '../backend';
 
 function useAuthedActor() {
@@ -35,6 +43,12 @@ function invalidateCommunity(queryClient: ReturnType<typeof useQueryClient>, com
         queryClient.invalidateQueries({ queryKey: ['callerCommunityRole', key] });
         queryClient.invalidateQueries({ queryKey: ['proposals', key] });
         queryClient.invalidateQueries({ queryKey: ['campaigns', key] });
+        queryClient.invalidateQueries({ queryKey: ['communityDocuments', key] });
+        queryClient.invalidateQueries({ queryKey: ['communityDocument'] });
+        queryClient.invalidateQueries({ queryKey: ['communityBoards', key] });
+        queryClient.invalidateQueries({ queryKey: ['communityBoard'] });
+        queryClient.invalidateQueries({ queryKey: ['communityEvents', key] });
+        queryClient.invalidateQueries({ queryKey: ['communityEvent'] });
     }
 }
 
@@ -525,5 +539,342 @@ export function useCanFinalizeCampaign(campaignId: bigint) {
         enabled,
         retry: false,
         staleTime: 5 * 1000
+    });
+}
+
+export function useCreateCommunityDocument() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, title }: { communityId: bigint; title: string }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.createCommunityDocument(communityId, title);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityDocuments', variables.communityId.toString()] });
+        }
+    });
+}
+
+export function useListCommunityDocuments(communityId: bigint) {
+    const { actor, enabled } = useAuthedActor();
+
+    return useQuery<CommunityDocumentSummary[]>({
+        queryKey: ['communityDocuments', communityId.toString()],
+        queryFn: async () => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.listCommunityDocuments(communityId);
+        },
+        enabled,
+        retry: false,
+        staleTime: 5 * 1000
+    });
+}
+
+export function useGetCommunityDocument(communityId: bigint, documentId: bigint | null) {
+    const { actor, enabled } = useAuthedActor();
+
+    return useQuery<CommunityDocumentPayload | null>({
+        queryKey: ['communityDocument', communityId.toString(), documentId?.toString() ?? 'none'],
+        queryFn: async () => {
+            if (!actor) throw new Error('Actor not available');
+            if (documentId === null) return null;
+            return actor.getCommunityDocument(communityId, documentId);
+        },
+        enabled: enabled && documentId !== null,
+        retry: false,
+        staleTime: 5 * 1000
+    });
+}
+
+export function useRenameCommunityDocument() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, documentId, title }: { communityId: bigint; documentId: bigint; title: string }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.renameCommunityDocument(communityId, documentId, title);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityDocuments', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityDocument', variables.communityId.toString(), variables.documentId.toString()] });
+        }
+    });
+}
+
+export function useAppendCommunityDocumentUpdate() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, documentId, update }: { communityId: bigint; documentId: bigint; update: Uint8Array | number[] }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.appendCommunityDocumentUpdate(communityId, documentId, update);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityDocument', variables.communityId.toString(), variables.documentId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityDocuments', variables.communityId.toString()] });
+        }
+    });
+}
+
+export function useSaveCommunityDocumentSnapshot() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, documentId, snapshot, compactThroughVersion }: {
+            communityId: bigint;
+            documentId: bigint;
+            snapshot: Uint8Array | number[];
+            compactThroughVersion: bigint;
+        }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.saveCommunityDocumentSnapshot(communityId, documentId, snapshot, compactThroughVersion);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityDocument', variables.communityId.toString(), variables.documentId.toString()] });
+        }
+    });
+}
+
+export function useSetCommunityDocumentShare() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, documentId, role }: { communityId: bigint; documentId: bigint; role: WorkspaceRole | null }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.setCommunityDocumentShare(communityId, documentId, role);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityDocuments', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityDocument', variables.communityId.toString(), variables.documentId.toString()] });
+        }
+    });
+}
+
+export function useSetCommunityDocumentGrant() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, documentId, user, role }: { communityId: bigint; documentId: bigint; user: Principal; role: WorkspaceRole | null }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.setCommunityDocumentGrant(communityId, documentId, user, role);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityDocument', variables.communityId.toString(), variables.documentId.toString()] });
+        }
+    });
+}
+
+export function useArchiveCommunityDocument() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, documentId }: { communityId: bigint; documentId: bigint }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.archiveCommunityDocument(communityId, documentId);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityDocuments', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityDocument', variables.communityId.toString(), variables.documentId.toString()] });
+        }
+    });
+}
+
+export function useCreateCommunityBoard() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, title }: { communityId: bigint; title: string }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.createCommunityBoard(communityId, title);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoards', variables.communityId.toString()] });
+        }
+    });
+}
+
+export function useListCommunityBoards(communityId: bigint) {
+    const { actor, enabled } = useAuthedActor();
+
+    return useQuery<CommunityBoardSummary[]>({
+        queryKey: ['communityBoards', communityId.toString()],
+        queryFn: async () => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.listCommunityBoards(communityId);
+        },
+        enabled,
+        retry: false,
+        staleTime: 5 * 1000
+    });
+}
+
+export function useGetCommunityBoard(communityId: bigint, boardId: bigint | null) {
+    const { actor, enabled } = useAuthedActor();
+
+    return useQuery<CommunityBoardPayload | null>({
+        queryKey: ['communityBoard', communityId.toString(), boardId?.toString() ?? 'none'],
+        queryFn: async () => {
+            if (!actor) throw new Error('Actor not available');
+            if (boardId === null) return null;
+            return actor.getCommunityBoard(communityId, boardId);
+        },
+        enabled: enabled && boardId !== null,
+        retry: false,
+        staleTime: 5 * 1000
+    });
+}
+
+export function useAddCommunityBoardColumn() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, boardId, title }: { communityId: bigint; boardId: bigint; title: string }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.addCommunityBoardColumn(communityId, boardId, title);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityBoards', variables.communityId.toString()] });
+        }
+    });
+}
+
+export function useAddCommunityBoardCard() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, boardId, columnId, input }: { communityId: bigint; boardId: bigint; columnId: bigint; input: KanbanCardInput }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.addCommunityBoardCard(communityId, boardId, columnId, input);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityBoards', variables.communityId.toString()] });
+        }
+    });
+}
+
+export function useUpdateCommunityBoardCard() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, boardId, cardId, input }: { communityId: bigint; boardId: bigint; cardId: bigint; input: KanbanCardInput }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.updateCommunityBoardCard(communityId, boardId, cardId, input);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+        }
+    });
+}
+
+export function useMoveCommunityBoardCard() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, boardId, cardId, toColumnId, toIndex }: {
+            communityId: bigint;
+            boardId: bigint;
+            cardId: bigint;
+            toColumnId: bigint;
+            toIndex: bigint;
+        }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.moveCommunityBoardCard(communityId, boardId, cardId, toColumnId, toIndex);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+        }
+    });
+}
+
+export function useSetCommunityBoardShare() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, boardId, role }: { communityId: bigint; boardId: bigint; role: WorkspaceRole | null }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.setCommunityBoardShare(communityId, boardId, role);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoards', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+        }
+    });
+}
+
+export function useCreateCommunityEvent() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, input }: { communityId: bigint; input: CommunityEventInput }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.createCommunityEvent(communityId, input);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityEvents', variables.communityId.toString()] });
+        }
+    });
+}
+
+export function useListCommunityEvents(communityId: bigint) {
+    const { actor, enabled } = useAuthedActor();
+
+    return useQuery<CommunityEventPayload[]>({
+        queryKey: ['communityEvents', communityId.toString()],
+        queryFn: async () => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.listCommunityEvents(communityId);
+        },
+        enabled,
+        retry: false,
+        staleTime: 5 * 1000
+    });
+}
+
+export function useUpdateCommunityEvent() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, eventId, input }: { communityId: bigint; eventId: bigint; input: CommunityEventInput }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.updateCommunityEvent(communityId, eventId, input);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityEvents', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityEvent', variables.communityId.toString(), variables.eventId.toString()] });
+        }
+    });
+}
+
+export function useSetCommunityEventShare() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, eventId, role }: { communityId: bigint; eventId: bigint; role: WorkspaceRole | null }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.setCommunityEventShare(communityId, eventId, role);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityEvents', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityEvent', variables.communityId.toString(), variables.eventId.toString()] });
+        }
     });
 }

@@ -10,7 +10,7 @@ import {
     useState
 } from 'react';
 import { AuthClient, type AuthClientCreateOptions, type AuthClientLoginOptions } from '@dfinity/auth-client';
-import { loadConfig } from '../config';
+import { DELEGATION_EXPIRED_EVENT, loadConfig } from '../config';
 
 export type Status = 'initializing' | 'idle' | 'logging-in' | 'success' | 'loginError';
 type AuthIdentity = ReturnType<AuthClient['getIdentity']>;
@@ -49,6 +49,7 @@ export type InternetIdentityContext = {
 };
 
 const ONE_HOUR_IN_NANOSECONDS = BigInt(3_600_000_000_000);
+const LOCAL_DEV_MAX_TIME_TO_LIVE = BigInt(8) * ONE_HOUR_IN_NANOSECONDS;
 
 type ProviderValue = InternetIdentityContext;
 const InternetIdentityReactContext = createContext<ProviderValue | undefined>(undefined);
@@ -174,7 +175,7 @@ export function InternetIdentityProvider({
         const options: AuthClientLoginOptions = {
             onSuccess: handleLoginSuccess,
             onError: handleLoginError,
-            maxTimeToLive: ONE_HOUR_IN_NANOSECONDS
+            maxTimeToLive: LOCAL_DEV_MAX_TIME_TO_LIVE
         };
 
         if (identityProvider) {
@@ -235,6 +236,18 @@ export function InternetIdentityProvider({
             cancelled = true;
         };
     }, [createOptions]);
+
+    useEffect(() => {
+        const handleDelegationExpired = () => {
+            setIdentity(undefined);
+            setStatus('idle');
+            setError(new Error('Your Internet Identity session has expired. Please log in again.'));
+            void authClient?.logout().catch(() => undefined);
+        };
+
+        window.addEventListener(DELEGATION_EXPIRED_EVENT, handleDelegationExpired);
+        return () => window.removeEventListener(DELEGATION_EXPIRED_EVENT, handleDelegationExpired);
+    }, [authClient]);
 
     const value = useMemo<ProviderValue>(
         () => ({

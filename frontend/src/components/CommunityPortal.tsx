@@ -14,6 +14,7 @@ import CreateCampaignModal from './CreateCampaignModal';
 import CreateProposalModal from './CreateProposalModal';
 import CampaignCard from './CampaignCard';
 import CommunityMembersList from './CommunityMembersList';
+import CommunityWorkspaceTools from './CommunityWorkspaceTools';
 import LeaveCommunityModal from './LeaveCommunityModal';
 import ProposalCard from './ProposalCard';
 
@@ -187,6 +188,8 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
             </div>
           </div>
         </section>
+
+        <CommunityWorkspaceTools communityId={communityId} access={access} />
 
         <section className="amnesty-panel bg-white p-8 md:p-10">
           <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">

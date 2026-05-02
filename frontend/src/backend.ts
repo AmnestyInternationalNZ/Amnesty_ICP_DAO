@@ -6,11 +6,20 @@ import type {
     Campaign as CandidCampaign,
     CampaignState as CandidCampaignState,
     CampaignUpdate as CandidCampaignUpdate,
+    CommunityBoardPayload as CandidCommunityBoardPayload,
+    CommunityBoardSummary as CandidCommunityBoardSummary,
     Community as CandidCommunity,
     CommunityAccess as CandidCommunityAccess,
+    CommunityDocumentPayload as CandidCommunityDocumentPayload,
+    CommunityDocumentSummary as CandidCommunityDocumentSummary,
+    CommunityEventInput as CandidCommunityEventInput,
+    CommunityEventPayload as CandidCommunityEventPayload,
     CommunityMember as CandidCommunityMember,
     CommunityRole as CandidCommunityRole,
     Contribution as CandidContribution,
+    KanbanCard as CandidKanbanCard,
+    KanbanCardInput as CandidKanbanCardInput,
+    KanbanColumn as CandidKanbanColumn,
     PlatformRole as CandidPlatformRole,
     Proposal as CandidProposal,
     ProposalOverrides as CandidProposalOverrides,
@@ -20,7 +29,9 @@ import type {
     StripeSessionStatus as CandidStripeSessionStatus,
     TransformationInput as CandidTransformationInput,
     TransformationOutput as CandidTransformationOutput,
-    UserProfile as CandidUserProfile
+    UserProfile as CandidUserProfile,
+    WorkspaceAccessEntry as CandidWorkspaceAccessEntry,
+    WorkspaceRole as CandidWorkspaceRole
 } from './declarations/backend.did';
 
 export type Community = CandidCommunity;
@@ -54,6 +65,12 @@ export enum ProposalState {
     pendingFinalization = 'pendingFinalization',
     failed = 'failed',
     passed = 'passed'
+}
+
+export enum WorkspaceRole {
+    owner = 'owner',
+    editor = 'editor',
+    viewer = 'viewer'
 }
 
 export interface ProposalOverrides {
@@ -105,6 +122,98 @@ export interface CommunityAccess {
     isPlatformAdmin: boolean;
     canCreateProposal: boolean;
     canVoteOnProposal: boolean;
+}
+
+export interface WorkspaceAccessEntry {
+    user: Principal;
+    role: WorkspaceRole;
+}
+
+export interface CommunityDocumentSummary {
+    id: bigint;
+    communityId: bigint;
+    title: string;
+    owner: Principal;
+    createdAt: bigint;
+    updatedAt: bigint;
+    archived: boolean;
+    role: WorkspaceRole;
+    communityShare: WorkspaceRole | null;
+    parentId: bigint | null;
+    version: bigint;
+}
+
+export interface CommunityDocumentPayload extends CommunityDocumentSummary {
+    access: WorkspaceAccessEntry[];
+    snapshot: Uint8Array | null;
+    updates: Uint8Array[];
+}
+
+export type KanbanColumn = CandidKanbanColumn;
+
+export interface KanbanCardInput {
+    title: string;
+    description?: string | null;
+    assignedTo?: Principal[];
+    docId?: bigint | null;
+    eventId?: bigint | null;
+    dueDateUtc?: bigint | null;
+}
+
+export interface KanbanCard {
+    id: bigint;
+    title: string;
+    description: string | null;
+    createdBy: Principal;
+    assignedTo: Principal[];
+    docId: bigint | null;
+    eventId: bigint | null;
+    dueDateUtc: bigint | null;
+    createdAt: bigint;
+    updatedAt: bigint;
+}
+
+export interface CommunityBoardSummary {
+    id: bigint;
+    communityId: bigint;
+    title: string;
+    owner: Principal;
+    createdAt: bigint;
+    updatedAt: bigint;
+    archived: boolean;
+    role: WorkspaceRole;
+    communityShare: WorkspaceRole | null;
+    columnCount: bigint;
+    cardCount: bigint;
+}
+
+export interface CommunityBoardPayload extends CommunityBoardSummary {
+    access: WorkspaceAccessEntry[];
+    columns: KanbanColumn[];
+    cards: KanbanCard[];
+}
+
+export interface CommunityEventInput {
+    title: string;
+    description?: string | null;
+    location?: string | null;
+    startUtc: bigint;
+    endUtc: bigint;
+    allDay: boolean;
+}
+
+export interface CommunityEventPayload extends CommunityEventInput {
+    id: bigint;
+    communityId: bigint;
+    owner: Principal;
+    createdAt: bigint;
+    updatedAt: bigint;
+    archived: boolean;
+    role: WorkspaceRole;
+    access: WorkspaceAccessEntry[];
+    communityShare: WorkspaceRole | null;
+    description: string | null;
+    location: string | null;
 }
 
 export interface CreateActorOptions {
@@ -202,6 +311,35 @@ function fromCommunityAccess(value: CandidCommunityAccess): CommunityAccess {
     };
 }
 
+function fromWorkspaceRole(value: CandidWorkspaceRole): WorkspaceRole {
+    if ('owner' in value) return WorkspaceRole.owner;
+    if ('editor' in value) return WorkspaceRole.editor;
+    if ('viewer' in value) return WorkspaceRole.viewer;
+    throw new Error('Unknown workspace role');
+}
+
+function toWorkspaceRole(value: WorkspaceRole): CandidWorkspaceRole {
+    switch (value) {
+        case WorkspaceRole.owner:
+            return { owner: null };
+        case WorkspaceRole.editor:
+            return { editor: null };
+        case WorkspaceRole.viewer:
+            return { viewer: null };
+    }
+}
+
+function toBlob(value: Uint8Array | number[]): Uint8Array {
+    return value instanceof Uint8Array ? value : Uint8Array.from(value);
+}
+
+function fromWorkspaceAccessEntry(value: CandidWorkspaceAccessEntry): WorkspaceAccessEntry {
+    return {
+        user: value.user,
+        role: fromWorkspaceRole(value.role)
+    };
+}
+
 function toProposalOverrides(value: ProposalOverrides): CandidProposalOverrides {
     return {
         passPct: toOptional(value.passPct),
@@ -210,15 +348,143 @@ function toProposalOverrides(value: ProposalOverrides): CandidProposalOverrides 
     };
 }
 
+function fromCommunityDocumentSummary(value: CandidCommunityDocumentSummary): CommunityDocumentSummary {
+    return {
+        id: value.id,
+        communityId: value.communityId,
+        title: value.title,
+        owner: value.owner,
+        createdAt: value.createdAt,
+        updatedAt: value.updatedAt,
+        archived: value.archived,
+        role: fromWorkspaceRole(value.role),
+        communityShare: fromOptional(value.communityShare, fromWorkspaceRole),
+        parentId: fromOptional(value.parentId, (id) => id),
+        version: value.version
+    };
+}
+
+function fromCommunityDocumentPayload(value: CandidCommunityDocumentPayload): CommunityDocumentPayload {
+    return {
+        ...fromCommunityDocumentSummary(value),
+        access: value.access.map(fromWorkspaceAccessEntry),
+        snapshot: fromOptional(value.snapshot, toBlob),
+        updates: value.updates.map(toBlob)
+    };
+}
+
+function toKanbanCardInput(value: KanbanCardInput): CandidKanbanCardInput {
+    return {
+        title: value.title,
+        description: toOptional(value.description ?? undefined),
+        assignedTo: value.assignedTo ?? [],
+        docId: toOptional(value.docId ?? undefined),
+        eventId: toOptional(value.eventId ?? undefined),
+        dueDateUtc: toOptional(value.dueDateUtc ?? undefined)
+    };
+}
+
+function fromKanbanCard(value: CandidKanbanCard): KanbanCard {
+    return {
+        id: value.id,
+        title: value.title,
+        description: fromOptional(value.description, (description) => description),
+        createdBy: value.createdBy,
+        assignedTo: value.assignedTo,
+        docId: fromOptional(value.docId, (id) => id),
+        eventId: fromOptional(value.eventId, (id) => id),
+        dueDateUtc: fromOptional(value.dueDateUtc, (date) => date),
+        createdAt: value.createdAt,
+        updatedAt: value.updatedAt
+    };
+}
+
+function fromCommunityBoardSummary(value: CandidCommunityBoardSummary): CommunityBoardSummary {
+    return {
+        id: value.id,
+        communityId: value.communityId,
+        title: value.title,
+        owner: value.owner,
+        createdAt: value.createdAt,
+        updatedAt: value.updatedAt,
+        archived: value.archived,
+        role: fromWorkspaceRole(value.role),
+        communityShare: fromOptional(value.communityShare, fromWorkspaceRole),
+        columnCount: value.columnCount,
+        cardCount: value.cardCount
+    };
+}
+
+function fromCommunityBoardPayload(value: CandidCommunityBoardPayload): CommunityBoardPayload {
+    return {
+        id: value.id,
+        communityId: value.communityId,
+        title: value.title,
+        owner: value.owner,
+        createdAt: value.createdAt,
+        updatedAt: value.updatedAt,
+        archived: value.archived,
+        role: fromWorkspaceRole(value.role),
+        communityShare: fromOptional(value.communityShare, fromWorkspaceRole),
+        columnCount: BigInt(value.columns.length),
+        cardCount: BigInt(value.cards.length),
+        access: value.access.map(fromWorkspaceAccessEntry),
+        columns: value.columns,
+        cards: value.cards.map(fromKanbanCard)
+    };
+}
+
+function toCommunityEventInput(value: CommunityEventInput): CandidCommunityEventInput {
+    return {
+        title: value.title,
+        description: toOptional(value.description ?? undefined),
+        location: toOptional(value.location ?? undefined),
+        startUtc: value.startUtc,
+        endUtc: value.endUtc,
+        allDay: value.allDay
+    };
+}
+
+function fromCommunityEventPayload(value: CandidCommunityEventPayload): CommunityEventPayload {
+    return {
+        id: value.id,
+        communityId: value.communityId,
+        title: value.title,
+        description: fromOptional(value.description, (description) => description),
+        location: fromOptional(value.location, (location) => location),
+        owner: value.owner,
+        startUtc: value.startUtc,
+        endUtc: value.endUtc,
+        allDay: value.allDay,
+        createdAt: value.createdAt,
+        updatedAt: value.updatedAt,
+        archived: value.archived,
+        role: fromWorkspaceRole(value.role),
+        access: value.access.map(fromWorkspaceAccessEntry),
+        communityShare: fromOptional(value.communityShare, fromWorkspaceRole)
+    };
+}
+
 export interface backendInterface {
     addCampaignUpdate(campaignId: bigint, content: string): Promise<void>;
+    addCommunityBoardCard(communityId: bigint, boardId: bigint, columnId: bigint, input: KanbanCardInput): Promise<KanbanCard>;
+    addCommunityBoardColumn(communityId: bigint, boardId: bigint, title: string): Promise<KanbanColumn>;
+    appendCommunityDocumentUpdate(communityId: bigint, documentId: bigint, update: Uint8Array | number[]): Promise<bigint>;
+    archiveCommunityBoard(communityId: bigint, boardId: bigint): Promise<void>;
+    archiveCommunityDocument(communityId: bigint, documentId: bigint): Promise<void>;
+    archiveCommunityEvent(communityId: bigint, eventId: bigint): Promise<void>;
     bootstrapPlatformAdmin(): Promise<void>;
     canFinalizeCampaign(campaignId: bigint): Promise<boolean>;
     contributeToCampaign(campaignId: bigint, amount: bigint): Promise<void>;
     createCampaign(communityId: bigint, title: string, description: string, goalAmount: bigint, deadlineNs: bigint): Promise<void>;
     createCheckoutSession(items: Array<ShoppingItem>, successUrl: string, cancelUrl: string): Promise<string>;
     createCommunity(name: string, policy: string): Promise<void>;
+    createCommunityBoard(communityId: bigint, title: string): Promise<bigint>;
+    createCommunityDocument(communityId: bigint, title: string): Promise<bigint>;
+    createCommunityEvent(communityId: bigint, input: CommunityEventInput): Promise<bigint>;
     createProposal(communityId: bigint, title: string, description: string, overrides: ProposalOverrides | null): Promise<void>;
+    deleteCommunityBoardCard(communityId: bigint, boardId: bigint, cardId: bigint): Promise<void>;
+    deleteCommunityBoardColumn(communityId: bigint, boardId: bigint, columnId: bigint): Promise<void>;
     finalizeCampaign(campaignId: bigint): Promise<void>;
     finalizeProposal(proposalId: bigint): Promise<void>;
     getCallerCommunityRole(communityId: bigint): Promise<CommunityRole | null>;
@@ -228,7 +494,10 @@ export interface backendInterface {
     getCampaignContributions(campaignId: bigint): Promise<Array<Contribution>>;
     getCampaignUpdates(campaignId: bigint): Promise<Array<CampaignUpdate>>;
     getCommunityAccess(communityId: bigint): Promise<CommunityAccess>;
+    getCommunityBoard(communityId: bigint, boardId: bigint): Promise<CommunityBoardPayload | null>;
     getCommunityById(id: bigint): Promise<Community | null>;
+    getCommunityDocument(communityId: bigint, documentId: bigint): Promise<CommunityDocumentPayload | null>;
+    getCommunityEvent(communityId: bigint, eventId: bigint): Promise<CommunityEventPayload | null>;
     getProposalById(proposalId: bigint): Promise<Proposal | null>;
     getStripeSessionStatus(sessionId: string): Promise<StripeSessionStatus>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
@@ -238,14 +507,32 @@ export interface backendInterface {
     listAllUsers(): Promise<Array<[Principal, UserProfile]>>;
     listCampaignsByCommunity(communityId: bigint): Promise<Array<Campaign>>;
     listCommunities(): Promise<Array<Community>>;
+    listCommunityBoards(communityId: bigint): Promise<Array<CommunityBoardSummary>>;
+    listCommunityDocuments(communityId: bigint): Promise<Array<CommunityDocumentSummary>>;
+    listCommunityEvents(communityId: bigint): Promise<Array<CommunityEventPayload>>;
     listCommunityMembers(communityId: bigint): Promise<Array<CommunityMember>>;
     listPlatformAdmins(): Promise<Array<Principal>>;
     listProposalsByCommunity(communityId: bigint): Promise<Array<Proposal>>;
+    moveCommunityBoardCard(communityId: bigint, boardId: bigint, cardId: bigint, toColumnId: bigint, toIndex: bigint): Promise<void>;
+    renameCommunityBoard(communityId: bigint, boardId: bigint, title: string): Promise<void>;
+    renameCommunityBoardColumn(communityId: bigint, boardId: bigint, columnId: bigint, title: string): Promise<void>;
+    renameCommunityDocument(communityId: bigint, documentId: bigint, title: string): Promise<void>;
+    reorderCommunityBoardColumns(communityId: bigint, boardId: bigint, columnIds: Array<bigint>): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    saveCommunityDocumentSnapshot(communityId: bigint, documentId: bigint, snapshot: Uint8Array | number[], compactThroughVersion: bigint): Promise<void>;
+    setCommunityBoardGrant(communityId: bigint, boardId: bigint, user: Principal, role: WorkspaceRole | null): Promise<void>;
+    setCommunityBoardShare(communityId: bigint, boardId: bigint, role: WorkspaceRole | null): Promise<WorkspaceRole | null>;
+    setCommunityDocumentGrant(communityId: bigint, documentId: bigint, user: Principal, role: WorkspaceRole | null): Promise<void>;
+    setCommunityDocumentParent(communityId: bigint, documentId: bigint, parentId: bigint | null): Promise<bigint | null>;
+    setCommunityDocumentShare(communityId: bigint, documentId: bigint, role: WorkspaceRole | null): Promise<WorkspaceRole | null>;
+    setCommunityEventGrant(communityId: bigint, eventId: bigint, user: Principal, role: WorkspaceRole | null): Promise<void>;
+    setCommunityEventShare(communityId: bigint, eventId: bigint, role: WorkspaceRole | null): Promise<WorkspaceRole | null>;
     setCommunityRole(communityId: bigint, user: Principal, role: CommunityRole | null): Promise<void>;
     setPlatformAdmin(user: Principal, enabled: boolean): Promise<void>;
     setStripeConfiguration(config: StripeConfiguration): Promise<void>;
     transform(input: TransformationInput): Promise<TransformationOutput>;
+    updateCommunityBoardCard(communityId: bigint, boardId: bigint, cardId: bigint, input: KanbanCardInput): Promise<void>;
+    updateCommunityEvent(communityId: bigint, eventId: bigint, input: CommunityEventInput): Promise<void>;
     voteOnProposal(proposalId: bigint, voteYes: boolean): Promise<void>;
 }
 
@@ -272,6 +559,30 @@ class Backend implements backendInterface {
         return this.handle(() => this.actor.addCampaignUpdate(campaignId, content));
     }
 
+    async addCommunityBoardCard(communityId: bigint, boardId: bigint, columnId: bigint, input: KanbanCardInput): Promise<KanbanCard> {
+        return this.handle(async () => fromKanbanCard(await this.actor.addCommunityBoardCard(communityId, boardId, columnId, toKanbanCardInput(input))));
+    }
+
+    async addCommunityBoardColumn(communityId: bigint, boardId: bigint, title: string): Promise<KanbanColumn> {
+        return this.handle(() => this.actor.addCommunityBoardColumn(communityId, boardId, title));
+    }
+
+    async appendCommunityDocumentUpdate(communityId: bigint, documentId: bigint, update: Uint8Array | number[]): Promise<bigint> {
+        return this.handle(() => this.actor.appendCommunityDocumentUpdate(communityId, documentId, update));
+    }
+
+    async archiveCommunityBoard(communityId: bigint, boardId: bigint): Promise<void> {
+        return this.handle(() => this.actor.archiveCommunityBoard(communityId, boardId));
+    }
+
+    async archiveCommunityDocument(communityId: bigint, documentId: bigint): Promise<void> {
+        return this.handle(() => this.actor.archiveCommunityDocument(communityId, documentId));
+    }
+
+    async archiveCommunityEvent(communityId: bigint, eventId: bigint): Promise<void> {
+        return this.handle(() => this.actor.archiveCommunityEvent(communityId, eventId));
+    }
+
     async bootstrapPlatformAdmin(): Promise<void> {
         return this.handle(() => this.actor.bootstrapPlatformAdmin());
     }
@@ -296,10 +607,30 @@ class Backend implements backendInterface {
         return this.handle(() => this.actor.createCommunity(name, policy));
     }
 
+    async createCommunityBoard(communityId: bigint, title: string): Promise<bigint> {
+        return this.handle(() => this.actor.createCommunityBoard(communityId, title));
+    }
+
+    async createCommunityDocument(communityId: bigint, title: string): Promise<bigint> {
+        return this.handle(() => this.actor.createCommunityDocument(communityId, title));
+    }
+
+    async createCommunityEvent(communityId: bigint, input: CommunityEventInput): Promise<bigint> {
+        return this.handle(() => this.actor.createCommunityEvent(communityId, toCommunityEventInput(input)));
+    }
+
     async createProposal(communityId: bigint, title: string, description: string, overrides: ProposalOverrides | null): Promise<void> {
         return this.handle(() =>
             this.actor.createProposal(communityId, title, description, toOptional(overrides == null ? undefined : toProposalOverrides(overrides)))
         );
+    }
+
+    async deleteCommunityBoardCard(communityId: bigint, boardId: bigint, cardId: bigint): Promise<void> {
+        return this.handle(() => this.actor.deleteCommunityBoardCard(communityId, boardId, cardId));
+    }
+
+    async deleteCommunityBoardColumn(communityId: bigint, boardId: bigint, columnId: bigint): Promise<void> {
+        return this.handle(() => this.actor.deleteCommunityBoardColumn(communityId, boardId, columnId));
     }
 
     async finalizeCampaign(campaignId: bigint): Promise<void> {
@@ -340,10 +671,22 @@ class Backend implements backendInterface {
         return this.handle(async () => fromCommunityAccess(await this.actor.getCommunityAccess(communityId)));
     }
 
+    async getCommunityBoard(communityId: bigint, boardId: bigint): Promise<CommunityBoardPayload | null> {
+        return this.handle(async () => fromOptional(await this.actor.getCommunityBoard(communityId, boardId), fromCommunityBoardPayload));
+    }
+
     async getCommunityById(id: bigint): Promise<Community | null> {
         return this.handle(async () =>
             fromOptional<CandidCommunity, Community>(await this.actor.getCommunityById(id), (value) => value)
         );
+    }
+
+    async getCommunityDocument(communityId: bigint, documentId: bigint): Promise<CommunityDocumentPayload | null> {
+        return this.handle(async () => fromOptional(await this.actor.getCommunityDocument(communityId, documentId), fromCommunityDocumentPayload));
+    }
+
+    async getCommunityEvent(communityId: bigint, eventId: bigint): Promise<CommunityEventPayload | null> {
+        return this.handle(async () => fromOptional(await this.actor.getCommunityEvent(communityId, eventId), fromCommunityEventPayload));
     }
 
     async getProposalById(proposalId: bigint): Promise<Proposal | null> {
@@ -384,6 +727,18 @@ class Backend implements backendInterface {
         return this.handle(() => this.actor.listCommunities());
     }
 
+    async listCommunityBoards(communityId: bigint): Promise<Array<CommunityBoardSummary>> {
+        return this.handle(async () => (await this.actor.listCommunityBoards(communityId)).map(fromCommunityBoardSummary));
+    }
+
+    async listCommunityDocuments(communityId: bigint): Promise<Array<CommunityDocumentSummary>> {
+        return this.handle(async () => (await this.actor.listCommunityDocuments(communityId)).map(fromCommunityDocumentSummary));
+    }
+
+    async listCommunityEvents(communityId: bigint): Promise<Array<CommunityEventPayload>> {
+        return this.handle(async () => (await this.actor.listCommunityEvents(communityId)).map(fromCommunityEventPayload));
+    }
+
     async listCommunityMembers(communityId: bigint): Promise<Array<CommunityMember>> {
         return this.handle(async () => (await this.actor.listCommunityMembers(communityId)).map(fromCommunityMember));
     }
@@ -396,8 +751,68 @@ class Backend implements backendInterface {
         return this.handle(async () => (await this.actor.listProposalsByCommunity(communityId)).map(fromProposal));
     }
 
+    async moveCommunityBoardCard(communityId: bigint, boardId: bigint, cardId: bigint, toColumnId: bigint, toIndex: bigint): Promise<void> {
+        return this.handle(() => this.actor.moveCommunityBoardCard(communityId, boardId, cardId, toColumnId, toIndex));
+    }
+
+    async renameCommunityBoard(communityId: bigint, boardId: bigint, title: string): Promise<void> {
+        return this.handle(() => this.actor.renameCommunityBoard(communityId, boardId, title));
+    }
+
+    async renameCommunityBoardColumn(communityId: bigint, boardId: bigint, columnId: bigint, title: string): Promise<void> {
+        return this.handle(() => this.actor.renameCommunityBoardColumn(communityId, boardId, columnId, title));
+    }
+
+    async renameCommunityDocument(communityId: bigint, documentId: bigint, title: string): Promise<void> {
+        return this.handle(() => this.actor.renameCommunityDocument(communityId, documentId, title));
+    }
+
+    async reorderCommunityBoardColumns(communityId: bigint, boardId: bigint, columnIds: Array<bigint>): Promise<void> {
+        return this.handle(() => this.actor.reorderCommunityBoardColumns(communityId, boardId, columnIds));
+    }
+
     async saveCallerUserProfile(profile: UserProfile): Promise<void> {
         return this.handle(() => this.actor.saveCallerUserProfile(profile));
+    }
+
+    async saveCommunityDocumentSnapshot(communityId: bigint, documentId: bigint, snapshot: Uint8Array | number[], compactThroughVersion: bigint): Promise<void> {
+        return this.handle(() => this.actor.saveCommunityDocumentSnapshot(communityId, documentId, snapshot, compactThroughVersion));
+    }
+
+    async setCommunityBoardGrant(communityId: bigint, boardId: bigint, user: Principal, role: WorkspaceRole | null): Promise<void> {
+        return this.handle(() => this.actor.setCommunityBoardGrant(communityId, boardId, user, toOptional(role == null ? undefined : toWorkspaceRole(role))));
+    }
+
+    async setCommunityBoardShare(communityId: bigint, boardId: bigint, role: WorkspaceRole | null): Promise<WorkspaceRole | null> {
+        return this.handle(async () =>
+            fromOptional(await this.actor.setCommunityBoardShare(communityId, boardId, toOptional(role == null ? undefined : toWorkspaceRole(role))), fromWorkspaceRole)
+        );
+    }
+
+    async setCommunityDocumentGrant(communityId: bigint, documentId: bigint, user: Principal, role: WorkspaceRole | null): Promise<void> {
+        return this.handle(() => this.actor.setCommunityDocumentGrant(communityId, documentId, user, toOptional(role == null ? undefined : toWorkspaceRole(role))));
+    }
+
+    async setCommunityDocumentParent(communityId: bigint, documentId: bigint, parentId: bigint | null): Promise<bigint | null> {
+        return this.handle(async () =>
+            fromOptional(await this.actor.setCommunityDocumentParent(communityId, documentId, toOptional(parentId ?? undefined)), (value) => value)
+        );
+    }
+
+    async setCommunityDocumentShare(communityId: bigint, documentId: bigint, role: WorkspaceRole | null): Promise<WorkspaceRole | null> {
+        return this.handle(async () =>
+            fromOptional(await this.actor.setCommunityDocumentShare(communityId, documentId, toOptional(role == null ? undefined : toWorkspaceRole(role))), fromWorkspaceRole)
+        );
+    }
+
+    async setCommunityEventGrant(communityId: bigint, eventId: bigint, user: Principal, role: WorkspaceRole | null): Promise<void> {
+        return this.handle(() => this.actor.setCommunityEventGrant(communityId, eventId, user, toOptional(role == null ? undefined : toWorkspaceRole(role))));
+    }
+
+    async setCommunityEventShare(communityId: bigint, eventId: bigint, role: WorkspaceRole | null): Promise<WorkspaceRole | null> {
+        return this.handle(async () =>
+            fromOptional(await this.actor.setCommunityEventShare(communityId, eventId, toOptional(role == null ? undefined : toWorkspaceRole(role))), fromWorkspaceRole)
+        );
     }
 
     async setCommunityRole(communityId: bigint, user: Principal, role: CommunityRole | null): Promise<void> {
@@ -414,6 +829,14 @@ class Backend implements backendInterface {
 
     async transform(input: TransformationInput): Promise<TransformationOutput> {
         return this.handle(() => this.actor.transform(input));
+    }
+
+    async updateCommunityBoardCard(communityId: bigint, boardId: bigint, cardId: bigint, input: KanbanCardInput): Promise<void> {
+        return this.handle(() => this.actor.updateCommunityBoardCard(communityId, boardId, cardId, toKanbanCardInput(input)));
+    }
+
+    async updateCommunityEvent(communityId: bigint, eventId: bigint, input: CommunityEventInput): Promise<void> {
+        return this.handle(() => this.actor.updateCommunityEvent(communityId, eventId, toCommunityEventInput(input)));
     }
 
     async voteOnProposal(proposalId: bigint, voteYes: boolean): Promise<void> {

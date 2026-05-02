@@ -1,3 +1,14 @@
+type WorkspaceRole =
+ variant {
+   editor;
+   owner;
+   viewer;
+ };
+type WorkspaceAccessEntry =
+ record {
+   role: WorkspaceRole;
+   user: principal;
+ };
 type UserProfile = record {name: text;};
 type TransformationOutput =
  record {
@@ -60,6 +71,34 @@ type Proposal =
    yes: nat;
  };
 type PlatformRole = variant {platformAdmin;};
+type KanbanColumn =
+ record {
+   cardIds: vec nat;
+   id: nat;
+   title: text;
+ };
+type KanbanCardInput =
+ record {
+   assignedTo: vec principal;
+   description: opt text;
+   docId: opt nat;
+   dueDateUtc: opt int;
+   eventId: opt nat;
+   title: text;
+ };
+type KanbanCard =
+ record {
+   assignedTo: vec principal;
+   createdAt: int;
+   createdBy: principal;
+   description: opt text;
+   docId: opt nat;
+   dueDateUtc: opt int;
+   eventId: opt nat;
+   id: nat;
+   title: text;
+   updatedAt: int;
+ };
 type Header =
  record {
    name: text;
@@ -81,6 +120,93 @@ type CommunityMember =
    "principal": principal;
    profile: opt UserProfile;
    role: CommunityRole;
+ };
+type CommunityEventPayload =
+ record {
+   access: vec WorkspaceAccessEntry;
+   allDay: bool;
+   archived: bool;
+   communityId: nat;
+   communityShare: opt WorkspaceRole;
+   createdAt: int;
+   description: opt text;
+   endUtc: int;
+   id: nat;
+   location: opt text;
+   owner: principal;
+   role: WorkspaceRole;
+   startUtc: int;
+   title: text;
+   updatedAt: int;
+ };
+type CommunityEventInput =
+ record {
+   allDay: bool;
+   description: opt text;
+   endUtc: int;
+   location: opt text;
+   startUtc: int;
+   title: text;
+ };
+type CommunityDocumentSummary =
+ record {
+   archived: bool;
+   communityId: nat;
+   communityShare: opt WorkspaceRole;
+   createdAt: int;
+   id: nat;
+   owner: principal;
+   parentId: opt nat;
+   role: WorkspaceRole;
+   title: text;
+   updatedAt: int;
+   version: nat;
+ };
+type CommunityDocumentPayload =
+ record {
+   access: vec WorkspaceAccessEntry;
+   archived: bool;
+   communityId: nat;
+   communityShare: opt WorkspaceRole;
+   createdAt: int;
+   id: nat;
+   owner: principal;
+   parentId: opt nat;
+   role: WorkspaceRole;
+   snapshot: opt blob;
+   title: text;
+   updatedAt: int;
+   updates: vec blob;
+   version: nat;
+ };
+type CommunityBoardSummary =
+ record {
+   archived: bool;
+   cardCount: nat;
+   columnCount: nat;
+   communityId: nat;
+   communityShare: opt WorkspaceRole;
+   createdAt: int;
+   id: nat;
+   owner: principal;
+   role: WorkspaceRole;
+   title: text;
+   updatedAt: int;
+ };
+type CommunityBoardPayload =
+ record {
+   access: vec WorkspaceAccessEntry;
+   archived: bool;
+   cards: vec KanbanCard;
+   columns: vec KanbanColumn;
+   communityId: nat;
+   communityShare: opt WorkspaceRole;
+   createdAt: int;
+   id: nat;
+   owner: principal;
+   role: WorkspaceRole;
+   title: text;
+   updatedAt: int;
  };
 type CommunityAccess =
  record {
@@ -131,6 +257,15 @@ type Campaign =
  };
 service : {
   addCampaignUpdate: (campaignId: nat, content: text) -> ();
+  addCommunityBoardCard: (communityId: nat, boardId: nat, columnId: nat,
+   input: KanbanCardInput) -> (KanbanCard);
+  addCommunityBoardColumn: (communityId: nat, boardId: nat, title: text) ->
+   (KanbanColumn);
+  appendCommunityDocumentUpdate: (communityId: nat, documentId: nat, update:
+   blob) -> (nat);
+  archiveCommunityBoard: (communityId: nat, boardId: nat) -> ();
+  archiveCommunityDocument: (communityId: nat, documentId: nat) -> ();
+  archiveCommunityEvent: (communityId: nat, eventId: nat) -> ();
   bootstrapPlatformAdmin: () -> ();
   canFinalizeCampaign: (campaignId: nat) -> (bool) query;
   contributeToCampaign: (campaignId: nat, amount: nat) -> ();
@@ -139,8 +274,16 @@ service : {
   createCheckoutSession: (items: vec ShoppingItem, successUrl: text,
    cancelUrl: text) -> (text);
   createCommunity: (name: text, policy: text) -> ();
+  createCommunityBoard: (communityId: nat, title: text) -> (nat);
+  createCommunityDocument: (communityId: nat, title: text) -> (nat);
+  createCommunityEvent: (communityId: nat, input: CommunityEventInput) ->
+   (nat);
   createProposal: (communityId: nat, title: text, description: text,
    overrides: opt ProposalOverrides) -> ();
+  deleteCommunityBoardCard: (communityId: nat, boardId: nat, cardId:
+   nat) -> ();
+  deleteCommunityBoardColumn: (communityId: nat, boardId: nat, columnId:
+   nat) -> ();
   finalizeCampaign: (campaignId: nat) -> ();
   finalizeProposal: (proposalId: nat) -> ();
   getCallerCommunityRole: (communityId: nat) -> (opt CommunityRole) query;
@@ -150,7 +293,13 @@ service : {
   getCampaignContributions: (campaignId: nat) -> (vec Contribution) query;
   getCampaignUpdates: (campaignId: nat) -> (vec CampaignUpdate) query;
   getCommunityAccess: (communityId: nat) -> (CommunityAccess) query;
+  getCommunityBoard: (communityId: nat, boardId: nat) ->
+   (opt CommunityBoardPayload) query;
   getCommunityById: (id: nat) -> (opt Community) query;
+  getCommunityDocument: (communityId: nat, documentId: nat) ->
+   (opt CommunityDocumentPayload) query;
+  getCommunityEvent: (communityId: nat, eventId: nat) ->
+   (opt CommunityEventPayload) query;
   getProposalById: (proposalId: nat) -> (opt Proposal) query;
   getStripeSessionStatus: (sessionId: text) -> (StripeSessionStatus);
   getUserProfile: (user: principal) -> (opt UserProfile) query;
@@ -163,14 +312,49 @@ service : {
                            }) query;
   listCampaignsByCommunity: (communityId: nat) -> (vec Campaign) query;
   listCommunities: () -> (vec Community) query;
+  listCommunityBoards: (communityId: nat) ->
+   (vec CommunityBoardSummary) query;
+  listCommunityDocuments: (communityId: nat) ->
+   (vec CommunityDocumentSummary) query;
+  listCommunityEvents: (communityId: nat) ->
+   (vec CommunityEventPayload) query;
   listCommunityMembers: (communityId: nat) -> (vec CommunityMember) query;
   listPlatformAdmins: () -> (vec principal) query;
   listProposalsByCommunity: (communityId: nat) -> (vec Proposal) query;
+  moveCommunityBoardCard: (communityId: nat, boardId: nat, cardId: nat,
+   toColumnId: nat, toIndex: nat) -> ();
+  renameCommunityBoard: (communityId: nat, boardId: nat, title: text) -> ();
+  renameCommunityBoardColumn: (communityId: nat, boardId: nat, columnId:
+   nat, title: text) -> ();
+  renameCommunityDocument: (communityId: nat, documentId: nat, title:
+   text) -> ();
+  reorderCommunityBoardColumns: (communityId: nat, boardId: nat, columnIds:
+   vec nat) -> ();
   saveCallerUserProfile: (profile: UserProfile) -> ();
+  saveCommunityDocumentSnapshot: (communityId: nat, documentId: nat,
+   snapshot: blob, compactThroughVersion: nat) -> ();
+  setCommunityBoardGrant: (communityId: nat, boardId: nat, user: principal,
+   role: opt WorkspaceRole) -> ();
+  setCommunityBoardShare: (communityId: nat, boardId: nat, role:
+   opt WorkspaceRole) -> (opt WorkspaceRole);
+  setCommunityDocumentGrant: (communityId: nat, documentId: nat, user:
+   principal, role: opt WorkspaceRole) -> ();
+  setCommunityDocumentParent: (communityId: nat, documentId: nat, parentId:
+   opt nat) -> (opt nat);
+  setCommunityDocumentShare: (communityId: nat, documentId: nat, role:
+   opt WorkspaceRole) -> (opt WorkspaceRole);
+  setCommunityEventGrant: (communityId: nat, eventId: nat, user: principal,
+   role: opt WorkspaceRole) -> ();
+  setCommunityEventShare: (communityId: nat, eventId: nat, role:
+   opt WorkspaceRole) -> (opt WorkspaceRole);
   setCommunityRole: (communityId: nat, user: principal, role:
    opt CommunityRole) -> ();
   setPlatformAdmin: (user: principal, enabled: bool) -> ();
   setStripeConfiguration: (config: StripeConfiguration) -> ();
   transform: (input: TransformationInput) -> (TransformationOutput) query;
+  updateCommunityBoardCard: (communityId: nat, boardId: nat, cardId:
+   nat, input: KanbanCardInput) -> ();
+  updateCommunityEvent: (communityId: nat, eventId: nat, input:
+   CommunityEventInput) -> ();
   voteOnProposal: (proposalId: nat, voteYes: bool) -> ();
 }

@@ -313,4 +313,223 @@ describe('Amnesty backend regression baseline', () => {
       ),
     ).rejects.toThrow(/Only community participants can create proposals/);
   });
+
+  it('enforces community-scoped document permissions, grants, and former-member access loss', async () => {
+    const adminActor = actorFor(fixture, fixture.adminIdentity);
+    const memberActor = actorFor(fixture, fixture.memberIdentity);
+    const outsiderActor = actorFor(fixture, fixture.outsiderIdentity);
+
+    await adminActor.bootstrapPlatformAdmin();
+    await adminActor.createCommunity('Workspace Community', 'Work here.');
+    await adminActor.createCommunity('Other Community', 'Separate work.');
+    await adminActor.setCommunityRole(
+      0n,
+      candidPrincipal(fixture.memberIdentity),
+      [{ member: null }],
+    );
+
+    const documentId = await memberActor.createCommunityDocument(0n, 'Campaign notes');
+    expect(documentId).toBe(0n);
+
+    await expect(outsiderActor.listCommunityDocuments(0n)).rejects.toThrow(
+      /workspace access requires a community role/i,
+    );
+    await expect(memberActor.listCommunityDocuments(1n)).rejects.toThrow(
+      /workspace access requires a community role/i,
+    );
+
+    await memberActor.appendCommunityDocumentUpdate(0n, documentId, Uint8Array.from([1, 2, 3]));
+    let payload = (await memberActor.getCommunityDocument(0n, documentId))[0];
+    expect(payload.title).toBe('Campaign notes');
+    expect(payload.role).toEqual({ owner: null });
+    expect(payload.updates).toHaveLength(1);
+    expect(Array.from(payload.updates[0])).toEqual([1, 2, 3]);
+
+    await memberActor.saveCommunityDocumentSnapshot(0n, documentId, Uint8Array.from([9, 9]), 1n);
+    payload = (await memberActor.getCommunityDocument(0n, documentId))[0];
+    expect(Array.from(payload.snapshot[0])).toEqual([9, 9]);
+    expect(payload.updates).toHaveLength(0);
+
+    await expect(
+      memberActor.setCommunityDocumentGrant(
+        0n,
+        documentId,
+        candidPrincipal(fixture.outsiderIdentity),
+        [{ viewer: null }],
+      ),
+    ).rejects.toThrow(/current members of this community/i);
+
+    await adminActor.setCommunityRole(
+      0n,
+      candidPrincipal(fixture.outsiderIdentity),
+      [{ member: null }],
+    );
+    await memberActor.setCommunityDocumentGrant(
+      0n,
+      documentId,
+      candidPrincipal(fixture.outsiderIdentity),
+      [{ viewer: null }],
+    );
+
+    expect((await outsiderActor.getCommunityDocument(0n, documentId))[0].role).toEqual({
+      viewer: null,
+    });
+    await expect(
+      outsiderActor.appendCommunityDocumentUpdate(0n, documentId, Uint8Array.from([7])),
+    ).rejects.toThrow(/cannot edit this document/i);
+
+    expect((await adminActor.getCommunityDocument(0n, documentId))[0].role).toEqual({
+      editor: null,
+    });
+
+    await adminActor.setCommunityRole(0n, candidPrincipal(fixture.outsiderIdentity), []);
+    await expect(outsiderActor.getCommunityDocument(0n, documentId)).rejects.toThrow(
+      /workspace access requires a community role/i,
+    );
+
+    await expect(memberActor.getCommunityDocument(1n, documentId)).rejects.toThrow(
+      /does not belong to this community/i,
+    );
+  });
+
+  it('enforces community-scoped board, card, and linked-resource permissions', async () => {
+    const adminActor = actorFor(fixture, fixture.adminIdentity);
+    const memberActor = actorFor(fixture, fixture.memberIdentity);
+    const outsiderActor = actorFor(fixture, fixture.outsiderIdentity);
+
+    await adminActor.bootstrapPlatformAdmin();
+    await adminActor.createCommunity('Board Community', 'Plan here.');
+    await adminActor.createCommunity('Separate Board Community', 'No leakage.');
+    await adminActor.setCommunityRole(
+      0n,
+      candidPrincipal(fixture.memberIdentity),
+      [{ member: null }],
+    );
+    await adminActor.setCommunityRole(
+      0n,
+      candidPrincipal(fixture.outsiderIdentity),
+      [{ member: null }],
+    );
+
+    const docId = await memberActor.createCommunityDocument(0n, 'Linked doc');
+    const eventId = await memberActor.createCommunityEvent(0n, {
+      title: 'Planning hui',
+      description: [],
+      location: [],
+      startUtc: 1_777_500_000_000_000_000n,
+      endUtc: 1_777_503_600_000_000_000n,
+      allDay: false,
+    });
+
+    const otherDocId = await adminActor.createCommunityDocument(1n, 'Other doc');
+    const boardId = await memberActor.createCommunityBoard(0n, 'Action board');
+    const column = await memberActor.addCommunityBoardColumn(0n, boardId, 'Backlog');
+    const card = await memberActor.addCommunityBoardCard(0n, boardId, column.id, {
+      title: 'Draft outreach plan',
+      description: ['Write the plan'],
+      assignedTo: [candidPrincipal(fixture.memberIdentity)],
+      docId: [docId],
+      eventId: [eventId],
+      dueDateUtc: [],
+    });
+
+    expect(card.title).toBe('Draft outreach plan');
+    expect((await memberActor.getCommunityBoard(0n, boardId))[0].cards).toHaveLength(1);
+
+    await expect(
+      memberActor.addCommunityBoardCard(0n, boardId, column.id, {
+        title: 'Bad link',
+        description: [],
+        assignedTo: [],
+        docId: [otherDocId],
+        eventId: [],
+        dueDateUtc: [],
+      }),
+    ).rejects.toThrow(/does not belong to this community/i);
+
+    await memberActor.setCommunityBoardShare(0n, boardId, [{ viewer: null }]);
+    expect((await outsiderActor.getCommunityBoard(0n, boardId))[0].role).toEqual({
+      viewer: null,
+    });
+    await expect(outsiderActor.addCommunityBoardColumn(0n, boardId, 'Blocked')).rejects.toThrow(
+      /cannot edit this board/i,
+    );
+
+    await memberActor.setCommunityBoardShare(0n, boardId, [{ editor: null }]);
+    await outsiderActor.moveCommunityBoardCard(0n, boardId, card.id, 0n, 0n);
+
+    await expect(outsiderActor.getCommunityBoard(1n, boardId)).rejects.toThrow(
+      /does not belong to this community/i,
+    );
+  });
+
+  it('enforces community-scoped calendar permissions and invalid range validation', async () => {
+    const adminActor = actorFor(fixture, fixture.adminIdentity);
+    const memberActor = actorFor(fixture, fixture.memberIdentity);
+    const outsiderActor = actorFor(fixture, fixture.outsiderIdentity);
+
+    await adminActor.bootstrapPlatformAdmin();
+    await adminActor.createCommunity('Calendar Community', 'Events here.');
+    await adminActor.setCommunityRole(
+      0n,
+      candidPrincipal(fixture.memberIdentity),
+      [{ member: null }],
+    );
+    await adminActor.setCommunityRole(
+      0n,
+      candidPrincipal(fixture.outsiderIdentity),
+      [{ member: null }],
+    );
+
+    await expect(
+      memberActor.createCommunityEvent(0n, {
+        title: 'Invalid event',
+        description: [],
+        location: [],
+        startUtc: 10n,
+        endUtc: 10n,
+        allDay: false,
+      }),
+    ).rejects.toThrow(/end must be after start/i);
+
+    const eventId = await memberActor.createCommunityEvent(0n, {
+      title: 'Community meeting',
+      description: ['Plan the next action'],
+      location: ['Library'],
+      startUtc: 1_777_500_000_000_000_000n,
+      endUtc: 1_777_503_600_000_000_000n,
+      allDay: false,
+    });
+
+    expect((await memberActor.getCommunityEvent(0n, eventId))[0].role).toEqual({
+      owner: null,
+    });
+    expect((await outsiderActor.getCommunityEvent(0n, eventId))).toEqual([]);
+
+    await memberActor.setCommunityEventShare(0n, eventId, [{ viewer: null }]);
+    expect((await outsiderActor.getCommunityEvent(0n, eventId))[0].role).toEqual({
+      viewer: null,
+    });
+    await expect(
+      outsiderActor.updateCommunityEvent(0n, eventId, {
+        title: 'Blocked edit',
+        description: [],
+        location: [],
+        startUtc: 1_777_500_000_000_000_000n,
+        endUtc: 1_777_503_600_000_000_000n,
+        allDay: false,
+      }),
+    ).rejects.toThrow(/cannot edit this event/i);
+
+    await memberActor.setCommunityEventShare(0n, eventId, [{ editor: null }]);
+    await outsiderActor.updateCommunityEvent(0n, eventId, {
+      title: 'Edited by member',
+      description: [],
+      location: [],
+      startUtc: 1_777_500_000_000_000_000n,
+      endUtc: 1_777_503_600_000_000_000n,
+      allDay: false,
+    });
+    expect((await adminActor.getCommunityEvent(0n, eventId))[0].title).toBe('Edited by member');
+  });
 });

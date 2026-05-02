@@ -1,5 +1,7 @@
 import AccessControl "authorization/access-control";
 import Membership "authorization/membership";
+import Workspace "workspace/workspace";
+import Blob "mo:base/Blob";
 import Principal "mo:base/Principal";
 import OrderedMap "mo:base/OrderedMap";
 import Debug "mo:base/Debug";
@@ -15,6 +17,7 @@ import OutCall "http-outcalls/outcall";
 persistent actor {
     let accessControlState = AccessControl.initState();
     let membershipState = Membership.initState();
+    let workspaceState = Workspace.initState();
 
     transient let principalMap = OrderedMap.Make<Principal>(Principal.compare);
     transient let natMap = OrderedMap.Make<Nat>(Nat.compare);
@@ -22,6 +25,17 @@ persistent actor {
     public type PlatformRole = Membership.PlatformRole;
     public type CommunityRole = Membership.CommunityRole;
     public type CommunityAccess = Membership.CommunityAccess;
+    public type WorkspaceRole = Workspace.WorkspaceRole;
+    public type WorkspaceAccessEntry = Workspace.WorkspaceAccessEntry;
+    public type CommunityDocumentSummary = Workspace.CommunityDocumentSummary;
+    public type CommunityDocumentPayload = Workspace.CommunityDocumentPayload;
+    public type KanbanColumn = Workspace.KanbanColumn;
+    public type KanbanCardInput = Workspace.KanbanCardInput;
+    public type KanbanCard = Workspace.KanbanCard;
+    public type CommunityBoardSummary = Workspace.CommunityBoardSummary;
+    public type CommunityBoardPayload = Workspace.CommunityBoardPayload;
+    public type CommunityEventInput = Workspace.CommunityEventInput;
+    public type CommunityEventPayload = Workspace.CommunityEventPayload;
 
     public type UserProfile = {
         name : Text;
@@ -221,6 +235,43 @@ persistent actor {
             community.admin,
             community.members,
         );
+    };
+
+    func getWorkspaceAccessForCaller(caller : Principal, communityId : Nat) : Workspace.CallerAccess {
+        let access = getCommunityAccessForCaller(caller, communityId);
+        {
+            communityRole = access.communityRole;
+            isPlatformAdmin = access.isPlatformAdmin;
+        };
+    };
+
+    func getCommunityRoleForPrincipal(user : Principal, communityId : Nat) : ?CommunityRole {
+        let community = ensureCommunityImported(communityId);
+        Membership.getCallerCommunityRole(
+            membershipState,
+            user,
+            communityId,
+            community.admin,
+            community.members,
+        );
+    };
+
+    func isAssignedCommunityParticipant(user : Principal, communityId : Nat) : Bool {
+        if (Principal.isAnonymous(user)) {
+            return false;
+        };
+        switch (getCommunityRoleForPrincipal(user, communityId)) {
+            case (?_) true;
+            case null false;
+        };
+    };
+
+    func validateWorkspaceAssignees(communityId : Nat, input : KanbanCardInput) {
+        for (assignee in input.assignedTo.vals()) {
+            if (not isAssignedCommunityParticipant(assignee, communityId)) {
+                Debug.trap("Card assignees must be current members of this community");
+            };
+        };
     };
 
     func requirePlatformAdmin(caller : Principal) {
@@ -822,6 +873,193 @@ persistent actor {
                 false;
             };
         };
+    };
+
+    public shared ({ caller }) func createCommunityDocument(communityId : Nat, title : Text) : async Nat {
+        Workspace.createDocument(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), title);
+    };
+
+    public query ({ caller }) func listCommunityDocuments(communityId : Nat) : async [CommunityDocumentSummary] {
+        Workspace.listDocuments(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId));
+    };
+
+    public query ({ caller }) func getCommunityDocument(communityId : Nat, documentId : Nat) : async ?CommunityDocumentPayload {
+        Workspace.getDocument(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), documentId);
+    };
+
+    public shared ({ caller }) func renameCommunityDocument(communityId : Nat, documentId : Nat, title : Text) : async () {
+        Workspace.renameDocument(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), documentId, title);
+    };
+
+    public shared ({ caller }) func appendCommunityDocumentUpdate(communityId : Nat, documentId : Nat, update : Blob) : async Nat {
+        Workspace.appendDocumentUpdate(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), documentId, update);
+    };
+
+    public shared ({ caller }) func saveCommunityDocumentSnapshot(
+        communityId : Nat,
+        documentId : Nat,
+        snapshot : Blob,
+        compactThroughVersion : Nat,
+    ) : async () {
+        Workspace.saveDocumentSnapshot(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), documentId, snapshot, compactThroughVersion);
+    };
+
+    public shared ({ caller }) func setCommunityDocumentParent(communityId : Nat, documentId : Nat, parentId : ?Nat) : async ?Nat {
+        Workspace.setDocumentParent(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), documentId, parentId);
+    };
+
+    public shared ({ caller }) func setCommunityDocumentShare(communityId : Nat, documentId : Nat, role : ?WorkspaceRole) : async ?WorkspaceRole {
+        Workspace.setDocumentShare(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), documentId, role);
+    };
+
+    public shared ({ caller }) func setCommunityDocumentGrant(
+        communityId : Nat,
+        documentId : Nat,
+        user : Principal,
+        role : ?WorkspaceRole,
+    ) : async () {
+        Workspace.setDocumentGrant(
+            workspaceState,
+            caller,
+            communityId,
+            getWorkspaceAccessForCaller(caller, communityId),
+            documentId,
+            user,
+            role,
+            isAssignedCommunityParticipant(user, communityId),
+        );
+    };
+
+    public shared ({ caller }) func archiveCommunityDocument(communityId : Nat, documentId : Nat) : async () {
+        Workspace.archiveDocument(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), documentId);
+    };
+
+    public shared ({ caller }) func createCommunityBoard(communityId : Nat, title : Text) : async Nat {
+        Workspace.createBoard(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), title);
+    };
+
+    public query ({ caller }) func listCommunityBoards(communityId : Nat) : async [CommunityBoardSummary] {
+        Workspace.listBoards(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId));
+    };
+
+    public query ({ caller }) func getCommunityBoard(communityId : Nat, boardId : Nat) : async ?CommunityBoardPayload {
+        Workspace.getBoard(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId);
+    };
+
+    public shared ({ caller }) func renameCommunityBoard(communityId : Nat, boardId : Nat, title : Text) : async () {
+        Workspace.renameBoard(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, title);
+    };
+
+    public shared ({ caller }) func setCommunityBoardShare(communityId : Nat, boardId : Nat, role : ?WorkspaceRole) : async ?WorkspaceRole {
+        Workspace.setBoardShare(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, role);
+    };
+
+    public shared ({ caller }) func setCommunityBoardGrant(
+        communityId : Nat,
+        boardId : Nat,
+        user : Principal,
+        role : ?WorkspaceRole,
+    ) : async () {
+        Workspace.setBoardGrant(
+            workspaceState,
+            caller,
+            communityId,
+            getWorkspaceAccessForCaller(caller, communityId),
+            boardId,
+            user,
+            role,
+            isAssignedCommunityParticipant(user, communityId),
+        );
+    };
+
+    public shared ({ caller }) func addCommunityBoardColumn(communityId : Nat, boardId : Nat, title : Text) : async KanbanColumn {
+        Workspace.addBoardColumn(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, title);
+    };
+
+    public shared ({ caller }) func renameCommunityBoardColumn(communityId : Nat, boardId : Nat, columnId : Nat, title : Text) : async () {
+        Workspace.renameBoardColumn(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, columnId, title);
+    };
+
+    public shared ({ caller }) func deleteCommunityBoardColumn(communityId : Nat, boardId : Nat, columnId : Nat) : async () {
+        Workspace.deleteBoardColumn(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, columnId);
+    };
+
+    public shared ({ caller }) func reorderCommunityBoardColumns(communityId : Nat, boardId : Nat, columnIds : [Nat]) : async () {
+        Workspace.reorderBoardColumns(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, columnIds);
+    };
+
+    public shared ({ caller }) func addCommunityBoardCard(
+        communityId : Nat,
+        boardId : Nat,
+        columnId : Nat,
+        input : KanbanCardInput,
+    ) : async KanbanCard {
+        validateWorkspaceAssignees(communityId, input);
+        Workspace.addBoardCard(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, columnId, input);
+    };
+
+    public shared ({ caller }) func updateCommunityBoardCard(
+        communityId : Nat,
+        boardId : Nat,
+        cardId : Nat,
+        input : KanbanCardInput,
+    ) : async () {
+        validateWorkspaceAssignees(communityId, input);
+        Workspace.updateBoardCard(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, cardId, input);
+    };
+
+    public shared ({ caller }) func deleteCommunityBoardCard(communityId : Nat, boardId : Nat, cardId : Nat) : async () {
+        Workspace.deleteBoardCard(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, cardId);
+    };
+
+    public shared ({ caller }) func moveCommunityBoardCard(communityId : Nat, boardId : Nat, cardId : Nat, toColumnId : Nat, toIndex : Nat) : async () {
+        Workspace.moveBoardCard(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, cardId, toColumnId, toIndex);
+    };
+
+    public shared ({ caller }) func archiveCommunityBoard(communityId : Nat, boardId : Nat) : async () {
+        Workspace.archiveBoard(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId);
+    };
+
+    public shared ({ caller }) func createCommunityEvent(communityId : Nat, input : CommunityEventInput) : async Nat {
+        Workspace.createEvent(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), input);
+    };
+
+    public query ({ caller }) func listCommunityEvents(communityId : Nat) : async [CommunityEventPayload] {
+        Workspace.listEvents(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId));
+    };
+
+    public query ({ caller }) func getCommunityEvent(communityId : Nat, eventId : Nat) : async ?CommunityEventPayload {
+        Workspace.getEvent(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), eventId);
+    };
+
+    public shared ({ caller }) func updateCommunityEvent(communityId : Nat, eventId : Nat, input : CommunityEventInput) : async () {
+        Workspace.updateEvent(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), eventId, input);
+    };
+
+    public shared ({ caller }) func setCommunityEventShare(communityId : Nat, eventId : Nat, role : ?WorkspaceRole) : async ?WorkspaceRole {
+        Workspace.setEventShare(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), eventId, role);
+    };
+
+    public shared ({ caller }) func setCommunityEventGrant(
+        communityId : Nat,
+        eventId : Nat,
+        user : Principal,
+        role : ?WorkspaceRole,
+    ) : async () {
+        Workspace.setEventGrant(
+            workspaceState,
+            caller,
+            communityId,
+            getWorkspaceAccessForCaller(caller, communityId),
+            eventId,
+            user,
+            role,
+            isAssignedCommunityParticipant(user, communityId),
+        );
+    };
+
+    public shared ({ caller }) func archiveCommunityEvent(communityId : Nat, eventId : Nat) : async () {
+        Workspace.archiveEvent(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), eventId);
     };
 
     public query ({ caller }) func isStripeConfigured() : async Bool {

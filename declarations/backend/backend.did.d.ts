@@ -42,6 +42,87 @@ export interface CommunityAccess {
   'canCreateProposal' : boolean,
   'canVoteOnProposal' : boolean,
 }
+export interface CommunityBoardPayload {
+  'id' : bigint,
+  'access' : Array<WorkspaceAccessEntry>,
+  'title' : string,
+  'communityId' : bigint,
+  'owner' : Principal,
+  'cards' : Array<KanbanCard>,
+  'createdAt' : bigint,
+  'role' : WorkspaceRole,
+  'updatedAt' : bigint,
+  'communityShare' : [] | [WorkspaceRole],
+  'archived' : boolean,
+  'columns' : Array<KanbanColumn>,
+}
+export interface CommunityBoardSummary {
+  'id' : bigint,
+  'title' : string,
+  'communityId' : bigint,
+  'owner' : Principal,
+  'createdAt' : bigint,
+  'role' : WorkspaceRole,
+  'updatedAt' : bigint,
+  'cardCount' : bigint,
+  'communityShare' : [] | [WorkspaceRole],
+  'columnCount' : bigint,
+  'archived' : boolean,
+}
+export interface CommunityDocumentPayload {
+  'id' : bigint,
+  'access' : Array<WorkspaceAccessEntry>,
+  'title' : string,
+  'communityId' : bigint,
+  'snapshot' : [] | [Uint8Array | number[]],
+  'owner' : Principal,
+  'createdAt' : bigint,
+  'role' : WorkspaceRole,
+  'version' : bigint,
+  'updatedAt' : bigint,
+  'updates' : Array<Uint8Array | number[]>,
+  'communityShare' : [] | [WorkspaceRole],
+  'parentId' : [] | [bigint],
+  'archived' : boolean,
+}
+export interface CommunityDocumentSummary {
+  'id' : bigint,
+  'title' : string,
+  'communityId' : bigint,
+  'owner' : Principal,
+  'createdAt' : bigint,
+  'role' : WorkspaceRole,
+  'version' : bigint,
+  'updatedAt' : bigint,
+  'communityShare' : [] | [WorkspaceRole],
+  'parentId' : [] | [bigint],
+  'archived' : boolean,
+}
+export interface CommunityEventInput {
+  'title' : string,
+  'allDay' : boolean,
+  'startUtc' : bigint,
+  'description' : [] | [string],
+  'location' : [] | [string],
+  'endUtc' : bigint,
+}
+export interface CommunityEventPayload {
+  'id' : bigint,
+  'access' : Array<WorkspaceAccessEntry>,
+  'title' : string,
+  'communityId' : bigint,
+  'owner' : Principal,
+  'allDay' : boolean,
+  'startUtc' : bigint,
+  'createdAt' : bigint,
+  'role' : WorkspaceRole,
+  'description' : [] | [string],
+  'updatedAt' : bigint,
+  'communityShare' : [] | [WorkspaceRole],
+  'location' : [] | [string],
+  'archived' : boolean,
+  'endUtc' : bigint,
+}
 export interface CommunityMember {
   'principal' : Principal,
   'role' : CommunityRole,
@@ -55,6 +136,31 @@ export interface Contribution {
   'contributor' : Principal,
 }
 export interface Header { 'value' : string, 'name' : string }
+export interface KanbanCard {
+  'id' : bigint,
+  'eventId' : [] | [bigint],
+  'title' : string,
+  'assignedTo' : Array<Principal>,
+  'createdAt' : bigint,
+  'createdBy' : Principal,
+  'description' : [] | [string],
+  'updatedAt' : bigint,
+  'docId' : [] | [bigint],
+  'dueDateUtc' : [] | [bigint],
+}
+export interface KanbanCardInput {
+  'eventId' : [] | [bigint],
+  'title' : string,
+  'assignedTo' : Array<Principal>,
+  'description' : [] | [string],
+  'docId' : [] | [bigint],
+  'dueDateUtc' : [] | [bigint],
+}
+export interface KanbanColumn {
+  'id' : bigint,
+  'title' : string,
+  'cardIds' : Array<bigint>,
+}
 export type PlatformRole = { 'platformAdmin' : null };
 export interface Proposal {
   'id' : bigint,
@@ -104,8 +210,30 @@ export interface TransformationOutput {
   'headers' : Array<Header>,
 }
 export interface UserProfile { 'name' : string }
+export interface WorkspaceAccessEntry {
+  'role' : WorkspaceRole,
+  'user' : Principal,
+}
+export type WorkspaceRole = { 'owner' : null } |
+  { 'editor' : null } |
+  { 'viewer' : null };
 export interface _SERVICE {
   'addCampaignUpdate' : ActorMethod<[bigint, string], undefined>,
+  'addCommunityBoardCard' : ActorMethod<
+    [bigint, bigint, bigint, KanbanCardInput],
+    KanbanCard
+  >,
+  'addCommunityBoardColumn' : ActorMethod<
+    [bigint, bigint, string],
+    KanbanColumn
+  >,
+  'appendCommunityDocumentUpdate' : ActorMethod<
+    [bigint, bigint, Uint8Array | number[]],
+    bigint
+  >,
+  'archiveCommunityBoard' : ActorMethod<[bigint, bigint], undefined>,
+  'archiveCommunityDocument' : ActorMethod<[bigint, bigint], undefined>,
+  'archiveCommunityEvent' : ActorMethod<[bigint, bigint], undefined>,
   'bootstrapPlatformAdmin' : ActorMethod<[], undefined>,
   'canFinalizeCampaign' : ActorMethod<[bigint], boolean>,
   'contributeToCampaign' : ActorMethod<[bigint, bigint], undefined>,
@@ -118,8 +246,16 @@ export interface _SERVICE {
     string
   >,
   'createCommunity' : ActorMethod<[string, string], undefined>,
+  'createCommunityBoard' : ActorMethod<[bigint, string], bigint>,
+  'createCommunityDocument' : ActorMethod<[bigint, string], bigint>,
+  'createCommunityEvent' : ActorMethod<[bigint, CommunityEventInput], bigint>,
   'createProposal' : ActorMethod<
     [bigint, string, string, [] | [ProposalOverrides]],
+    undefined
+  >,
+  'deleteCommunityBoardCard' : ActorMethod<[bigint, bigint, bigint], undefined>,
+  'deleteCommunityBoardColumn' : ActorMethod<
+    [bigint, bigint, bigint],
     undefined
   >,
   'finalizeCampaign' : ActorMethod<[bigint], undefined>,
@@ -131,7 +267,19 @@ export interface _SERVICE {
   'getCampaignContributions' : ActorMethod<[bigint], Array<Contribution>>,
   'getCampaignUpdates' : ActorMethod<[bigint], Array<CampaignUpdate>>,
   'getCommunityAccess' : ActorMethod<[bigint], CommunityAccess>,
+  'getCommunityBoard' : ActorMethod<
+    [bigint, bigint],
+    [] | [CommunityBoardPayload]
+  >,
   'getCommunityById' : ActorMethod<[bigint], [] | [Community]>,
+  'getCommunityDocument' : ActorMethod<
+    [bigint, bigint],
+    [] | [CommunityDocumentPayload]
+  >,
+  'getCommunityEvent' : ActorMethod<
+    [bigint, bigint],
+    [] | [CommunityEventPayload]
+  >,
   'getProposalById' : ActorMethod<[bigint], [] | [Proposal]>,
   'getStripeSessionStatus' : ActorMethod<[string], StripeSessionStatus>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
@@ -141,10 +289,62 @@ export interface _SERVICE {
   'listAllUsers' : ActorMethod<[], Array<[Principal, UserProfile]>>,
   'listCampaignsByCommunity' : ActorMethod<[bigint], Array<Campaign>>,
   'listCommunities' : ActorMethod<[], Array<Community>>,
+  'listCommunityBoards' : ActorMethod<[bigint], Array<CommunityBoardSummary>>,
+  'listCommunityDocuments' : ActorMethod<
+    [bigint],
+    Array<CommunityDocumentSummary>
+  >,
+  'listCommunityEvents' : ActorMethod<[bigint], Array<CommunityEventPayload>>,
   'listCommunityMembers' : ActorMethod<[bigint], Array<CommunityMember>>,
   'listPlatformAdmins' : ActorMethod<[], Array<Principal>>,
   'listProposalsByCommunity' : ActorMethod<[bigint], Array<Proposal>>,
+  'moveCommunityBoardCard' : ActorMethod<
+    [bigint, bigint, bigint, bigint, bigint],
+    undefined
+  >,
+  'renameCommunityBoard' : ActorMethod<[bigint, bigint, string], undefined>,
+  'renameCommunityBoardColumn' : ActorMethod<
+    [bigint, bigint, bigint, string],
+    undefined
+  >,
+  'renameCommunityDocument' : ActorMethod<[bigint, bigint, string], undefined>,
+  'reorderCommunityBoardColumns' : ActorMethod<
+    [bigint, bigint, Array<bigint>],
+    undefined
+  >,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'saveCommunityDocumentSnapshot' : ActorMethod<
+    [bigint, bigint, Uint8Array | number[], bigint],
+    undefined
+  >,
+  'setCommunityBoardGrant' : ActorMethod<
+    [bigint, bigint, Principal, [] | [WorkspaceRole]],
+    undefined
+  >,
+  'setCommunityBoardShare' : ActorMethod<
+    [bigint, bigint, [] | [WorkspaceRole]],
+    [] | [WorkspaceRole]
+  >,
+  'setCommunityDocumentGrant' : ActorMethod<
+    [bigint, bigint, Principal, [] | [WorkspaceRole]],
+    undefined
+  >,
+  'setCommunityDocumentParent' : ActorMethod<
+    [bigint, bigint, [] | [bigint]],
+    [] | [bigint]
+  >,
+  'setCommunityDocumentShare' : ActorMethod<
+    [bigint, bigint, [] | [WorkspaceRole]],
+    [] | [WorkspaceRole]
+  >,
+  'setCommunityEventGrant' : ActorMethod<
+    [bigint, bigint, Principal, [] | [WorkspaceRole]],
+    undefined
+  >,
+  'setCommunityEventShare' : ActorMethod<
+    [bigint, bigint, [] | [WorkspaceRole]],
+    [] | [WorkspaceRole]
+  >,
   'setCommunityRole' : ActorMethod<
     [bigint, Principal, [] | [CommunityRole]],
     undefined
@@ -152,6 +352,14 @@ export interface _SERVICE {
   'setPlatformAdmin' : ActorMethod<[Principal, boolean], undefined>,
   'setStripeConfiguration' : ActorMethod<[StripeConfiguration], undefined>,
   'transform' : ActorMethod<[TransformationInput], TransformationOutput>,
+  'updateCommunityBoardCard' : ActorMethod<
+    [bigint, bigint, bigint, KanbanCardInput],
+    undefined
+  >,
+  'updateCommunityEvent' : ActorMethod<
+    [bigint, bigint, CommunityEventInput],
+    undefined
+  >,
   'voteOnProposal' : ActorMethod<[bigint, boolean], undefined>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;

@@ -432,6 +432,83 @@ export const en = {
             timeMinutes: '{{minutes}}m remaining'
         }
     },
+    workspace: {
+        kicker: 'Community workspace',
+        title: 'Plan, document, and coordinate local action',
+        body:
+            'Keep working notes, practical task boards, and community events scoped to this community only.',
+        viewerLockedTitle: 'Workspace access is member-only',
+        viewerLockedBody:
+            'Docs, boards, and events can include private or member-shared material, so they are only available to assigned community members and admins.',
+        tabs: {
+            documents: 'Docs',
+            boards: 'Boards',
+            calendar: 'Calendar'
+        },
+        roles: {
+            owner: 'Owner',
+            editor: 'Editor',
+            viewer: 'Viewer'
+        },
+        actions: {
+            archive: 'Archive',
+            compact: 'Compact snapshot',
+            grant: 'Grant access',
+            updateShare: 'Update share'
+        },
+        share: {
+            title: 'Community sharing',
+            private: 'Private',
+            communityViewer: 'Shared with community as viewer',
+            communityEditor: 'Shared with community as editor'
+        },
+        grants: {
+            title: 'Specific member access',
+            selectMember: 'Select a community member'
+        },
+        documents: {
+            sidebarTitle: 'Community docs',
+            newPlaceholder: 'New document title',
+            bodyPlaceholder: 'Write notes, plans, links, or meeting outcomes...',
+            empty: 'No workspace docs are visible to you yet.',
+            emptyTitle: 'No document selected',
+            emptyBody: 'Create or select a document to start writing inside this community.'
+        }
+    },
+    boards: {
+        newPlaceholder: 'New board title',
+        newColumnPlaceholder: 'New column title',
+        newCardPlaceholder: 'New card title',
+        empty: 'No boards are visible to you yet.',
+        emptyTitle: 'No board selected',
+        emptyBody: 'Create a board to coordinate tasks for this community.',
+        labels: {
+            cards: 'cards'
+        },
+        actions: {
+            createBoard: 'Create board',
+            addColumn: 'Add column',
+            addCard: 'Add card',
+            moveLeft: 'Move left',
+            moveRight: 'Move right'
+        }
+    },
+    calendar: {
+        createTitle: 'Create community event',
+        editTitle: 'Edit community event',
+        emptyTitle: 'No events yet',
+        emptyBody: 'Create the first event to make upcoming community work visible.',
+        fields: {
+            title: 'Event title',
+            location: 'Location',
+            description: 'Description',
+            allDay: 'All day'
+        },
+        actions: {
+            create: 'Create event',
+            update: 'Update event'
+        }
+    },
     campaigns: {
         create: {
             title: 'Create fundraising campaign',

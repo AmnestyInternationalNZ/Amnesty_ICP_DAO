@@ -16,6 +16,7 @@ interface Config {
 }
 
 let configCache: Config | null = null;
+export const DELEGATION_EXPIRED_EVENT = 'amnesty:delegation-expired';
 
 export async function loadConfig(): Promise<Config> {
     if (configCache) {
@@ -61,9 +62,32 @@ function extractAgentErrorMessage(error: string): string {
     return match ? match[1] : errorString;
 }
 
+function isExpiredDelegationError(message: string): boolean {
+    const normalized = message.toLowerCase();
+    return (
+        normalized.includes('invalid delegation expiry') ||
+        normalized.includes('sender delegation has expired') ||
+        (normalized.includes('delegation') &&
+            (normalized.includes('invalid') || normalized.includes('signature') || normalized.includes('certificate')))
+    );
+}
+
+function notifyDelegationExpired(message: string) {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    window.dispatchEvent(new CustomEvent(DELEGATION_EXPIRED_EVENT, { detail: { message } }));
+}
+
 function processError(e: unknown): never {
     if (e && typeof e === 'object' && 'message' in e) {
-        throw new Error(extractAgentErrorMessage(e['message'] as string));
+        const message = extractAgentErrorMessage(e['message'] as string);
+        if (isExpiredDelegationError(message)) {
+            notifyDelegationExpired(message);
+            throw new Error('Your Internet Identity session has expired. Please log in again.');
+        }
+        throw new Error(message);
     } else throw e;
 }
 
