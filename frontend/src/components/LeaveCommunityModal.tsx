@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLeaveCommunity } from '../hooks/useQueries';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -17,6 +18,7 @@ export default function LeaveCommunityModal({
   communityName, 
   onSuccess 
 }: LeaveCommunityModalProps) {
+  const { t } = useTranslation();
   const [confirmText, setConfirmText] = useState('');
   const leaveCommunity = useLeaveCommunity();
 
@@ -50,7 +52,7 @@ export default function LeaveCommunityModal({
       <div className="bg-white border-4 border-black max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-amnesty">
         <div className="p-8">
           <div className="flex items-center justify-between mb-8 pb-6 border-b-4 border-black">
-            <h2 className="text-3xl font-bold text-black amnesty-heading">LEAVE COMMUNITY</h2>
+            <h2 className="text-3xl font-bold text-black amnesty-heading">{t('communities.leave.title')}</h2>
             <button
               onClick={handleClose}
               disabled={leaveCommunity.isPending}
@@ -70,20 +72,20 @@ export default function LeaveCommunityModal({
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
                 </svg>
                 <div>
-                  <h4 className="text-lg font-bold text-black mb-2 amnesty-heading">⚠️ CONFIRM COMMUNITY DEPARTURE</h4>
+                  <h4 className="text-lg font-bold text-black mb-2 amnesty-heading">{t('communities.leave.warningTitle')}</h4>
                   <p className="text-lg text-black mb-4">
-                    You are about to leave <strong>"{communityName}"</strong>. This action will:
+                    {t('communities.leave.warningIntro', { communityName })}
                   </p>
                   <ul className="list-disc list-inside space-y-2 text-black ml-4">
-                    <li>Remove you from the community's member list</li>
-                    <li>Return you to read-only viewer access in this community</li>
-                    <li>Revoke your ability to create new proposals in this community</li>
-                    <li>Revoke your ability to vote on proposals in this community</li>
-                    <li>Allow you to continue viewing the community as an authenticated viewer</li>
-                    <li><strong>Preserve</strong> your historical proposals and votes (they will remain visible)</li>
+                    <li>{t('communities.leave.bulletRemove')}</li>
+                    <li>{t('communities.leave.bulletViewer')}</li>
+                    <li>{t('communities.leave.bulletProposal')}</li>
+                    <li>{t('communities.leave.bulletVote')}</li>
+                    <li>{t('communities.leave.bulletBrowse')}</li>
+                    <li>{t('communities.leave.bulletPreserve')}</li>
                   </ul>
                   <p className="text-lg text-black mt-4 font-bold">
-                    You will need admin assistance to rejoin as a member if you wish to participate again.
+                    {t('communities.leave.warningOutro')}
                   </p>
                 </div>
               </div>
@@ -92,7 +94,7 @@ export default function LeaveCommunityModal({
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="confirm-text" className="block text-lg font-bold text-black mb-3 amnesty-heading">
-                  TYPE "LEAVE" TO CONFIRM *
+                  {t('communities.leave.confirmLabel')}
                 </label>
                 <input
                   type="text"
@@ -100,24 +102,24 @@ export default function LeaveCommunityModal({
                   value={confirmText}
                   onChange={(e) => setConfirmText(e.target.value)}
                   className="input-field text-lg"
-                  placeholder="Type LEAVE to confirm"
+                  placeholder={t('communities.leave.confirmPlaceholder')}
                   required
                   disabled={leaveCommunity.isPending}
                 />
                 <p className="text-sm text-amnesty-gray-600 mt-2 font-bold">
-                  This confirmation helps prevent accidental community departure.
+                  {t('communities.leave.confirmHelp')}
                 </p>
               </div>
 
               <div className="flex space-x-4 pt-6">
                 <button
-                  type="button"
-                  onClick={handleClose}
-                  disabled={leaveCommunity.isPending}
-                  className="flex-1 btn-secondary text-lg py-4"
-                >
-                  CANCEL
-                </button>
+                type="button"
+                onClick={handleClose}
+                disabled={leaveCommunity.isPending}
+                className="flex-1 btn-secondary text-lg py-4"
+              >
+                {t('common.actions.cancel')}
+              </button>
                 <button
                   type="submit"
                   disabled={!isConfirmValid || leaveCommunity.isPending}
@@ -126,10 +128,10 @@ export default function LeaveCommunityModal({
                   {leaveCommunity.isPending ? (
                     <>
                       <LoadingSpinner size="small" className="mr-3" />
-                      LEAVING...
+                      {t('common.loading.leaving')}
                     </>
                   ) : (
-                    'LEAVE COMMUNITY'
+                    t('common.actions.leaveCommunity')
                   )}
                 </button>
               </div>
@@ -138,10 +140,10 @@ export default function LeaveCommunityModal({
             {leaveCommunity.isError && (
               <div className="p-4 bg-black text-white border-4 border-amnesty-yellow">
                 <p className="text-lg font-bold amnesty-heading">
-                  FAILED TO LEAVE COMMUNITY. PLEASE CHECK YOUR PERMISSIONS AND TRY AGAIN.
+                  {t('communities.leave.errorTitle')}
                 </p>
                 <p className="text-white mt-2">
-                  Make sure you are a member of this community and have the correct permissions to leave.
+                  {t('communities.leave.errorBody')}
                 </p>
               </div>
             )}
@@ -149,11 +151,10 @@ export default function LeaveCommunityModal({
             {leaveCommunity.isSuccess && (
               <div className="p-4 bg-amnesty-yellow text-black border-4 border-black">
                 <p className="text-lg font-bold amnesty-heading">
-                  SUCCESSFULLY LEFT THE COMMUNITY!
+                  {t('communities.leave.successTitle')}
                 </p>
                 <p className="text-black mt-2">
-                  You have been removed from the community member list and can now view it as a read-only viewer.
-                  Your historical contributions remain preserved.
+                  {t('communities.leave.successBody')}
                 </p>
               </div>
             )}

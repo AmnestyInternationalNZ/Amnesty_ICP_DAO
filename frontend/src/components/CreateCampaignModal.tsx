@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCreateCampaign } from '../hooks/useQueries';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -9,6 +10,7 @@ interface CreateCampaignModalProps {
 }
 
 export default function CreateCampaignModal({ isOpen, onClose, communityId }: CreateCampaignModalProps) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [goalAmount, setGoalAmount] = useState('');
@@ -22,7 +24,7 @@ export default function CreateCampaignModal({ isOpen, onClose, communityId }: Cr
     e.preventDefault();
     
     if (!title.trim() || !description.trim() || !goalAmount || !daysUntilDeadline) {
-      alert('Please fill in all fields');
+      alert(t('campaigns.create.validationAllFields'));
       return;
     }
     
@@ -30,12 +32,12 @@ export default function CreateCampaignModal({ isOpen, onClose, communityId }: Cr
     const daysNum = Number(daysUntilDeadline);
     
     if (isNaN(goalAmountNum) || goalAmountNum <= 0) {
-      alert('Please enter a valid goal amount');
+      alert(t('campaigns.create.validationGoalAmount'));
       return;
     }
     
     if (isNaN(daysNum) || daysNum <= 0) {
-      alert('Please enter a valid number of days');
+      alert(t('campaigns.create.validationDays'));
       return;
     }
     
@@ -58,7 +60,7 @@ export default function CreateCampaignModal({ isOpen, onClose, communityId }: Cr
       setDaysUntilDeadline('30');
       onClose();
     } catch (error: any) {
-      alert(`Failed to create campaign: ${error.message || 'Unknown error'}`);
+      alert(t('campaigns.create.error', { message: error.message || 'Unknown error' }));
     }
   };
   
@@ -66,7 +68,7 @@ export default function CreateCampaignModal({ isOpen, onClose, communityId }: Cr
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white border-4 border-black p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-amnesty">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-3xl font-bold text-black amnesty-heading">CREATE FUNDRAISING CAMPAIGN</h3>
+          <h3 className="text-3xl font-bold text-black amnesty-heading">{t('campaigns.create.title')}</h3>
           <button
             onClick={onClose}
             className="text-black hover:text-amnesty-gray-700 transition-colors"
@@ -78,31 +80,30 @@ export default function CreateCampaignModal({ isOpen, onClose, communityId }: Cr
         </div>
         
         <div className="mb-6 p-4 bg-amnesty-yellow border-4 border-black">
-          <h4 className="text-lg font-bold text-black mb-2 amnesty-heading">ALL-OR-NOTHING FUNDING</h4>
+          <h4 className="text-lg font-bold text-black mb-2 amnesty-heading">{t('campaigns.create.fundingTitle')}</h4>
           <p className="text-base text-black">
-            Your campaign will follow an all-or-nothing model. Funds are only collected if the target 
-            amount is met by the deadline. If the goal is not reached, no funds will be collected.
+            {t('campaigns.create.fundingBody')}
           </p>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-lg font-bold text-black mb-2 amnesty-heading">
-              CAMPAIGN TITLE *
+              {t('campaigns.create.titleLabel')}
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="input-field"
-              placeholder="Enter campaign title"
+              placeholder={t('campaigns.create.titlePlaceholder')}
               required
             />
           </div>
           
           <div>
             <label className="block text-lg font-bold text-black mb-2 amnesty-heading">
-              GOAL AMOUNT ($) *
+              {t('campaigns.create.goalLabel')}
             </label>
             <input
               type="number"
@@ -111,14 +112,14 @@ export default function CreateCampaignModal({ isOpen, onClose, communityId }: Cr
               value={goalAmount}
               onChange={(e) => setGoalAmount(e.target.value)}
               className="input-field"
-              placeholder="Enter target amount"
+              placeholder={t('campaigns.create.goalPlaceholder')}
               required
             />
           </div>
           
           <div>
             <label className="block text-lg font-bold text-black mb-2 amnesty-heading">
-              CAMPAIGN DURATION (DAYS) *
+              {t('campaigns.create.durationLabel')}
             </label>
             <input
               type="number"
@@ -127,24 +128,24 @@ export default function CreateCampaignModal({ isOpen, onClose, communityId }: Cr
               value={daysUntilDeadline}
               onChange={(e) => setDaysUntilDeadline(e.target.value)}
               className="input-field"
-              placeholder="Enter number of days"
+              placeholder={t('campaigns.create.durationPlaceholder')}
               required
             />
           </div>
           
           <div>
             <label className="block text-lg font-bold text-black mb-2 amnesty-heading">
-              CAMPAIGN STORY *
+              {t('campaigns.create.storyLabel')}
             </label>
             <p className="text-sm text-black mb-2">
-              Include narrative, who benefits, and budget outline
+              {t('campaigns.create.storyHelp')}
             </p>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="input-field"
               rows={8}
-              placeholder="Describe your campaign, who it will help, and how the funds will be used..."
+              placeholder={t('campaigns.create.storyPlaceholder')}
               required
             />
           </div>
@@ -158,10 +159,10 @@ export default function CreateCampaignModal({ isOpen, onClose, communityId }: Cr
               {createCampaign.isPending ? (
                 <span className="flex items-center justify-center">
                   <LoadingSpinner size="small" />
-                  <span className="ml-2">CREATING...</span>
+                  <span className="ml-2">{t('common.loading.creating')}</span>
                 </span>
               ) : (
-                'CREATE CAMPAIGN'
+                t('common.actions.createCampaign')
               )}
             </button>
             <button
@@ -169,7 +170,7 @@ export default function CreateCampaignModal({ isOpen, onClose, communityId }: Cr
               onClick={onClose}
               className="bg-amnesty-gray-200 text-black px-8 py-4 font-bold uppercase tracking-wide hover:bg-amnesty-gray-300 focus:outline-none focus:ring-4 focus:ring-gray-400 border-4 border-black amnesty-heading text-lg"
             >
-              CANCEL
+              {t('common.actions.cancel')}
             </button>
           </div>
         </form>

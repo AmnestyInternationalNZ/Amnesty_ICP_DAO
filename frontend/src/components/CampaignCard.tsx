@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Campaign, CampaignState, CommunityRole } from '../backend';
+import { formatCurrency, formatNumber } from '../i18n/format';
+import { useLocalePreference } from '../i18n/preferences';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import CampaignDetailModal from './CampaignDetailModal';
 
@@ -11,6 +14,8 @@ interface CampaignCardProps {
 }
 
 export default function CampaignCard({ campaign, canInteract, communityRole, isPlatformAdmin = false }: CampaignCardProps) {
+  const { t } = useTranslation();
+  const { locale } = useLocalePreference();
   const [showDetail, setShowDetail] = useState(false);
   const { identity } = useInternetIdentity();
   const currentUserPrincipal = identity?.getPrincipal();
@@ -31,15 +36,15 @@ export default function CampaignCard({ campaign, canInteract, communityRole, isP
   const getStateDisplay = (state: CampaignState) => {
     switch (state) {
       case CampaignState.active:
-        return { text: 'ACTIVE', color: 'bg-amnesty-yellow text-black' };
+        return { text: t('common.states.campaign.active').toUpperCase(), color: 'bg-amnesty-yellow text-black' };
       case CampaignState.successful:
-        return { text: 'SUCCESSFUL', color: 'bg-amnesty-green text-black' };
+        return { text: t('common.states.campaign.successful').toUpperCase(), color: 'bg-amnesty-green text-black' };
       case CampaignState.failed:
-        return { text: 'FAILED', color: 'bg-amnesty-orange text-black' };
+        return { text: t('common.states.campaign.failed').toUpperCase(), color: 'bg-amnesty-orange text-black' };
       case CampaignState.expired:
-        return { text: 'EXPIRED', color: 'bg-amnesty-purple text-white' };
+        return { text: t('common.states.campaign.expired').toUpperCase(), color: 'bg-amnesty-purple text-white' };
       default:
-        return { text: 'UNKNOWN', color: 'bg-amnesty-gray-300 text-black' };
+        return { text: t('common.labels.unknown').toUpperCase(), color: 'bg-amnesty-gray-300 text-black' };
     }
   };
   
@@ -51,12 +56,12 @@ export default function CampaignCard({ campaign, canInteract, communityRole, isP
         <div className="mb-6 h-1.5 w-24 bg-amnesty-green" />
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <p className="amnesty-kicker text-amnesty-green mb-3">Campaign</p>
+            <p className="amnesty-kicker text-amnesty-green mb-3">{t('common.labels.campaign')}</p>
             <div className="flex items-center space-x-3 mb-2">
               <h4 className="text-4xl text-amnesty-ink amnesty-heading">{campaign.title}</h4>
               {isCreator && (
                 <span className="bg-[#e9f4f8] px-2 py-1 text-xs text-amnesty-ink amnesty-heading">
-                  Your campaign
+                  {t('campaigns.card.yourCampaign')}
                 </span>
               )}
             </div>
@@ -67,14 +72,16 @@ export default function CampaignCard({ campaign, canInteract, communityRole, isP
           </span>
         </div>
         
-        {/* Progress Bar */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-lg font-bold text-amnesty-ink amnesty-heading">
-              ${Number(campaign.totalRaised).toLocaleString()} / ${Number(campaign.goalAmount).toLocaleString()}
+              {t('campaigns.card.progress', {
+                raised: formatCurrency(campaign.totalRaised, locale),
+                goal: formatCurrency(campaign.goalAmount, locale)
+              })}
             </span>
             <span className="text-lg font-bold text-amnesty-ink amnesty-heading">
-              {progressPercentage.toFixed(0)}%
+              {t('campaigns.card.progressPercentage', { percentage: formatNumber(progressPercentage, locale) })}
             </span>
           </div>
           <div className="h-4 w-full bg-[#e6ecef]">
@@ -85,7 +92,6 @@ export default function CampaignCard({ campaign, canInteract, communityRole, isP
           </div>
         </div>
         
-        {/* Campaign Info */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
@@ -94,30 +100,28 @@ export default function CampaignCard({ campaign, canInteract, communityRole, isP
               </svg>
               <span className="text-base font-bold text-amnesty-ink amnesty-heading">
                 {campaign.state === CampaignState.active 
-                  ? `${daysLeft} DAYS LEFT`
-                  : 'ENDED'
+                  ? t('campaigns.card.daysLeft', { days: formatNumber(daysLeft, locale) }).toUpperCase()
+                  : t('campaigns.card.ended').toUpperCase()
                 }
               </span>
             </div>
           </div>
         </div>
         
-        {/* All-or-Nothing Notice */}
         {campaign.state === CampaignState.active && (
           <div className="mb-4 border border-amnesty-line bg-[#f4f7f8] p-4">
             <p className="text-sm text-amnesty-ink font-bold amnesty-heading">
-              ALL-OR-NOTHING: Funds are only collected if the target is met by the deadline.
+              {t('campaigns.card.allOrNothing').toUpperCase()}
             </p>
           </div>
         )}
         
-        {/* Action Buttons */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <button
             onClick={() => setShowDetail(true)}
             className="flex-1 btn-inverted"
           >
-            VIEW DETAILS
+            {t('common.actions.viewDetails').toUpperCase()}
           </button>
           
           {canInteract && campaign.state === CampaignState.active && (
@@ -125,7 +129,7 @@ export default function CampaignCard({ campaign, canInteract, communityRole, isP
               onClick={() => setShowDetail(true)}
               className="btn-primary"
             >
-              CONTRIBUTE
+              {t('common.actions.contribute').toUpperCase()}
             </button>
           )}
           
@@ -133,9 +137,9 @@ export default function CampaignCard({ campaign, canInteract, communityRole, isP
             <button
               disabled
               className="border border-[#082333] bg-[#eef3f5] px-6 py-3 font-bold uppercase tracking-wide text-amnesty-ink amnesty-heading cursor-not-allowed opacity-50"
-              title="Only assigned community members and admins can contribute to campaigns"
+              title={t('campaigns.card.contributeLockedTitle')}
             >
-              CONTRIBUTE
+              {t('common.actions.contribute').toUpperCase()}
             </button>
           )}
         </div>

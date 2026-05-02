@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -8,12 +9,18 @@ interface LoginButtonProps {
 }
 
 export default function LoginButton({ className = '', compact = false }: LoginButtonProps) {
+  const { t } = useTranslation();
   const { login, clear, loginStatus, identity } = useInternetIdentity();
   const queryClient = useQueryClient();
 
   const isAuthenticated = !!identity;
   const disabled = loginStatus === 'logging-in';
-  const text = loginStatus === 'logging-in' ? 'LOGGING IN...' : isAuthenticated ? 'LOGOUT' : 'LOGIN';
+  const text =
+    loginStatus === 'logging-in'
+      ? t('auth.action.loggingIn')
+      : isAuthenticated
+        ? t('auth.action.logout')
+        : t('auth.action.login');
 
   const handleAuth = async () => {
     if (isAuthenticated) {

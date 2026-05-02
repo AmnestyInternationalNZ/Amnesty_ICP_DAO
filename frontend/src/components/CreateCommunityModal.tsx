@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCreateCommunity } from '../hooks/useQueries';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -8,6 +9,7 @@ interface CreateCommunityModalProps {
 }
 
 export default function CreateCommunityModal({ isOpen, onClose }: CreateCommunityModalProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [policy, setPolicy] = useState('');
   const createCommunity = useCreateCommunity();
@@ -41,7 +43,7 @@ export default function CreateCommunityModal({ isOpen, onClose }: CreateCommunit
       <div className="bg-white border-4 border-amnesty-yellow max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-amnesty-yellow">
         <div className="p-8">
           <div className="flex items-center justify-between mb-8 pb-6 border-b-4 border-black">
-            <h2 className="text-3xl font-bold text-black amnesty-heading">CREATE NEW COMMUNITY</h2>
+            <h2 className="text-3xl font-bold text-black amnesty-heading">{t('communities.create.title')}</h2>
             <button
               onClick={handleClose}
               disabled={createCommunity.isPending}
@@ -56,7 +58,7 @@ export default function CreateCommunityModal({ isOpen, onClose }: CreateCommunit
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="community-name" className="block text-lg font-bold text-black mb-3 amnesty-heading">
-                COMMUNITY NAME *
+                {t('communities.create.nameLabel')}
               </label>
               <input
                 type="text"
@@ -64,17 +66,17 @@ export default function CreateCommunityModal({ isOpen, onClose }: CreateCommunit
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="input-field text-lg"
-                placeholder="Enter community name"
+                placeholder={t('communities.create.namePlaceholder')}
                 required
                 disabled={createCommunity.isPending}
                 maxLength={100}
               />
-              <p className="text-sm text-amnesty-gray-600 mt-2 font-bold">{name.length}/100 CHARACTERS</p>
+              <p className="text-sm text-amnesty-gray-600 mt-2 font-bold">{t('common.labels.characters', { count: name.length, max: 100 })}</p>
             </div>
 
             <div>
               <label htmlFor="community-policy" className="block text-lg font-bold text-black mb-3 amnesty-heading">
-                COMMUNITY POLICY *
+                {t('communities.create.policyLabel')}
               </label>
               <textarea
                 id="community-policy"
@@ -82,12 +84,12 @@ export default function CreateCommunityModal({ isOpen, onClose }: CreateCommunit
                 onChange={(e) => setPolicy(e.target.value)}
                 rows={6}
                 className="input-field text-lg resize-none"
-                placeholder="Describe the community's purpose, governance rules, and guidelines..."
+                placeholder={t('communities.create.policyPlaceholder')}
                 required
                 disabled={createCommunity.isPending}
                 maxLength={500}
               />
-              <p className="text-sm text-amnesty-gray-600 mt-2 font-bold">{policy.length}/500 CHARACTERS</p>
+              <p className="text-sm text-amnesty-gray-600 mt-2 font-bold">{t('common.labels.characters', { count: policy.length, max: 500 })}</p>
             </div>
 
             <div className="bg-amnesty-yellow border-4 border-black p-6">
@@ -96,10 +98,9 @@ export default function CreateCommunityModal({ isOpen, onClose }: CreateCommunit
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
                 <div>
-                  <h4 className="text-lg font-bold text-black mb-2 amnesty-heading">COMMUNITY CREATION</h4>
+                  <h4 className="text-lg font-bold text-black mb-2 amnesty-heading">{t('communities.create.panelTitle')}</h4>
                   <p className="text-lg text-black">
-                    You will become the first community admin and be automatically assigned to the community.
-                    Platform admins can still oversee the community, but local membership management starts here.
+                    {t('communities.create.panelBody')}
                   </p>
                 </div>
               </div>
@@ -112,7 +113,7 @@ export default function CreateCommunityModal({ isOpen, onClose }: CreateCommunit
                 disabled={createCommunity.isPending}
                 className="flex-1 btn-secondary text-lg py-4"
               >
-                CANCEL
+                {t('common.actions.cancel')}
               </button>
               <button
                 type="submit"
@@ -122,10 +123,10 @@ export default function CreateCommunityModal({ isOpen, onClose }: CreateCommunit
                 {createCommunity.isPending ? (
                   <>
                     <LoadingSpinner size="small" className="mr-3" />
-                    CREATING...
+                    {t('common.loading.creating')}
                   </>
                 ) : (
-                  'CREATE COMMUNITY'
+                  t('common.actions.createCommunity')
                 )}
               </button>
             </div>
@@ -134,7 +135,7 @@ export default function CreateCommunityModal({ isOpen, onClose }: CreateCommunit
           {createCommunity.isError && (
             <div className="mt-6 p-4 bg-black text-white border-4 border-amnesty-yellow">
               <p className="text-lg font-bold amnesty-heading">
-                FAILED TO CREATE COMMUNITY. PLEASE CHECK YOUR PERMISSIONS AND TRY AGAIN.
+                {t('communities.create.error')}
               </p>
             </div>
           )}

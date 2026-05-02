@@ -5,23 +5,33 @@ import type {
     _SERVICE,
     Campaign as CandidCampaign,
     CampaignState as CandidCampaignState,
-    CampaignUpdate,
-    Community,
+    CampaignUpdate as CandidCampaignUpdate,
+    Community as CandidCommunity,
     CommunityAccess as CandidCommunityAccess,
     CommunityMember as CandidCommunityMember,
     CommunityRole as CandidCommunityRole,
-    Contribution,
+    Contribution as CandidContribution,
     PlatformRole as CandidPlatformRole,
     Proposal as CandidProposal,
     ProposalOverrides as CandidProposalOverrides,
     ProposalState as CandidProposalState,
-    ShoppingItem,
-    StripeConfiguration,
-    StripeSessionStatus,
-    TransformationInput,
-    TransformationOutput,
-    UserProfile
+    ShoppingItem as CandidShoppingItem,
+    StripeConfiguration as CandidStripeConfiguration,
+    StripeSessionStatus as CandidStripeSessionStatus,
+    TransformationInput as CandidTransformationInput,
+    TransformationOutput as CandidTransformationOutput,
+    UserProfile as CandidUserProfile
 } from './declarations/backend.did';
+
+export type Community = CandidCommunity;
+export type CampaignUpdate = CandidCampaignUpdate;
+export type Contribution = CandidContribution;
+export type ShoppingItem = CandidShoppingItem;
+export type StripeConfiguration = CandidStripeConfiguration;
+export type StripeSessionStatus = CandidStripeSessionStatus;
+export type TransformationInput = CandidTransformationInput;
+export type TransformationOutput = CandidTransformationOutput;
+export type UserProfile = CandidUserProfile;
 
 export enum PlatformRole {
     platformAdmin = 'platformAdmin'
@@ -309,7 +319,9 @@ class Backend implements backendInterface {
     }
 
     async getCallerUserProfile(): Promise<UserProfile | null> {
-        return this.handle(async () => fromOptional(await this.actor.getCallerUserProfile(), (value) => value));
+        return this.handle(async () =>
+            fromOptional<CandidUserProfile, UserProfile>(await this.actor.getCallerUserProfile(), (value) => value)
+        );
     }
 
     async getCampaignById(campaignId: bigint): Promise<Campaign | null> {
@@ -329,7 +341,9 @@ class Backend implements backendInterface {
     }
 
     async getCommunityById(id: bigint): Promise<Community | null> {
-        return this.handle(async () => fromOptional(await this.actor.getCommunityById(id), (value) => value));
+        return this.handle(async () =>
+            fromOptional<CandidCommunity, Community>(await this.actor.getCommunityById(id), (value) => value)
+        );
     }
 
     async getProposalById(proposalId: bigint): Promise<Proposal | null> {
@@ -341,7 +355,9 @@ class Backend implements backendInterface {
     }
 
     async getUserProfile(user: Principal): Promise<UserProfile | null> {
-        return this.handle(async () => fromOptional(await this.actor.getUserProfile(user), (value) => value));
+        return this.handle(async () =>
+            fromOptional<CandidUserProfile, UserProfile>(await this.actor.getUserProfile(user), (value) => value)
+        );
     }
 
     async isCallerPlatformAdmin(): Promise<boolean> {

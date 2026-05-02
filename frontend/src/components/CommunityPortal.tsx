@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CommunityRole } from '../backend';
+import { formatNumber } from '../i18n/format';
+import { useLocalePreference } from '../i18n/preferences';
 import {
   useGetCommunityAccess,
   useGetCommunityById,
@@ -20,6 +23,8 @@ interface CommunityPortalProps {
 }
 
 export default function CommunityPortal({ communityId, onBack }: CommunityPortalProps) {
+  const { t } = useTranslation();
+  const { locale } = useLocalePreference();
   const [showCreateProposal, setShowCreateProposal] = useState(false);
   const [showCreateCampaign, setShowCreateCampaign] = useState(false);
   const [showLeaveCommunity, setShowLeaveCommunity] = useState(false);
@@ -43,13 +48,13 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
     return (
       <div className="amnesty-panel bg-white p-8">
         <div className="text-center py-16">
-          <p className="amnesty-kicker text-amnesty-pink mb-4">Community portal</p>
-          <h2 className="text-4xl text-amnesty-ink amnesty-heading">We could not load this community.</h2>
+          <p className="amnesty-kicker text-amnesty-pink mb-4">{t('communities.portal.kicker')}</p>
+          <h2 className="text-4xl text-amnesty-ink amnesty-heading">{t('communities.portal.loadErrorTitle')}</h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-[#38505d]">
-            The requested community is missing or could not be loaded right now.
+            {t('communities.portal.loadErrorBody')}
           </p>
           <button onClick={onBack} className="btn-primary mt-8 rounded-full">
-            Back to communities
+            {t('communities.portal.backToCommunities')}
           </button>
         </div>
       </div>
@@ -57,34 +62,34 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
   }
 
   const roleLabel = access.isPlatformAdmin
-    ? 'Platform admin'
+    ? t('common.roles.platformAdmin')
     : access.communityRole === CommunityRole.communityAdmin
-      ? 'Community admin'
+      ? t('common.roles.communityAdmin')
       : access.communityRole === CommunityRole.member
-        ? 'Member'
-        : 'Viewer';
+        ? t('common.roles.member')
+        : t('common.roles.viewer');
 
   const accessBanner = access.isPlatformAdmin
     ? {
-        title: 'Platform-wide stewardship',
-        body: 'You can participate here and manage community membership because you hold the platform admin role.',
+        title: t('communities.portal.accessBanners.platformAdminTitle'),
+        body: t('communities.portal.accessBanners.platformAdminBody'),
         className: 'bg-amnesty-ink text-white',
       }
     : access.communityRole === CommunityRole.communityAdmin
       ? {
-          title: 'Community stewardship',
-          body: 'You can participate in governance and manage community role assignments inside this space.',
+          title: t('communities.portal.accessBanners.communityAdminTitle'),
+          body: t('communities.portal.accessBanners.communityAdminBody'),
           className: 'bg-[#0f3044] text-white',
         }
       : access.communityRole === CommunityRole.member
         ? {
-            title: 'Community participation',
-            body: 'You can create proposals, vote, contribute to campaigns, and step back from this community if needed.',
+            title: t('communities.portal.accessBanners.memberTitle'),
+            body: t('communities.portal.accessBanners.memberBody'),
             className: 'bg-[#eff7e7] text-amnesty-ink',
           }
         : {
-            title: 'Viewer access',
-            body: 'You can read community context, proposals, and campaigns. Participation opens once a role is assigned.',
+            title: t('communities.portal.accessBanners.viewerTitle'),
+            body: t('communities.portal.accessBanners.viewerBody'),
             className: 'bg-white text-amnesty-ink border border-amnesty-line',
           };
 
@@ -99,12 +104,12 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
-            Back to communities
+            {t('communities.portal.backToCommunities')}
           </button>
 
           <div className="grid gap-8 xl:grid-cols-[1.1fr_0.9fr]">
             <div>
-              <p className="amnesty-kicker text-amnesty-pink mb-4">Community portal</p>
+              <p className="amnesty-kicker text-amnesty-pink mb-4">{t('communities.portal.kicker')}</p>
               <h1 className="max-w-4xl text-5xl text-amnesty-ink md:text-7xl amnesty-heading">
                 {community.name}
               </h1>
@@ -112,7 +117,7 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
 
               <div className={`mt-8 px-5 py-5 ${accessBanner.className}`}>
                 <p className="amnesty-kicker text-amnesty-yellow mb-3">
-                  {access.isPlatformAdmin ? 'Platform access' : 'Role access'}
+                  {access.isPlatformAdmin ? t('communities.portal.platformAccessTitle') : t('communities.portal.roleAccessTitle')}
                 </p>
                 <h2 className="text-3xl amnesty-heading">{accessBanner.title}</h2>
                 <p className="mt-3 text-base leading-7">{accessBanner.body}</p>
@@ -131,15 +136,15 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="amnesty-kicker text-amnesty-blue mb-2">Assigned participants</p>
-                  <p className="text-4xl text-white amnesty-heading">{community.members.length}</p>
+                  <p className="amnesty-kicker text-amnesty-blue mb-2">{t('communities.portal.assignedParticipants')}</p>
+                  <p className="text-4xl text-white amnesty-heading">{formatNumber(community.members.length, locale)}</p>
                 </div>
                 <div>
-                  <p className="amnesty-kicker text-amnesty-green mb-2">Your capabilities</p>
+                  <p className="amnesty-kicker text-amnesty-green mb-2">{t('communities.portal.capabilities')}</p>
                   <p className="text-base leading-7 text-white/80">
                     {access.canCreateProposal
-                      ? 'Create proposals, vote, and help shape community action.'
-                      : 'Read the full community context while you remain in viewer mode.'}
+                      ? t('communities.portal.capabilitiesEnabled')
+                      : t('communities.portal.capabilitiesViewer')}
                   </p>
                 </div>
               </div>
@@ -147,35 +152,35 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
               <div className="mt-8 flex flex-col gap-3">
                 {access.canCreateProposal ? (
                   <button onClick={() => setShowCreateProposal(true)} className="btn-primary rounded-full">
-                    Create proposal
+                    {t('common.actions.createProposal')}
                   </button>
                 ) : (
                   <button
                     disabled
                     className="btn-secondary rounded-full opacity-50"
-                    title="Only assigned community members and admins can create proposals"
+                    title={t('communities.portal.createProposalLockedTitle')}
                   >
-                    Proposal access locked
+                    {t('common.buttons.proposalAccessLocked')}
                   </button>
                 )}
 
                 {access.canCreateCampaign ? (
                   <button onClick={() => setShowCreateCampaign(true)} className="btn-secondary rounded-full text-white border-white hover:bg-white/10">
-                    Create campaign
+                    {t('common.actions.createCampaign')}
                   </button>
                 ) : (
                   <button
                     disabled
                     className="btn-secondary rounded-full text-white border-white opacity-50"
-                    title="Only assigned community members and admins can create campaigns"
+                    title={t('communities.portal.createCampaignLockedTitle')}
                   >
-                    Campaign access locked
+                    {t('common.buttons.campaignAccessLocked')}
                   </button>
                 )}
 
                 {access.canLeaveCommunity && (
                   <button onClick={() => setShowLeaveCommunity(true)} className="btn-secondary rounded-full text-white border-white hover:bg-white/10">
-                    Leave community
+                    {t('common.actions.leaveCommunity')}
                   </button>
                 )}
               </div>
@@ -186,12 +191,12 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
         <section className="amnesty-panel bg-white p-8 md:p-10">
           <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="amnesty-kicker text-amnesty-green mb-4">Campaigns</p>
-              <h2 className="text-5xl text-amnesty-ink amnesty-heading">Fund local action</h2>
+              <p className="amnesty-kicker text-amnesty-green mb-4">{t('communities.portal.campaignsKicker')}</p>
+              <h2 className="text-5xl text-amnesty-ink amnesty-heading">{t('communities.portal.campaignsTitle')}</h2>
               <p className="mt-4 max-w-3xl text-lg leading-8 text-[#38505d]">
                 {access.canContributeToCampaign
-                  ? 'Support campaigns or launch a new one for this community.'
-                  : 'Follow campaign progress here. Contribution opens once a community role is assigned.'}
+                  ? t('communities.portal.campaignsBodyEnabled')
+                  : t('communities.portal.campaignsBodyViewer')}
               </p>
             </div>
           </div>
@@ -202,15 +207,15 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
             </div>
           ) : !campaigns || campaigns.length === 0 ? (
             <div className="border border-amnesty-line bg-[#f4f7f8] px-6 py-10 text-center">
-              <h3 className="text-4xl text-amnesty-ink amnesty-heading">No campaigns yet</h3>
+              <h3 className="text-4xl text-amnesty-ink amnesty-heading">{t('common.empty.noCampaigns')}</h3>
               <p className="mx-auto mt-4 max-w-3xl text-lg leading-8 text-[#38505d]">
                 {access.canCreateCampaign
-                  ? 'Start the first fundraising campaign for this community when the moment calls for collective support.'
-                  : 'No campaigns have been created for this community yet.'}
+                  ? t('communities.portal.emptyCampaignsAdmin')
+                  : t('communities.portal.emptyCampaignsViewer')}
               </p>
               {access.canCreateCampaign && (
                 <button onClick={() => setShowCreateCampaign(true)} className="btn-primary mt-8 rounded-full">
-                  Create first campaign
+                  {t('common.actions.createFirstCampaign')}
                 </button>
               )}
             </div>
@@ -232,12 +237,12 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
         <section className="amnesty-panel bg-white p-8 md:p-10">
           <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="amnesty-kicker text-amnesty-pink mb-4">Proposals</p>
-              <h2 className="text-5xl text-amnesty-ink amnesty-heading">Use community voice</h2>
+              <p className="amnesty-kicker text-amnesty-pink mb-4">{t('app.nav.proposals')}</p>
+              <h2 className="text-5xl text-amnesty-ink amnesty-heading">{t('communities.portal.proposalsTitle')}</h2>
               <p className="mt-4 max-w-3xl text-lg leading-8 text-[#38505d]">
-                {access.canVoteOnProposal
-                  ? 'Debate and vote on proposals that shape this community.'
-                  : 'Read proposal context and outcomes here. Voting opens once a community role is assigned.'}
+                {access.canCreateProposal
+                  ? t('communities.portal.proposalsBodyEnabled')
+                  : t('communities.portal.proposalsBodyViewer')}
               </p>
             </div>
           </div>
@@ -248,15 +253,15 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
             </div>
           ) : !proposals || proposals.length === 0 ? (
             <div className="border border-amnesty-line bg-[#f8f3f8] px-6 py-10 text-center">
-              <h3 className="text-4xl text-amnesty-ink amnesty-heading">No proposals yet</h3>
+              <h3 className="text-4xl text-amnesty-ink amnesty-heading">{t('common.empty.noProposals')}</h3>
               <p className="mx-auto mt-4 max-w-3xl text-lg leading-8 text-[#38505d]">
                 {access.canCreateProposal
-                  ? 'Be the first to bring a proposal into this community space.'
-                  : 'No proposals have been created for this community yet.'}
+                  ? t('communities.portal.emptyProposalsAdmin')
+                  : t('communities.portal.emptyProposalsViewer')}
               </p>
               {access.canCreateProposal && (
                 <button onClick={() => setShowCreateProposal(true)} className="btn-inverted mt-8 rounded-full">
-                  Create first proposal
+                  {t('common.actions.createFirstProposal')}
                 </button>
               )}
             </div>
@@ -300,6 +305,7 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
           onClose={() => setShowLeaveCommunity(false)}
           communityId={communityId}
           communityName={community.name}
+          onSuccess={onBack}
         />
       )}
     </>

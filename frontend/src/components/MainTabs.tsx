@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   useBootstrapPlatformAdmin,
   useGetCallerPlatformRole,
@@ -11,6 +12,7 @@ import Dashboard from './Dashboard';
 import LoadingSpinner from './LoadingSpinner';
 
 export default function MainTabs() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'admin'>('dashboard');
   const { data: platformRole, isLoading: roleLoading } = useGetCallerPlatformRole();
   const { data: isPlatformAdmin, isLoading: adminLoading } = useIsCallerPlatformAdmin();
@@ -28,7 +30,8 @@ export default function MainTabs() {
   const adminCount = platformAdmins?.length ?? 0;
   const needsBootstrap = adminCount === 0;
   const isAdmin = !!isPlatformAdmin;
-  const roleLabel = platformRole === PlatformRole.platformAdmin ? 'Platform admin' : 'Viewer';
+  const roleLabel =
+    platformRole === PlatformRole.platformAdmin ? t('common.roles.platformAdmin') : t('common.roles.viewer');
 
   const handleBootstrap = async () => {
     try {
@@ -42,32 +45,29 @@ export default function MainTabs() {
     <div id="platform" className="space-y-12">
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr] xl:items-start">
         <div>
-          <p className="amnesty-kicker text-amnesty-pink mb-4">Amnesty Community</p>
+          <p className="amnesty-kicker text-amnesty-pink mb-4">{t('mainTabs.kicker')}</p>
           <h1 id="dashboard" className="max-w-4xl text-5xl text-amnesty-ink md:text-7xl amnesty-heading">
-            Take action together
+            {t('mainTabs.title')}
           </h1>
           <p className="mt-6 max-w-3xl text-xl leading-8 text-amnesty-ink">
-            Read communities as a viewer, step into decision-making wherever you hold a
-            role, and keep platform participation grounded in people power.
+            {t('mainTabs.body')}
           </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="amnesty-panel bg-white p-6">
-            <p className="amnesty-kicker text-amnesty-blue mb-3">Your access</p>
+            <p className="amnesty-kicker text-amnesty-blue mb-3">{t('mainTabs.yourAccess')}</p>
             <p className="text-4xl text-amnesty-ink amnesty-heading">{roleLabel}</p>
             <p className="mt-4 text-base leading-7 text-[#38505d]">
-              Viewers can read across the platform. Community roles unlock proposals,
-              voting, fundraising, and membership stewardship.
+              {t('mainTabs.yourAccessBody')}
             </p>
           </div>
 
           <div className="amnesty-panel bg-white p-6">
-            <p className="amnesty-kicker text-amnesty-green mb-3">Platform roles</p>
+            <p className="amnesty-kicker text-amnesty-green mb-3">{t('mainTabs.platformRoles')}</p>
             <p className="text-4xl text-amnesty-ink amnesty-heading">{adminCount}</p>
             <p className="mt-4 text-base leading-7 text-[#38505d]">
-              Platform admins manage platform-wide access and can support membership across
-              every community.
+              {t('mainTabs.platformRolesBody')}
             </p>
           </div>
         </div>
@@ -77,11 +77,10 @@ export default function MainTabs() {
         <section className="amnesty-dark-band px-8 py-8">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="amnesty-kicker text-amnesty-yellow mb-3">Platform setup</p>
-              <h2 className="text-3xl text-white amnesty-heading">Claim the first platform admin</h2>
+              <p className="amnesty-kicker text-amnesty-yellow mb-3">{t('mainTabs.setupKicker')}</p>
+              <h2 className="text-3xl text-white amnesty-heading">{t('mainTabs.setupTitle')}</h2>
               <p className="mt-3 max-w-3xl text-base leading-7 text-white/80">
-                No platform admin exists yet. Claim the first role explicitly before
-                communities and member assignments can be managed.
+                {t('mainTabs.setupBody')}
               </p>
             </div>
             <button
@@ -89,7 +88,7 @@ export default function MainTabs() {
               disabled={bootstrapPlatformAdmin.isPending}
               className="btn-primary rounded-full"
             >
-              {bootstrapPlatformAdmin.isPending ? 'Claiming...' : 'Claim platform admin'}
+              {bootstrapPlatformAdmin.isPending ? t('common.loading.creating') : t('mainTabs.claimAction')}
             </button>
           </div>
         </section>
@@ -105,7 +104,7 @@ export default function MainTabs() {
                 : 'border-b-4 border-transparent text-[#6b7f89] hover:text-amnesty-ink'
             }`}
           >
-            Dashboard
+            {t('mainTabs.tabs.dashboard')}
           </button>
 
           {isAdmin && (
@@ -117,7 +116,7 @@ export default function MainTabs() {
                   : 'border-b-4 border-transparent text-[#6b7f89] hover:text-amnesty-ink'
               }`}
             >
-              Platform admin
+              {t('mainTabs.tabs.platformAdmin')}
             </button>
           )}
         </div>
@@ -129,11 +128,9 @@ export default function MainTabs() {
 
       {!isAdmin && !needsBootstrap && (
         <section className="border border-amnesty-line bg-white px-6 py-5">
-          <p className="amnesty-kicker text-amnesty-blue mb-3">Role model</p>
+          <p className="amnesty-kicker text-amnesty-blue mb-3">{t('communities.membership.kicker')}</p>
           <p className="text-lg leading-8 text-amnesty-ink">
-            Platform-wide access is reserved for the people stewarding community roles.
-            Participation itself remains community-scoped, so members can focus on local
-            organising and decision-making.
+            {t('mainTabs.roleModelBody')}
           </p>
         </section>
       )}

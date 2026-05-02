@@ -1,7 +1,10 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useVoteOnProposal, useGetUserProfile, useFinalizeProposal } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { CommunityRole, Proposal, ProposalState } from '../backend';
+import { formatNumber } from '../i18n/format';
+import { useLocalePreference } from '../i18n/preferences';
 import LoadingSpinner from './LoadingSpinner';
 
 interface ProposalCardProps {
@@ -17,6 +20,8 @@ export default function ProposalCard({
   communityRole,
   isPlatformAdmin = false
 }: ProposalCardProps) {
+  const { t } = useTranslation();
+  const { locale } = useLocalePreference();
   const { identity } = useInternetIdentity();
   const voteOnProposal = useVoteOnProposal();
   const finalizeProposal = useFinalizeProposal();
@@ -63,38 +68,38 @@ export default function ProposalCard({
   const getVoteButtonConfig = (voteType: 'yes' | 'no') => {
     if (hasAlreadyVoted) {
       return {
-        text: 'YOU HAVE ALREADY VOTED',
+        text: t('proposals.card.alreadyVotedTitle').toUpperCase(),
         className: "px-4 py-3 text-lg text-amnesty-ink bg-[#eef3f5] border border-[#082333] amnesty-heading font-bold cursor-not-allowed opacity-75",
         disabled: true,
-        title: "You have already voted on this proposal"
+        title: t('proposals.card.voteButtonTitles.alreadyVoted')
       };
     }
     if (!isVotingActive) {
       return {
-        text: hasVotingEnded ? 'VOTING CLOSED' : 'VOTING NOT STARTED',
+        text: hasVotingEnded ? t('proposals.card.votingClosed').toUpperCase() : t('proposals.card.votingNotStarted').toUpperCase(),
         className: "px-4 py-3 text-lg text-amnesty-ink bg-[#eef3f5] border border-[#082333] amnesty-heading font-bold cursor-not-allowed opacity-75",
         disabled: true,
-        title: hasVotingEnded ? "The voting window has closed" : "Voting has not started yet"
+        title: hasVotingEnded ? t('proposals.card.voteButtonTitles.votingClosed') : t('proposals.card.voteButtonTitles.votingNotStarted')
       };
     }
     if (!canVote) {
       return {
-        text: 'VIEWER ACCESS',
+        text: t('proposals.card.viewerAccess').toUpperCase(),
         className: "px-4 py-3 text-lg text-amnesty-ink bg-[#eef3f5] border border-[#082333] amnesty-heading font-bold cursor-not-allowed opacity-75",
         disabled: true,
-        title: "Only assigned community members and admins can vote"
+        title: t('proposals.card.voteButtonTitles.viewer')
       };
     }
 
     const normalizedBaseClass = "px-6 py-3 font-bold uppercase tracking-[0.12em] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center border border-[#082333] amnesty-heading text-lg";
     
     return {
-      text: voteType === 'yes' ? 'VOTE YES' : 'VOTE NO',
+      text: voteType === 'yes' ? t('proposals.card.voteYes').toUpperCase() : t('proposals.card.voteNo').toUpperCase(),
       className: voteType === 'yes' 
         ? `bg-amnesty-green text-black hover:bg-amnesty-yellow ${normalizedBaseClass}`
         : `bg-amnesty-pink text-white hover:bg-amnesty-purple ${normalizedBaseClass}`,
       disabled: false,
-      title: `Vote ${voteType} on this proposal`
+      title: voteType === 'yes' ? t('proposals.card.voteButtonTitles.yes') : t('proposals.card.voteButtonTitles.no')
     };
   };
 
@@ -102,13 +107,13 @@ export default function ProposalCard({
     const fetchCreatorName = async () => {
       try {
         const profile = await getUserProfile.mutateAsync(proposal.creator);
-        setCreatorName(profile?.name || 'UNKNOWN MEMBER');
+        setCreatorName(profile?.name || t('proposals.card.creatorUnknown').toUpperCase());
       } catch (error) {
-        setCreatorName('UNKNOWN MEMBER');
+        setCreatorName(t('proposals.card.creatorUnknown').toUpperCase());
       }
     };
     fetchCreatorName();
-  }, [proposal.creator, getUserProfile]);
+  }, [proposal.creator, getUserProfile, t]);
 
   const handleVote = async (voteYes: boolean) => {
     const config = getVoteButtonConfig(voteYes ? 'yes' : 'no');
@@ -133,16 +138,16 @@ export default function ProposalCard({
     switch (proposal.state) {
       case ProposalState.active:
         return isVotingActive 
-          ? { text: 'ACTIVE', color: 'bg-amnesty-blue text-black' }
-          : { text: 'PENDING FINALIZATION', color: 'bg-amnesty-yellow text-black' };
+          ? { text: t('common.states.proposal.active').toUpperCase(), color: 'bg-amnesty-blue text-black' }
+          : { text: t('common.states.proposal.pendingFinalization').toUpperCase(), color: 'bg-amnesty-yellow text-black' };
       case ProposalState.pendingFinalization:
-        return { text: 'PENDING FINALIZATION', color: 'bg-amnesty-yellow text-black' };
+        return { text: t('common.states.proposal.pendingFinalization').toUpperCase(), color: 'bg-amnesty-yellow text-black' };
       case ProposalState.passed:
-        return { text: 'PASSED', color: 'bg-amnesty-green text-black' };
+        return { text: t('common.states.proposal.passed').toUpperCase(), color: 'bg-amnesty-green text-black' };
       case ProposalState.failed:
-        return { text: 'FAILED', color: 'bg-amnesty-pink text-white' };
+        return { text: t('common.states.proposal.failed').toUpperCase(), color: 'bg-amnesty-pink text-white' };
       default:
-        return { text: 'UNKNOWN', color: 'bg-amnesty-gray-400 text-black' };
+        return { text: t('common.labels.unknown').toUpperCase(), color: 'bg-amnesty-gray-400 text-black' };
     }
   };
 
@@ -151,12 +156,12 @@ export default function ProposalCard({
   const yesPercentage = totalVotes > 0 ? Math.round((Number(proposal.yes) / totalVotes) * 100) : 0;
   const noPercentage = totalVotes > 0 ? Math.round((Number(proposal.no) / totalVotes) * 100) : 0;
   const roleLabel = isPlatformAdmin
-    ? 'PLATFORM ADMIN'
+    ? t('common.roles.platformAdmin').toUpperCase()
     : communityRole === CommunityRole.communityAdmin
-      ? 'COMMUNITY ADMIN'
+      ? t('common.roles.communityAdmin').toUpperCase()
       : communityRole === CommunityRole.member
-        ? 'MEMBER'
-        : 'VIEWER';
+        ? t('common.roles.member').toUpperCase()
+        : t('common.roles.viewer').toUpperCase();
 
   // Check if the error is specifically about duplicate voting
   const isDuplicateVoteError = voteOnProposal.error?.message?.includes('already voted') || 
@@ -166,13 +171,21 @@ export default function ProposalCard({
     if (!isVotingActive) return null;
     
     if (daysRemaining > 0) {
-      return `${daysRemaining}d ${hoursRemaining}h remaining`;
+      return t('proposals.card.timeDaysHours', {
+        days: formatNumber(daysRemaining, locale),
+        hours: formatNumber(hoursRemaining, locale)
+      });
     } else if (hoursRemaining > 0) {
-      return `${hoursRemaining}h ${minutesRemaining}m remaining`;
+      return t('proposals.card.timeHoursMinutes', {
+        hours: formatNumber(hoursRemaining, locale),
+        minutes: formatNumber(minutesRemaining, locale)
+      });
     } else if (minutesRemaining > 0) {
-      return `${minutesRemaining}m remaining`;
+      return t('proposals.card.timeMinutes', {
+        minutes: formatNumber(minutesRemaining, locale)
+      });
     } else {
-      return 'Less than 1m remaining';
+      return t('proposals.card.lessThanMinute');
     }
   };
 
@@ -181,7 +194,7 @@ export default function ProposalCard({
       <div className="mb-6 h-1.5 w-24 bg-amnesty-pink" />
       <div className="flex items-start justify-between mb-6">
         <div className="flex-1">
-          <p className="amnesty-kicker text-amnesty-pink mb-3">Proposal</p>
+          <p className="amnesty-kicker text-amnesty-pink mb-3">{t('common.labels.proposal')}</p>
           <div className="flex items-center mb-4">
             <h4 className="mr-4 text-4xl text-amnesty-ink amnesty-heading">{proposal.title}</h4>
             <span className={`px-3 py-1 text-sm font-bold amnesty-heading ${stateDisplay.color}`}>
@@ -189,50 +202,47 @@ export default function ProposalCard({
             </span>
             {isOwnProposal && (
               <span className="ml-2 bg-[#e9f4f8] px-3 py-1 text-sm font-bold amnesty-heading text-amnesty-ink">
-                Your proposal
+                {t('proposals.card.yourProposal')}
               </span>
             )}
           </div>
           <p className="mb-6 text-lg leading-8 text-[#38505d]">{proposal.description}</p>
           <div className="mb-4 flex items-center space-x-6 text-lg text-[#38505d]">
-            <span className="font-bold amnesty-heading">By {creatorName}</span>
+            <span className="font-bold amnesty-heading">{t('common.labels.by', { name: creatorName })}</span>
             <span className="font-bold">•</span>
             <span className="font-bold amnesty-heading">#{proposal.id.toString()}</span>
           </div>
 
-          {/* Governance Settings Display */}
           <div className="mb-4 border border-amnesty-line bg-[#f4f7f8] p-5">
-            <h5 className="mb-3 text-lg font-bold text-amnesty-ink amnesty-heading">Governance settings</h5>
+            <h5 className="mb-3 text-lg font-bold text-amnesty-ink amnesty-heading">{t('proposals.card.governanceSettings')}</h5>
             <div className="grid grid-cols-1 gap-4 text-amnesty-ink md:grid-cols-3">
               <div>
-                <span className="font-bold amnesty-heading">Voting window</span>
-                <p>{Math.round(Number(proposal.endNs - proposal.startNs) / (24 * 60 * 60 * 1000 * 1000 * 1000))} days</p>
+                <span className="font-bold amnesty-heading">{t('proposals.card.votingWindow')}</span>
+                <p>{t('proposals.card.daysCount', { count: formatNumber(Math.round(Number(proposal.endNs - proposal.startNs) / (24 * 60 * 60 * 1000 * 1000 * 1000)), locale) })}</p>
               </div>
               <div>
-                <span className="font-bold amnesty-heading">Quorum</span>
-                <p>{proposal.quorum.toString()} votes minimum</p>
+                <span className="font-bold amnesty-heading">{t('proposals.card.quorum')}</span>
+                <p>{t('proposals.card.votesMinimum', { count: formatNumber(proposal.quorum, locale) })}</p>
               </div>
               <div>
-                <span className="font-bold amnesty-heading">Pass threshold</span>
-                <p>{proposal.passPct.toString()}% yes votes</p>
+                <span className="font-bold amnesty-heading">{t('proposals.card.passThreshold')}</span>
+                <p>{t('proposals.card.passThresholdValue', { count: formatNumber(proposal.passPct, locale) })}</p>
               </div>
             </div>
           </div>
 
-          {/* Time Remaining Display */}
           {isVotingActive && (
             <div className="mb-4 bg-amnesty-blue p-4">
               <p className="text-white font-bold amnesty-heading">
-                TIME REMAINING: {formatTimeRemaining()}
+                {t('proposals.card.timeRemaining', { value: formatTimeRemaining() })}
               </p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Vote Results */}
       <div className="mb-6 border border-amnesty-line bg-white p-5">
-        <h5 className="mb-4 text-lg font-bold text-amnesty-ink amnesty-heading">Voting results</h5>
+        <h5 className="mb-4 text-lg font-bold text-amnesty-ink amnesty-heading">{t('proposals.card.votingResults')}</h5>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -242,7 +252,10 @@ export default function ProposalCard({
                 </svg>
               </div>
               <span className="text-xl font-bold text-amnesty-ink amnesty-heading">
-                YES: {proposal.yes.toString()} ({yesPercentage}%)
+                {t('proposals.card.yes', {
+                  count: formatNumber(proposal.yes, locale),
+                  percentage: formatNumber(yesPercentage, locale)
+                })}
               </span>
             </div>
             <div className="h-4 w-32 bg-[#e6ecef]">
@@ -261,7 +274,10 @@ export default function ProposalCard({
                 </svg>
               </div>
               <span className="text-xl font-bold text-amnesty-ink amnesty-heading">
-                NO: {proposal.no.toString()} ({noPercentage}%)
+                {t('proposals.card.no', {
+                  count: formatNumber(proposal.no, locale),
+                  percentage: formatNumber(noPercentage, locale)
+                })}
               </span>
             </div>
             <div className="h-4 w-32 bg-[#e6ecef]">
@@ -274,13 +290,15 @@ export default function ProposalCard({
 
           <div className="border-t border-amnesty-line pt-2">
             <span className="text-lg font-bold text-amnesty-ink amnesty-heading">
-              TOTAL VOTES: {totalVotes} / {proposal.quorum.toString()} REQUIRED
+              {t('proposals.card.totalVotesRequired', {
+                total: formatNumber(totalVotes, locale),
+                required: formatNumber(proposal.quorum, locale)
+              })}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="flex flex-col gap-4 border-t border-amnesty-line pt-6 lg:flex-row lg:items-center lg:justify-between">
         {isVotingActive && canVote ? (
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -293,14 +311,14 @@ export default function ProposalCard({
               {voteOnProposal.isPending ? (
                 <>
                   <LoadingSpinner size="small" className="mr-3" />
-                  VOTING...
+                  {t('common.loading.voting')}
                 </>
               ) : (
                 <>
                   <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L9 7v3m-3 10h3m-3 0h-3m3 0v-3m-3 3v-3" />
                   </svg>
-                  VOTE YES
+                  {t('proposals.card.voteYes').toUpperCase()}
                 </>
               )}
             </button>
@@ -314,14 +332,14 @@ export default function ProposalCard({
               {voteOnProposal.isPending ? (
                 <>
                   <LoadingSpinner size="small" className="mr-3" />
-                  VOTING...
+                  {t('common.loading.voting')}
                 </>
               ) : (
                 <>
                   <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v5a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L15 17v-3m-6-10h-3m3 0h3m-3 0v3m3-3v3" />
                   </svg>
-                  VOTE NO
+                  {t('proposals.card.voteNo').toUpperCase()}
                 </>
               )}
             </button>
@@ -330,11 +348,11 @@ export default function ProposalCard({
           <div className="text-lg text-black">
             {hasAlreadyVoted ? (
               <span className="bg-amnesty-yellow px-3 py-1 font-bold amnesty-heading">
-                YOU HAVE VOTED
+                {t('proposals.card.alreadyVotedTitle').toUpperCase()}
               </span>
             ) : !isVotingActive ? (
               <span className="bg-[#eef3f5] px-3 py-1 font-bold amnesty-heading">
-                {hasVotingEnded ? 'VOTING CLOSED' : 'VOTING NOT STARTED'}
+                {hasVotingEnded ? t('proposals.card.votingClosed').toUpperCase() : t('proposals.card.votingNotStarted').toUpperCase()}
               </span>
             ) : (
               <span className="bg-[#eef3f5] px-3 py-1 font-bold amnesty-heading">
@@ -344,7 +362,6 @@ export default function ProposalCard({
           </div>
         )}
 
-        {/* Finalize Button */}
         {canFinalize && (
           <button
             onClick={handleFinalize}
@@ -354,61 +371,57 @@ export default function ProposalCard({
             {finalizeProposal.isPending ? (
               <>
                 <LoadingSpinner size="small" className="mr-3" />
-                FINALIZING...
+                {t('common.loading.finalizing')}
               </>
             ) : (
-              'FINALIZE PROPOSAL'
+              t('common.actions.finalizeProposal')
             )}
           </button>
         )}
       </div>
 
-      {/* Show message for users who have already voted */}
       {hasAlreadyVoted && (
         <div className="mt-4 bg-amnesty-yellow p-4 text-amnesty-ink">
           <p className="text-lg font-bold amnesty-heading">
-            YOU HAVE ALREADY VOTED ON THIS PROPOSAL
+            {t('proposals.card.alreadyVotedTitle').toUpperCase()}
           </p>
           <p className="text-black mt-2">
-            The system enforces one vote per person per proposal. Your vote has been recorded and counted.
-            {isOwnProposal && " As the proposal creator, you were able to vote on your own proposal."}
+            {t('proposals.card.alreadyVotedBody')}
+            {isOwnProposal ? ` ${t('proposals.card.alreadyVotedCreator')}` : ''}
           </p>
         </div>
       )}
 
-      {/* Show error for voting errors (not duplicate votes) */}
       {voteOnProposal.isError && !isDuplicateVoteError && (
         <div className="mt-4 border border-amnesty-line bg-amnesty-ink p-4 text-white">
           <p className="text-lg font-bold amnesty-heading">
-            FAILED TO VOTE. PLEASE TRY AGAIN.
+            {t('proposals.card.voteErrorTitle')}
           </p>
           <p className="text-white mt-2">
-            {voteOnProposal.error?.message || 'An error occurred while processing your vote. Please try again.'}
+            {voteOnProposal.error?.message || t('common.errors.genericVote')}
           </p>
         </div>
       )}
 
-      {/* Show success message for voting */}
       {voteOnProposal.isSuccess && (
         <div className="mt-4 bg-[#eff7e7] p-4 text-amnesty-ink">
           <p className="text-lg font-bold amnesty-heading">
-            VOTE CAST SUCCESSFULLY!
+            {t('proposals.card.voteSuccessTitle').toUpperCase()}
           </p>
           <p className="text-black mt-2">
-            Your vote has been recorded. The system ensures one vote per person per proposal.
-            {isOwnProposal && " As the proposal creator, you successfully voted on your own proposal."}
+            {t('proposals.card.voteSuccessBody')}
+            {isOwnProposal ? ` ${t('proposals.card.voteSuccessCreator')}` : ''}
           </p>
         </div>
       )}
 
-      {/* Show finalization messages */}
       {finalizeProposal.isError && (
         <div className="mt-4 border border-amnesty-line bg-amnesty-ink p-4 text-white">
           <p className="text-lg font-bold amnesty-heading">
-            FAILED TO FINALIZE PROPOSAL.
+            {t('proposals.card.finalizeErrorTitle')}
           </p>
           <p className="text-white mt-2">
-            {finalizeProposal.error?.message || 'An error occurred while finalizing the proposal. Please try again.'}
+            {finalizeProposal.error?.message || t('common.errors.genericFinalizeProposal')}
           </p>
         </div>
       )}
@@ -416,10 +429,10 @@ export default function ProposalCard({
       {finalizeProposal.isSuccess && (
         <div className="mt-4 bg-[#e9f4f8] p-4 text-amnesty-ink">
           <p className="text-lg font-bold amnesty-heading">
-            PROPOSAL FINALIZED SUCCESSFULLY!
+            {t('proposals.card.finalizeSuccessTitle')}
           </p>
           <p className="text-white mt-2">
-            The proposal has been finalized and its final status has been determined based on the voting results.
+            {t('proposals.card.finalizeSuccessBody')}
           </p>
         </div>
       )}

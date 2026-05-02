@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Principal } from '@dfinity/principal';
+import { useTranslation } from 'react-i18next';
 import { CommunityMember, CommunityRole } from '../backend';
+import { formatNumber } from '../i18n/format';
+import { useLocalePreference } from '../i18n/preferences';
 import {
   useGetUserProfile,
   useListAllUsers,
@@ -16,16 +19,16 @@ type SelectionMode = 'list' | 'manual';
 type ScopeValue = 'platform' | string;
 type AssignmentValue = 'viewer' | 'platformAdmin' | CommunityRole;
 
-function assignmentLabel(value: AssignmentValue) {
+function assignmentLabel(value: AssignmentValue, t: (key: string) => string) {
   switch (value) {
     case 'platformAdmin':
-      return 'Platform admin';
+      return t('common.roles.platformAdmin');
     case CommunityRole.communityAdmin:
-      return 'Community admin';
+      return t('common.roles.communityAdmin');
     case CommunityRole.member:
-      return 'Member';
+      return t('common.roles.member');
     default:
-      return 'Viewer';
+      return t('common.roles.viewer');
   }
 }
 
@@ -48,24 +51,26 @@ function roleBadge(role: CommunityRole) {
     : 'bg-[#eff7e7] text-amnesty-ink';
 }
 
-function roleText(role: CommunityRole) {
-  return role === CommunityRole.communityAdmin ? 'Community admin' : 'Member';
+function roleText(role: CommunityRole, t: (key: string) => string) {
+  return role === CommunityRole.communityAdmin ? t('common.roles.communityAdmin') : t('common.roles.member');
 }
 
 function RosterRow({ member }: { member: CommunityMember }) {
+  const { t } = useTranslation();
+
   return (
     <div className="border border-amnesty-line bg-white px-4 py-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <p className="text-2xl text-amnesty-ink amnesty-heading">
-            {member.profile?.name || 'Unnamed member'}
+            {member.profile?.name || t('communities.membership.unnamedMember')}
           </p>
           <p className="mt-2 break-all font-mono text-xs text-[#6c8089]">
             {member.principal.toString()}
           </p>
         </div>
         <span className={`px-3 py-2 text-sm amnesty-heading ${roleBadge(member.role)}`}>
-          {roleText(member.role)}
+          {roleText(member.role, t)}
         </span>
       </div>
     </div>
@@ -73,6 +78,8 @@ function RosterRow({ member }: { member: CommunityMember }) {
 }
 
 export default function AdminPanel() {
+  const { t } = useTranslation();
+  const { locale } = useLocalePreference();
   const [selectedUser, setSelectedUser] = useState<Principal | null>(null);
   const [principalText, setPrincipalText] = useState('');
   const [selectionMode, setSelectionMode] = useState<SelectionMode>('list');
@@ -183,14 +190,14 @@ export default function AdminPanel() {
   }, [isPlatformScope, platformAdminSet, selectedMembers, selectedUser]);
 
   const platformAssignmentOptions: Array<{ value: AssignmentValue; label: string }> = [
-    { value: 'viewer', label: 'Viewer only' },
-    { value: 'platformAdmin', label: 'Platform admin' }
+    { value: 'viewer', label: t('admin.roles.viewerOnly') },
+    { value: 'platformAdmin', label: t('common.roles.platformAdmin') }
   ];
 
   const communityAssignmentOptions: Array<{ value: AssignmentValue; label: string }> = [
-    { value: 'viewer', label: 'Viewer only' },
-    { value: CommunityRole.member, label: 'Member' },
-    { value: CommunityRole.communityAdmin, label: 'Community admin' }
+    { value: 'viewer', label: t('admin.roles.viewerOnly') },
+    { value: CommunityRole.member, label: t('common.roles.member') },
+    { value: CommunityRole.communityAdmin, label: t('common.roles.communityAdmin') }
   ];
 
   const visibleRoster = selectedMembers.slice(0, 6);
@@ -199,33 +206,31 @@ export default function AdminPanel() {
     <div className="space-y-10">
       <section className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
         <div>
-          <p className="amnesty-kicker text-amnesty-pink mb-4">Platform stewardship</p>
+          <p className="amnesty-kicker text-amnesty-pink mb-4">{t('admin.heroKicker')}</p>
           <h2 className="max-w-4xl text-5xl text-amnesty-ink md:text-6xl amnesty-heading">
-            Assign platform admins and community roles from one place.
+            {t('admin.heroTitle')}
           </h2>
           <p className="mt-5 max-w-3xl text-lg leading-8 text-[#38505d]">
-            Review who holds platform-wide access, inspect local rosters, and shift people
-            between viewer, member, and community admin roles without leaving this space.
+            {t('admin.heroBody')}
           </p>
         </div>
 
         <div className="amnesty-dark-band px-7 py-7">
-          <p className="amnesty-kicker text-amnesty-yellow mb-4">Current focus</p>
+          <p className="amnesty-kicker text-amnesty-yellow mb-4">{t('admin.focusKicker')}</p>
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
-              <p className="text-sm uppercase tracking-[0.18em] text-white/60">Platform admins</p>
-              <p className="mt-2 text-4xl text-white amnesty-heading">{platformAdmins?.length ?? 0}</p>
+              <p className="text-sm uppercase tracking-[0.18em] text-white/60">{t('admin.platformAdminsCount')}</p>
+              <p className="mt-2 text-4xl text-white amnesty-heading">{formatNumber(platformAdmins?.length ?? 0, locale)}</p>
             </div>
             <div>
-              <p className="text-sm uppercase tracking-[0.18em] text-white/60">Working scope</p>
+              <p className="text-sm uppercase tracking-[0.18em] text-white/60">{t('admin.workingScope')}</p>
               <p className="mt-2 text-4xl text-white amnesty-heading">
-                {isPlatformScope ? 'Platform' : selectedCommunity?.name || 'Community'}
+                {isPlatformScope ? t('app.nav.platform') : selectedCommunity?.name || t('admin.selectedScopeFallback')}
               </p>
             </div>
           </div>
           <p className="mt-6 text-base leading-7 text-white/78">
-            Platform admins can manage any community. Community roles stay local to the
-            selected community space.
+            {t('admin.focusBody')}
           </p>
         </div>
       </section>
@@ -233,8 +238,8 @@ export default function AdminPanel() {
       <section className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
         <div className="amnesty-panel bg-white p-7">
           <div className="mb-6">
-            <p className="amnesty-kicker text-amnesty-blue mb-3">Platform admins</p>
-            <h3 className="text-4xl text-amnesty-ink amnesty-heading">Current stewards</h3>
+            <p className="amnesty-kicker text-amnesty-blue mb-3">{t('admin.stewardsKicker')}</p>
+            <h3 className="text-4xl text-amnesty-ink amnesty-heading">{t('admin.stewardsTitle')}</h3>
           </div>
 
           {platformAdminsLoading ? (
@@ -244,7 +249,7 @@ export default function AdminPanel() {
           ) : !platformAdmins || platformAdmins.length === 0 ? (
             <div className="border border-amnesty-line bg-[#f4f7f8] px-5 py-8">
               <p className="text-lg leading-8 text-[#38505d]">
-                No platform admins are currently assigned.
+                {t('admin.noPlatformAdmins')}
               </p>
             </div>
           ) : (
@@ -256,14 +261,14 @@ export default function AdminPanel() {
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0 flex-1">
                         <p className="text-2xl text-amnesty-ink amnesty-heading">
-                          {profile?.name || 'Unnamed user'}
+                          {profile?.name || t('communities.membership.unnamedMember')}
                         </p>
                         <p className="mt-2 break-all font-mono text-xs text-[#6c8089]">
                           {principal.toString()}
                         </p>
                       </div>
                       <span className="bg-amnesty-ink px-3 py-2 text-sm text-white amnesty-heading">
-                        Platform admin
+                        {t('common.roles.platformAdmin')}
                       </span>
                     </div>
                   </div>
@@ -276,15 +281,15 @@ export default function AdminPanel() {
         <div className="amnesty-panel bg-white p-7">
           <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="amnesty-kicker text-amnesty-green mb-3">Community roster</p>
+              <p className="amnesty-kicker text-amnesty-green mb-3">{t('admin.rosterKicker')}</p>
               <h3 className="text-4xl text-amnesty-ink amnesty-heading">
-                {selectedCommunity ? selectedCommunity.name : 'Choose a working scope'}
+                {selectedCommunity ? selectedCommunity.name : t('admin.chooseScopeTitle')}
               </h3>
             </div>
 
             <div className="min-w-[18rem]">
               <label htmlFor="admin-scope" className="mb-2 block text-sm text-[#38505d] amnesty-heading">
-                Working scope
+                {t('admin.scopeLabel')}
               </label>
               <select
                 id="admin-scope"
@@ -292,7 +297,7 @@ export default function AdminPanel() {
                 onChange={(event) => setSelectedScope(event.target.value as ScopeValue)}
                 className="input-field text-lg"
               >
-                <option value="platform">Platform</option>
+                <option value="platform">{t('app.nav.platform')}</option>
                 {communities?.map((community) => (
                   <option key={community.id.toString()} value={community.id.toString()}>
                     {community.name}
@@ -305,8 +310,7 @@ export default function AdminPanel() {
           {selectedCommunityId === null ? (
             <div className="border border-amnesty-line bg-[#f4f7f8] px-5 py-8">
               <p className="text-lg leading-8 text-[#38505d]">
-                Choose a community scope to inspect its current role assignments. Viewer
-                access remains implicit and is never listed in the roster.
+                {t('admin.rosterPrompt')}
               </p>
             </div>
           ) : selectedCommunityMembersLoading ? (
@@ -317,19 +321,19 @@ export default function AdminPanel() {
             <div className="space-y-6">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="border border-amnesty-line bg-[#f8fbf4] px-5 py-5">
-                  <p className="amnesty-kicker text-amnesty-green mb-2">Community admins</p>
-                  <p className="text-4xl text-amnesty-ink amnesty-heading">{selectedCommunityAdmins.length}</p>
+                  <p className="amnesty-kicker text-amnesty-green mb-2">{t('communities.membership.communityAdmins')}</p>
+                  <p className="text-4xl text-amnesty-ink amnesty-heading">{formatNumber(selectedCommunityAdmins.length, locale)}</p>
                 </div>
                 <div className="border border-amnesty-line bg-[#f4f7f8] px-5 py-5">
-                  <p className="amnesty-kicker text-amnesty-blue mb-2">Members</p>
-                  <p className="text-4xl text-amnesty-ink amnesty-heading">{selectedRegularMembers.length}</p>
+                  <p className="amnesty-kicker text-amnesty-blue mb-2">{t('communities.membership.members')}</p>
+                  <p className="text-4xl text-amnesty-ink amnesty-heading">{formatNumber(selectedRegularMembers.length, locale)}</p>
                 </div>
               </div>
 
               {visibleRoster.length === 0 ? (
                 <div className="border border-amnesty-line bg-white px-5 py-8">
                   <p className="text-lg leading-8 text-[#38505d]">
-                    Nobody has an assigned role in this community yet.
+                    {t('admin.rosterNobody')}
                   </p>
                 </div>
               ) : (
@@ -339,8 +343,10 @@ export default function AdminPanel() {
                   ))}
                   {selectedMembers.length > visibleRoster.length && (
                     <p className="text-sm leading-6 text-[#6c8089]">
-                      Showing {visibleRoster.length} of {selectedMembers.length} assigned
-                      people in this community.
+                      {t('admin.rosterShowing', {
+                        visible: formatNumber(visibleRoster.length, locale),
+                        total: formatNumber(selectedMembers.length, locale)
+                      })}
                     </p>
                   )}
                 </div>
@@ -359,8 +365,8 @@ export default function AdminPanel() {
           <section className="amnesty-panel bg-white p-8">
             <div className="mb-6 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <p className="amnesty-kicker text-amnesty-purple mb-3">User selection</p>
-                <h3 className="text-4xl text-amnesty-ink amnesty-heading">Choose who to update</h3>
+                <p className="amnesty-kicker text-amnesty-purple mb-3">{t('admin.userSelectionKicker')}</p>
+                <h3 className="text-4xl text-amnesty-ink amnesty-heading">{t('admin.userSelectionTitle')}</h3>
               </div>
 
               <div className="flex flex-wrap gap-3">
@@ -373,7 +379,7 @@ export default function AdminPanel() {
                       : 'btn-secondary rounded-full'
                   }
                 >
-                  Select from list
+                  {t('common.actions.selectFromList')}
                 </button>
                 <button
                   type="button"
@@ -384,7 +390,7 @@ export default function AdminPanel() {
                       : 'btn-secondary rounded-full'
                   }
                 >
-                  Enter principal
+                  {t('common.actions.enterPrincipal')}
                 </button>
               </div>
             </div>
@@ -392,7 +398,7 @@ export default function AdminPanel() {
             {selectionMode === 'list' ? (
               !allUsers || allUsers.length === 0 ? (
                 <div className="border border-amnesty-line bg-[#f4f7f8] px-5 py-8">
-                  <p className="text-lg leading-8 text-[#38505d]">No saved user profiles yet.</p>
+                  <p className="text-lg leading-8 text-[#38505d]">{t('common.empty.noUsers')}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -416,7 +422,7 @@ export default function AdminPanel() {
                         <div className="flex flex-wrap items-start justify-between gap-4">
                           <div className="min-w-0 flex-1">
                             <p className="text-2xl text-amnesty-ink amnesty-heading">
-                              {profile?.name || 'Unnamed user'}
+                              {profile?.name || t('communities.membership.unnamedMember')}
                             </p>
                             <p className="mt-2 break-all font-mono text-xs text-[#6c8089]">
                               {principal.toString()}
@@ -425,17 +431,17 @@ export default function AdminPanel() {
                           <div className="flex flex-wrap gap-2">
                             {isAdmin && (
                               <span className="bg-amnesty-ink px-3 py-2 text-sm text-white amnesty-heading">
-                                Platform admin
+                                {t('common.roles.platformAdmin')}
                               </span>
                             )}
                             {communityRole && !isPlatformScope && (
                               <span className={`px-3 py-2 text-sm amnesty-heading ${roleBadge(communityRole)}`}>
-                                {roleText(communityRole)}
+                                {roleText(communityRole, t)}
                               </span>
                             )}
                             {!isAdmin && !communityRole && (
                               <span className="bg-[#eef3f5] px-3 py-2 text-sm text-amnesty-ink amnesty-heading">
-                                Viewer
+                                {t('common.roles.viewer')}
                               </span>
                             )}
                           </div>
@@ -449,7 +455,7 @@ export default function AdminPanel() {
               <div className="space-y-5">
                 <div>
                   <label htmlFor="principal" className="mb-3 block text-lg text-amnesty-ink amnesty-heading">
-                    User principal ID
+                    {t('admin.principalLabel')}
                   </label>
                   <div className="flex flex-col gap-3 lg:flex-row">
                     <input
@@ -458,7 +464,7 @@ export default function AdminPanel() {
                       value={principalText}
                       onChange={(event) => handleManualUserInput(event.target.value)}
                       className="input-field flex-1 text-lg font-mono"
-                      placeholder="Enter a principal ID"
+                      placeholder={t('admin.principalPlaceholder')}
                     />
                     <button
                       type="button"
@@ -466,14 +472,13 @@ export default function AdminPanel() {
                       disabled={!selectedUser || getUserProfile.isPending}
                       className="btn-secondary lg:min-w-[10rem]"
                     >
-                      {getUserProfile.isPending ? <LoadingSpinner size="small" /> : 'Look up'}
+                      {getUserProfile.isPending ? <LoadingSpinner size="small" /> : t('common.actions.lookUp')}
                     </button>
                   </div>
                 </div>
 
                 <p className="text-sm leading-6 text-[#6c8089]">
-                  Enter a valid principal to manage a user who does not yet appear in the
-                  saved profile list.
+                  {t('admin.principalHelp')}
                 </p>
               </div>
             )}
@@ -482,9 +487,9 @@ export default function AdminPanel() {
           {selectedUser && (
             <section className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
               <div className="amnesty-panel bg-white p-7">
-                <p className="amnesty-kicker text-amnesty-blue mb-3">Selected user</p>
+                <p className="amnesty-kicker text-amnesty-blue mb-3">{t('admin.selectedUserKicker')}</p>
                 <h3 className="text-4xl text-amnesty-ink amnesty-heading">
-                  {selectedUserName || 'Unnamed user'}
+                  {selectedUserName || t('communities.membership.unnamedMember')}
                 </h3>
                 <p className="mt-4 break-all font-mono text-sm leading-7 text-[#6c8089]">
                   {selectedUser.toString()}
@@ -492,34 +497,36 @@ export default function AdminPanel() {
 
                 <div className="mt-6 flex flex-wrap gap-3">
                   <span className={`px-3 py-2 text-sm amnesty-heading ${assignmentTone(currentScopeAssignment)}`}>
-                    Current in scope: {assignmentLabel(currentScopeAssignment)}
+                    {t('admin.currentInScope', { assignment: assignmentLabel(currentScopeAssignment, t) })}
                   </span>
                   <span className="border border-amnesty-line px-3 py-2 text-sm text-amnesty-ink amnesty-heading">
-                    Scope: {isPlatformScope ? 'Platform' : selectedCommunity?.name || 'Community'}
+                    {t('common.labels.scope', {
+                      scope: isPlatformScope ? t('app.nav.platform') : selectedCommunity?.name || t('admin.selectedScopeFallback')
+                    })}
                   </span>
                 </div>
 
                 <div className="mt-8 border border-amnesty-line bg-[#f8fbf4] px-5 py-5">
-                  <p className="amnesty-kicker text-amnesty-green mb-3">What changes here</p>
+                  <p className="amnesty-kicker text-amnesty-green mb-3">{t('admin.whatChangesKicker')}</p>
                   <p className="text-base leading-7 text-[#38505d]">
                     {isPlatformScope
-                      ? 'Platform admin changes affect platform-wide stewardship only. Any community-specific roles remain intact.'
-                      : 'Community role changes affect only the selected community. Platform admin access, if any, remains unchanged.'}
+                      ? t('admin.whatChangesPlatform')
+                      : t('admin.whatChangesCommunity')}
                   </p>
                 </div>
               </div>
 
               <form onSubmit={handleSubmit} className="amnesty-panel bg-white p-7 space-y-6">
                 <div>
-                  <p className="amnesty-kicker text-amnesty-pink mb-3">Assignment</p>
+                  <p className="amnesty-kicker text-amnesty-pink mb-3">{t('admin.assignmentKicker')}</p>
                   <h3 className="text-4xl text-amnesty-ink amnesty-heading">
-                    Update access for this scope
+                    {t('admin.assignmentTitle')}
                   </h3>
                 </div>
 
                 <div>
                   <label htmlFor="assignment" className="mb-3 block text-lg text-amnesty-ink amnesty-heading">
-                    Assignment
+                    {t('admin.assignmentLabel')}
                   </label>
                   <select
                     id="assignment"
@@ -536,17 +543,17 @@ export default function AdminPanel() {
                 </div>
 
                 <div className="bg-amnesty-yellow px-5 py-5">
-                  <p className="amnesty-kicker text-amnesty-ink mb-3">What this does</p>
+                  <p className="amnesty-kicker text-amnesty-ink mb-3">{t('admin.assignmentEffectTitle')}</p>
                   <p className="text-base leading-7 text-amnesty-ink">
                     {isPlatformScope
                       ? selectedAssignment === 'platformAdmin'
-                        ? 'Grant platform-wide admin privileges. This person will be able to create communities and manage membership across the platform.'
-                        : 'Remove platform-wide admin privileges while leaving community-scoped assignments untouched.'
+                        ? t('admin.assignmentEffects.platformAdmin')
+                        : t('admin.assignmentEffects.removePlatformAdmin')
                       : selectedAssignment === 'viewer'
-                        ? 'Remove any assigned community role. The person will still be able to read the community as an authenticated viewer.'
+                        ? t('admin.assignmentEffects.viewer')
                         : selectedAssignment === CommunityRole.communityAdmin
-                          ? 'Assign community admin privileges for the selected community.'
-                          : 'Assign member participation for the selected community.'}
+                          ? t('admin.assignmentEffects.communityAdmin')
+                          : t('admin.assignmentEffects.member')}
                   </p>
                 </div>
 
@@ -557,8 +564,8 @@ export default function AdminPanel() {
                     className="btn-primary rounded-full"
                   >
                     {setPlatformAdmin.isPending || setCommunityRole.isPending
-                      ? 'Saving...'
-                      : 'Save assignment'}
+                      ? t('common.loading.saving')
+                      : t('common.actions.saveAssignment')}
                   </button>
                 </div>
               </form>

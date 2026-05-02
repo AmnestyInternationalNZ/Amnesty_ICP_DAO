@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
 import { useGetCallerUserProfile } from './hooks/useQueries';
 import LoginButton from './components/LoginButton';
@@ -7,25 +8,14 @@ import MainTabs from './components/MainTabs';
 import LoadingSpinner from './components/LoadingSpinner';
 import AmnestyLogo from './components/AmnestyLogo';
 
-const landingNav = [
-  { label: 'Communities', href: '#communities' },
-  { label: 'Proposals', href: '#proposals' },
-  { label: 'Campaigns', href: '#campaigns' },
-];
-
-const appNav = [
-  { label: 'Dashboard', href: '#dashboard' },
-  { label: 'Communities', href: '#communities' },
-  { label: 'Platform', href: '#platform' },
-];
-
 function StatementBand() {
+  const { t } = useTranslation();
+
   return (
     <section className="bg-amnesty-yellow">
       <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">
         <p className="mx-auto max-w-5xl text-3xl font-bold leading-tight text-amnesty-ink md:text-5xl amnesty-heading">
-          Community voice, visible accountability, and collective action belong in the
-          same place.
+          {t('app.landing.statement')}
         </p>
       </div>
     </section>
@@ -33,6 +23,8 @@ function StatementBand() {
 }
 
 function SiteFooter() {
+  const { t } = useTranslation();
+
   return (
     <footer className="mt-20">
       <StatementBand />
@@ -41,32 +33,28 @@ function SiteFooter() {
           <div className="space-y-5">
             <AmnestyLogo className="max-w-[11rem]" imageClassName="w-full" />
             <p className="max-w-sm text-base leading-7 text-white/74">
-              A local expression of Amnesty Community, shaped for proposals, campaigns,
-              and people power across Aotearoa.
+              {t('app.footer.intro')}
             </p>
           </div>
 
           <div>
-            <p className="mb-5 text-xl text-white amnesty-heading">Community</p>
+            <p className="mb-5 text-xl text-white amnesty-heading">{t('app.footer.communityTitle')}</p>
             <p className="text-base leading-7 text-white/74">
-              Browse community spaces, read the kaupapa behind each group, and see where
-              you can take part.
+              {t('app.footer.communityBody')}
             </p>
           </div>
 
           <div>
-            <p className="mb-5 text-xl text-white amnesty-heading">Governance</p>
+            <p className="mb-5 text-xl text-white amnesty-heading">{t('app.footer.governanceTitle')}</p>
             <p className="text-base leading-7 text-white/74">
-              Debate proposals with visible voting windows, quorum settings, and clearly
-              attributed decisions.
+              {t('app.footer.governanceBody')}
             </p>
           </div>
 
           <div>
-            <p className="mb-5 text-xl text-white amnesty-heading">Action</p>
+            <p className="mb-5 text-xl text-white amnesty-heading">{t('app.footer.actionTitle')}</p>
             <p className="text-base leading-7 text-white/74">
-              Support campaigns, fund urgent work together, and keep community action
-              grounded in accountability.
+              {t('app.footer.actionBody')}
             </p>
           </div>
         </div>
@@ -76,11 +64,22 @@ function SiteFooter() {
 }
 
 export default function App() {
+  const { t } = useTranslation();
   const { identity, isInitializing } = useInternetIdentity();
   const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
 
   const isAuthenticated = !!identity;
   const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
+  const landingNav = [
+    { label: t('app.nav.communities'), href: '#communities' },
+    { label: t('app.nav.proposals'), href: '#proposals' },
+    { label: t('app.nav.campaigns'), href: '#campaigns' },
+  ];
+  const appNav = [
+    { label: t('app.nav.dashboard'), href: '#dashboard' },
+    { label: t('app.nav.communities'), href: '#communities' },
+    { label: t('app.nav.platform'), href: '#platform' },
+  ];
   const navigation = isAuthenticated ? appNav : landingNav;
 
   if (isInitializing) {
@@ -114,7 +113,7 @@ export default function App() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
               {isAuthenticated && userProfile && (
                 <div className="border border-amnesty-line bg-white px-4 py-3">
-                  <p className="amnesty-kicker text-amnesty-blue mb-1">Signed in</p>
+                  <p className="amnesty-kicker text-amnesty-blue mb-1">{t('common.labels.signedIn')}</p>
                   <p className="text-lg text-amnesty-ink amnesty-heading">{userProfile.name}</p>
                 </div>
               )}
@@ -132,23 +131,21 @@ export default function App() {
                 <div className="grid gap-10 xl:grid-cols-[1fr_0.92fr] xl:items-stretch">
                   <div className="flex flex-col justify-center">
                     <p className="amnesty-kicker text-amnesty-yellow mb-5">
-                      A human rights movement in Aotearoa
+                      {t('app.landing.heroKicker')}
                     </p>
                     <h1 className="max-w-4xl text-5xl text-white md:text-7xl amnesty-heading">
-                      People power for community governance
+                      {t('app.landing.heroTitle')}
                     </h1>
                     <p className="mt-6 max-w-3xl text-lg leading-8 text-white/82 md:text-2xl">
-                      Bring Amnesty communities together to organise local events, debate
-                      proposals, and fund urgent action with visible accountability.
+                      {t('app.landing.heroBody')}
                     </p>
 
                     <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
                       <LoginButton className="w-full rounded-full sm:w-auto" />
                       <div className="border border-white/20 bg-white/8 px-5 py-4 text-left backdrop-blur">
-                        <p className="amnesty-kicker text-amnesty-yellow mb-2">Access model</p>
+                        <p className="amnesty-kicker text-amnesty-yellow mb-2">{t('common.labels.accessModel')}</p>
                         <p className="max-w-xl text-base leading-7 text-white/82">
-                          Viewers can explore every community. Assigned members and
-                          community admins can propose, vote, and contribute together.
+                          {t('app.landing.accessBody')}
                         </p>
                       </div>
                     </div>
@@ -163,13 +160,12 @@ export default function App() {
                     </div>
 
                     <div className="relative flex min-h-[28rem] h-full flex-col justify-end px-8 py-10 md:px-12">
-                      <p className="amnesty-kicker text-amnesty-yellow mb-4">People power</p>
+                      <p className="amnesty-kicker text-amnesty-yellow mb-4">{t('app.landing.artKicker')}</p>
                       <h2 className="max-w-[19rem] text-5xl text-white md:max-w-[22rem] md:text-[4.25rem] amnesty-heading">
-                        If you care enough to question, you care enough to act.
+                        {t('app.landing.artTitle')}
                       </h2>
                       <p className="mt-6 max-w-[21rem] text-base leading-7 text-white/84 md:text-lg">
-                        Shape collective decisions, support urgent campaigns, and keep
-                        community action grounded in accountability.
+                        {t('app.landing.artBody')}
                       </p>
                     </div>
                   </div>
@@ -180,27 +176,24 @@ export default function App() {
             <section id="communities" className="border-b border-amnesty-line bg-white">
               <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-24">
                 <div className="bg-amnesty-yellow px-8 py-10">
-                  <p className="amnesty-kicker text-amnesty-ink mb-4">Join Amnesty Community</p>
+                  <p className="amnesty-kicker text-amnesty-ink mb-4">{t('app.landing.joinKicker')}</p>
                   <h2 className="max-w-md text-5xl text-amnesty-ink md:text-6xl amnesty-heading">
-                    Meet other human rights advocates
+                    {t('app.landing.joinTitle')}
                   </h2>
                   <p className="mt-6 max-w-lg text-lg leading-8 text-amnesty-ink">
-                    Communities create a shared place to organise around local action,
-                    clear participation, and practical solidarity.
+                    {t('app.landing.joinBody')}
                   </p>
                 </div>
 
                 <div className="flex flex-col justify-center">
                   <h3 className="max-w-3xl text-5xl text-amnesty-ink md:text-6xl amnesty-heading">
-                    When community voice becomes visible, action can move faster.
+                    {t('app.landing.visibilityTitle')}
                   </h3>
                   <p className="mt-8 max-w-3xl text-xl leading-8 text-amnesty-ink">
-                    Read community spaces, understand the local kaupapa, and see where you
-                    can help organise proposals, campaigns, and people power.
+                    {t('app.landing.visibilityBody')}
                   </p>
                   <p className="mt-8 max-w-3xl text-xl font-semibold leading-8 text-amnesty-ink">
-                    <span className="amnesty-underline">View communities openly.</span>{' '}
-                    Take part where you are trusted with a role.
+                    {t('app.landing.visibilityCallout')}
                   </p>
                 </div>
               </div>
@@ -210,46 +203,41 @@ export default function App() {
               <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
                 <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                   <div>
-                    <p className="amnesty-kicker text-amnesty-yellow mb-4">Take action together</p>
+                    <p className="amnesty-kicker text-amnesty-yellow mb-4">{t('app.landing.actionKicker')}</p>
                     <h2 className="max-w-3xl text-5xl text-white md:text-6xl amnesty-heading">
-                      Build local momentum across communities, proposals, and campaigns.
+                      {t('app.landing.actionTitle')}
                     </h2>
                   </div>
                   <p className="max-w-2xl text-lg leading-8 text-white/74">
-                    The live Amnesty site balances urgency with openness. This application
-                    now follows that same rhythm: more editorial space, clearer calls to
-                    action, and less of the boxed dashboard feel.
+                    {t('app.landing.actionBody')}
                   </p>
                 </div>
 
                 <div className="grid gap-6 lg:grid-cols-3">
                   <article className="bg-white px-7 py-8 text-amnesty-ink amnesty-card-lift">
                     <div className="mb-5 h-1.5 w-24 bg-amnesty-green" />
-                    <p className="amnesty-kicker text-amnesty-green mb-4">Communities</p>
-                    <h3 className="text-4xl amnesty-heading">Build local momentum</h3>
+                    <p className="amnesty-kicker text-amnesty-green mb-4">{t('app.nav.communities')}</p>
+                    <h3 className="text-4xl amnesty-heading">{t('app.landing.cards.communitiesTitle')}</h3>
                     <p className="mt-5 text-lg leading-8 text-amnesty-ink">
-                      Organise community spaces, invite participation deliberately, and
-                      keep human rights work rooted in people power.
+                      {t('app.landing.cards.communitiesBody')}
                     </p>
                   </article>
 
                   <article id="proposals" className="bg-white px-7 py-8 text-amnesty-ink amnesty-card-lift">
                     <div className="mb-5 h-1.5 w-24 bg-amnesty-pink" />
-                    <p className="amnesty-kicker text-amnesty-pink mb-4">Proposals</p>
-                    <h3 className="text-4xl amnesty-heading">Use community voice</h3>
+                    <p className="amnesty-kicker text-amnesty-pink mb-4">{t('app.nav.proposals')}</p>
+                    <h3 className="text-4xl amnesty-heading">{t('app.landing.cards.proposalsTitle')}</h3>
                     <p className="mt-5 text-lg leading-8 text-amnesty-ink">
-                      Move ideas from discussion to decision with clear windows, visible
-                      voting results, and community accountability.
+                      {t('app.landing.cards.proposalsBody')}
                     </p>
                   </article>
 
                   <article id="campaigns" className="bg-white px-7 py-8 text-amnesty-ink amnesty-card-lift">
                     <div className="mb-5 h-1.5 w-24 bg-amnesty-yellow" />
-                    <p className="amnesty-kicker text-amnesty-orange mb-4">Campaigns</p>
-                    <h3 className="text-4xl amnesty-heading">Practice generosity</h3>
+                    <p className="amnesty-kicker text-amnesty-orange mb-4">{t('app.nav.campaigns')}</p>
+                    <h3 className="text-4xl amnesty-heading">{t('app.landing.cards.campaignsTitle')}</h3>
                     <p className="mt-5 text-lg leading-8 text-amnesty-ink">
-                      Support urgent work together with shared targets, visible progress,
-                      and community-led fundraising decisions.
+                      {t('app.landing.cards.campaignsBody')}
                     </p>
                   </article>
                 </div>

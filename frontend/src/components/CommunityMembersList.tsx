@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { CommunityMember, CommunityRole } from '../backend';
 import { useListCommunityMembers } from '../hooks/useQueries';
 import LoadingSpinner from './LoadingSpinner';
@@ -13,11 +14,14 @@ function roleColor(role: CommunityRole) {
     : 'bg-[#eef3f5] text-amnesty-ink';
 }
 
-function roleLabel(role: CommunityRole) {
-  return role === CommunityRole.communityAdmin ? 'COMMUNITY ADMIN' : 'MEMBER';
+function roleLabel(role: CommunityRole, translate: (key: string) => string) {
+  return role === CommunityRole.communityAdmin
+    ? translate('common.roles.communityAdmin').toUpperCase()
+    : translate('common.roles.member').toUpperCase();
 }
 
 function renderMemberList(
+  translate: (key: string, options?: Record<string, unknown>) => string,
   title: string,
   members: Array<CommunityMember>,
   emptyMessage: string
@@ -40,15 +44,15 @@ function renderMemberList(
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-3 mb-2">
                     <h5 className="text-2xl text-amnesty-ink amnesty-heading">
-                      {member.profile?.name || 'Unnamed member'}
+                      {member.profile?.name || translate('communities.membership.unnamedMember')}
                     </h5>
                     <span className={`px-3 py-1 text-sm font-bold amnesty-heading ${roleColor(member.role)}`}>
-                      {roleLabel(member.role)}
+                      {roleLabel(member.role, (key) => translate(key))}
                     </span>
                   </div>
                   <div className="border border-amnesty-line bg-[#f4f7f8] p-3">
                     <p className="text-xs text-amnesty-ink font-mono break-all">
-                      <span className="font-bold amnesty-heading">Principal</span>
+                      <span className="font-bold amnesty-heading">{translate('common.labels.principal')}</span>
                     </p>
                     <p className="text-xs text-amnesty-ink font-mono break-all mt-1">{member.principal.toString()}</p>
                   </div>
@@ -70,12 +74,13 @@ function renderMemberList(
 }
 
 export default function CommunityMembersList({ communityId }: CommunityMembersListProps) {
+  const { t } = useTranslation();
   const { data: members, isLoading, error } = useListCommunityMembers(communityId);
 
   if (isLoading) {
     return (
       <div id="membership" className="amnesty-panel bg-white p-8">
-        <h3 className="text-4xl text-amnesty-ink mb-6 amnesty-heading">Community membership</h3>
+        <h3 className="text-4xl text-amnesty-ink mb-6 amnesty-heading">{t('communities.membership.title')}</h3>
         <div className="flex justify-center py-8">
           <LoadingSpinner size="medium" />
         </div>
@@ -86,9 +91,9 @@ export default function CommunityMembersList({ communityId }: CommunityMembersLi
   if (error || !members) {
     return (
       <div id="membership" className="amnesty-panel bg-white p-8">
-        <h3 className="text-4xl text-amnesty-ink mb-6 amnesty-heading">Community membership</h3>
+        <h3 className="text-4xl text-amnesty-ink mb-6 amnesty-heading">{t('communities.membership.title')}</h3>
         <div className="text-center py-8">
-          <p className="text-lg text-[#38505d]">Unable to load community membership information.</p>
+          <p className="text-lg text-[#38505d]">{t('communities.membership.loadError')}</p>
         </div>
       </div>
     );
@@ -100,10 +105,10 @@ export default function CommunityMembersList({ communityId }: CommunityMembersLi
   return (
     <section id="membership" className="amnesty-panel bg-white p-8 md:p-10">
       <div className="mb-8">
-        <p className="amnesty-kicker text-amnesty-blue mb-4">Role model</p>
-        <h3 className="text-5xl text-amnesty-ink amnesty-heading">Community membership</h3>
+        <p className="amnesty-kicker text-amnesty-blue mb-4">{t('communities.membership.kicker')}</p>
+        <h3 className="text-5xl text-amnesty-ink amnesty-heading">{t('communities.membership.title')}</h3>
         <p className="text-lg text-[#38505d] mt-4 leading-8">
-          Role-based membership assignments for this community.
+          {t('communities.membership.body')}
         </p>
       </div>
 
@@ -113,16 +118,16 @@ export default function CommunityMembersList({ communityId }: CommunityMembersLi
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
           </svg>
           <div>
-            <h4 className="text-lg font-bold text-amnesty-ink mb-1 amnesty-heading">Viewer access stays implicit</h4>
+            <h4 className="text-lg font-bold text-amnesty-ink mb-1 amnesty-heading">{t('communities.membership.viewerAccessTitle')}</h4>
             <p className="text-amnesty-ink">
-              Viewers are implicit and are not listed here. This roster shows only the principals with an assigned community role: community admins and members.
+              {t('communities.membership.viewerAccessBody')}
             </p>
           </div>
         </div>
       </div>
 
-      {renderMemberList('COMMUNITY ADMINS', communityAdmins, 'No community admins assigned.')}
-      {renderMemberList('MEMBERS', communityMembers, 'No members assigned to this community.')}
+      {renderMemberList(t, t('communities.membership.communityAdmins').toUpperCase(), communityAdmins, t('communities.membership.emptyCommunityAdmins'))}
+      {renderMemberList(t, t('communities.membership.members').toUpperCase(), communityMembers, t('communities.membership.emptyMembers'))}
     </section>
   );
 }

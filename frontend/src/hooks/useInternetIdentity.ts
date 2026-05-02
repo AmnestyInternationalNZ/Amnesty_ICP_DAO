@@ -10,19 +10,18 @@ import {
     useState
 } from 'react';
 import { AuthClient, type AuthClientCreateOptions, type AuthClientLoginOptions } from '@dfinity/auth-client';
-import type { Identity } from '@icp-sdk/core/agent';
-import { DelegationIdentity, isDelegationValid } from '@icp-sdk/core/identity';
 import { loadConfig } from '../config';
 
 export type Status = 'initializing' | 'idle' | 'logging-in' | 'success' | 'loginError';
+type AuthIdentity = ReturnType<AuthClient['getIdentity']>;
 
 export type InternetIdentityContext = {
     /** The identity is available after successfully loading the identity from local storage
      * or completing the login process. */
-    identity?: Identity;
+    identity?: AuthIdentity;
 
     /** Connect to Internet Identity to login the user. */
-    login: () => void;
+    login: () => Promise<void>;
 
     /** Clears the identity from the state and local storage. Effectively "logs the user out". */
     clear: () => void;
@@ -132,7 +131,7 @@ export function InternetIdentityProvider({
     createOptions?: AuthClientCreateOptions;
 }>) {
     const [authClient, setAuthClient] = useState<AuthClient | undefined>(undefined);
-    const [identity, setIdentity] = useState<Identity | undefined>(undefined);
+    const [identity, setIdentity] = useState<AuthIdentity | undefined>(undefined);
     const [identityProvider, setIdentityProvider] = useState<string | undefined>(process.env.II_URL || undefined);
     const [loginStatus, setStatus] = useState<Status>('initializing');
     const [loginError, setError] = useState<Error | undefined>(undefined);
@@ -159,7 +158,7 @@ export function InternetIdentityProvider({
         [setErrorMessage]
     );
 
-    const login = useCallback(() => {
+    const login = useCallback(async () => {
         if (!authClient) {
             setErrorMessage(
                 'AuthClient is not initialized yet, make sure to call `login` on user interaction e.g. click.'
@@ -167,12 +166,7 @@ export function InternetIdentityProvider({
             return;
         }
 
-        const currentIdentity = authClient.getIdentity();
-        if (
-            !currentIdentity.getPrincipal().isAnonymous() &&
-            currentIdentity instanceof DelegationIdentity &&
-            isDelegationValid(currentIdentity.getDelegation())
-        ) {
+        if (await authClient.isAuthenticated()) {
             setErrorMessage('User is already authenticated');
             return;
         }

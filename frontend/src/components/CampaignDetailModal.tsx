@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useGetCampaignById, useGetCampaignUpdates, useGetCampaignContributions, useContributeToCampaign, useAddCampaignUpdate, useFinalizeCampaign, useCanFinalizeCampaign } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { CampaignState, CommunityRole } from '../backend';
+import { formatCurrency, formatDateTime, formatNumber } from '../i18n/format';
+import { useLocalePreference } from '../i18n/preferences';
 import LoadingSpinner from './LoadingSpinner';
 
 interface CampaignDetailModalProps {
@@ -19,6 +22,8 @@ export default function CampaignDetailModal({
   campaignId, 
   canInteract
 }: CampaignDetailModalProps) {
+  const { t } = useTranslation();
+  const { locale } = useLocalePreference();
   const [contributionAmount, setContributionAmount] = useState('');
   const [updateContent, setUpdateContent] = useState('');
   const [activeTab, setActiveTab] = useState<'details' | 'updates' | 'contributions'>('details');
@@ -63,7 +68,7 @@ export default function CampaignDetailModal({
   
   const handleContribute = async () => {
     if (!contributionAmount || isNaN(Number(contributionAmount)) || Number(contributionAmount) <= 0) {
-      alert('Please enter a valid contribution amount');
+      alert(t('campaigns.detail.contributionValidation'));
       return;
     }
     
@@ -73,15 +78,15 @@ export default function CampaignDetailModal({
         amount: BigInt(Math.floor(Number(contributionAmount)))
       });
       setContributionAmount('');
-      alert('Contribution successful!');
+      alert(t('campaigns.detail.contributeSuccess'));
     } catch (error: any) {
-      alert(`Failed to contribute: ${error.message || 'Unknown error'}`);
+      alert(t('campaigns.detail.contributeError', { message: error.message || 'Unknown error' }));
     }
   };
   
   const handleAddUpdate = async () => {
     if (!updateContent.trim()) {
-      alert('Please enter update content');
+      alert(t('campaigns.detail.updateValidation'));
       return;
     }
     
@@ -91,46 +96,60 @@ export default function CampaignDetailModal({
         content: updateContent
       });
       setUpdateContent('');
-      alert('Update posted successfully!');
+      alert(t('campaigns.detail.updateSuccess'));
     } catch (error: any) {
-      alert(`Failed to post update: ${error.message || 'Unknown error'}`);
+      alert(t('campaigns.detail.updateError', { message: error.message || 'Unknown error' }));
     }
   };
   
   const handleFinalize = async () => {
-    if (!confirm('Are you sure you want to finalize this campaign? This will mark the campaign as successful and complete. This action cannot be undone.')) {
+    if (!confirm(t('campaigns.detail.finalizeConfirm'))) {
       return;
     }
     
     try {
       await finalizeMutation.mutateAsync(campaignId);
-      alert('Campaign finalized successfully!');
+      alert(t('campaigns.detail.finalizeSuccess'));
     } catch (error: any) {
-      alert(`Failed to finalize campaign: ${error.message || 'Unknown error'}`);
+      alert(t('campaigns.detail.finalizeError', { message: error.message || 'Unknown error' }));
     }
   };
   
   const getFinalizeTooltip = () => {
     if (!isCreator) {
-      return "Only the campaign creator can finalize the campaign";
+      return t('campaigns.detail.creatorTooltip.notCreator');
     }
     if (campaign.state !== CampaignState.active) {
-      return "Campaign has already been finalized";
+      return t('campaigns.detail.creatorTooltip.notActive');
     }
     if (!goalMet) {
-      return "Campaign can only be finalized once the funding goal is reached";
+      return t('campaigns.detail.creatorTooltip.goalNotMet');
     }
-    return "Finalize campaign now that the funding goal has been reached";
+    return t('campaigns.detail.creatorTooltip.ready');
   };
+
+  const campaignStateLabel = (() => {
+    switch (campaign.state) {
+      case CampaignState.active:
+        return t('common.states.campaign.active');
+      case CampaignState.successful:
+        return t('common.states.campaign.successful');
+      case CampaignState.failed:
+        return t('common.states.campaign.failed');
+      case CampaignState.expired:
+        return t('common.states.campaign.expired');
+      default:
+        return t('common.labels.unknown');
+    }
+  })();
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white border-4 border-black p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-amnesty">
-        {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1">
             <h3 className="text-3xl font-bold text-black mb-2 amnesty-heading">{campaign.title}</h3>
-            <p className="text-lg text-black">Campaign ID: {campaign.id.toString()}</p>
+            <p className="text-lg text-black">{t('common.labels.campaignId', { id: campaign.id.toString() })}</p>
           </div>
           <button
             onClick={onClose}
@@ -142,14 +161,16 @@ export default function CampaignDetailModal({
           </button>
         </div>
         
-        {/* Progress Section */}
         <div className="mb-6 p-6 bg-amnesty-gray-100 border-4 border-black">
           <div className="flex items-center justify-between mb-3">
             <span className="text-2xl font-bold text-black amnesty-heading">
-              ${Number(campaign.totalRaised).toLocaleString()} / ${Number(campaign.goalAmount).toLocaleString()}
+              {t('campaigns.detail.progressSummary', {
+                raised: formatCurrency(campaign.totalRaised, locale),
+                goal: formatCurrency(campaign.goalAmount, locale)
+              })}
             </span>
             <span className="text-2xl font-bold text-black amnesty-heading">
-              {progressPercentage.toFixed(0)}%
+              {formatNumber(progressPercentage, locale)}%
             </span>
           </div>
           <div className="w-full h-8 bg-white border-4 border-black mb-3">
@@ -161,24 +182,23 @@ export default function CampaignDetailModal({
           <div className="flex items-center justify-between">
             <span className="text-lg font-bold text-black amnesty-heading">
               {campaign.state === CampaignState.active 
-                ? `${daysLeft} DAYS LEFT`
-                : 'CAMPAIGN ENDED'
+                ? t('campaigns.card.daysLeft', { days: formatNumber(daysLeft, locale) }).toUpperCase()
+                : t('campaigns.detail.campaignEnded').toUpperCase()
               }
             </span>
             <span className="text-lg font-bold text-black amnesty-heading">
-              STATE: {campaign.state.toUpperCase()}
+              {t('campaigns.detail.stateLabel', { state: campaignStateLabel }).toUpperCase()}
             </span>
           </div>
           {goalMet && campaign.state === CampaignState.active && (
             <div className="mt-3 p-3 bg-amnesty-yellow border-2 border-black">
               <p className="text-base font-bold text-black amnesty-heading">
-                🎉 FUNDING GOAL REACHED! Campaign can now be finalized.
+                {t('campaigns.detail.goalReached')}
               </p>
             </div>
           )}
         </div>
         
-        {/* Tabs */}
         <div className="border-4 border-black mb-6">
           <div className="flex border-b-4 border-black">
             <button
@@ -189,7 +209,7 @@ export default function CampaignDetailModal({
                   : 'bg-white text-black hover:bg-amnesty-gray-100'
               }`}
             >
-              DETAILS
+              {t('campaigns.detail.detailsTab').toUpperCase()}
             </button>
             <button
               onClick={() => setActiveTab('updates')}
@@ -199,7 +219,7 @@ export default function CampaignDetailModal({
                   : 'bg-white text-black hover:bg-amnesty-gray-100'
               }`}
             >
-              UPDATES ({updates?.length || 0})
+              {t('campaigns.detail.updatesTab', { count: formatNumber(updates?.length || 0, locale) }).toUpperCase()}
             </button>
             <button
               onClick={() => setActiveTab('contributions')}
@@ -209,7 +229,7 @@ export default function CampaignDetailModal({
                   : 'bg-white text-black hover:bg-amnesty-gray-100'
               }`}
             >
-              CONTRIBUTIONS ({contributions?.length || 0})
+              {t('campaigns.detail.contributionsTab', { count: formatNumber(contributions?.length || 0, locale) }).toUpperCase()}
             </button>
           </div>
           
@@ -217,26 +237,24 @@ export default function CampaignDetailModal({
             {activeTab === 'details' && (
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-xl font-bold text-black mb-3 amnesty-heading">CAMPAIGN STORY</h4>
+                  <h4 className="text-xl font-bold text-black mb-3 amnesty-heading">{t('campaigns.detail.storyTitle')}</h4>
                   <p className="text-lg text-black whitespace-pre-wrap">{campaign.description}</p>
                 </div>
                 
                 <div className="p-4 bg-amnesty-gray-100 border-2 border-black">
-                  <h4 className="text-lg font-bold text-black mb-2 amnesty-heading">ALL-OR-NOTHING FUNDING</h4>
+                  <h4 className="text-lg font-bold text-black mb-2 amnesty-heading">{t('campaigns.detail.fundingTitle')}</h4>
                   <p className="text-base text-black">
-                    This campaign follows an all-or-nothing model. Funds are only collected if the target amount 
-                    is met by the deadline or if the campaign creator finalizes it early once the goal is reached. 
-                    If the goal is not reached, no funds will be collected.
+                    {t('campaigns.detail.fundingBody')}
                   </p>
                 </div>
                 
                 {canInteract && campaign.state === CampaignState.active && (
                   <div className="p-6 bg-amnesty-yellow border-4 border-black">
-                    <h4 className="text-xl font-bold text-black mb-4 amnesty-heading">CONTRIBUTE TO THIS CAMPAIGN</h4>
+                    <h4 className="text-xl font-bold text-black mb-4 amnesty-heading">{t('campaigns.detail.contributeTitle')}</h4>
                     <div className="flex items-end space-x-4">
                       <div className="flex-1">
                         <label className="block text-base font-bold text-black mb-2 amnesty-heading">
-                          AMOUNT ($)
+                          {t('campaigns.detail.amountLabel')}
                         </label>
                         <input
                           type="number"
@@ -245,7 +263,7 @@ export default function CampaignDetailModal({
                           value={contributionAmount}
                           onChange={(e) => setContributionAmount(e.target.value)}
                           className="input-field"
-                          placeholder="Enter amount"
+                          placeholder={t('campaigns.detail.amountPlaceholder')}
                         />
                       </div>
                       <button
@@ -253,7 +271,7 @@ export default function CampaignDetailModal({
                         disabled={contributeMutation.isPending}
                         className="bg-black text-white px-8 py-3 font-bold uppercase tracking-wide hover:bg-amnesty-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-400 border-4 border-black amnesty-heading disabled:opacity-50"
                       >
-                        {contributeMutation.isPending ? 'CONTRIBUTING...' : 'CONTRIBUTE'}
+                        {contributeMutation.isPending ? t('common.loading.contributing') : t('common.actions.contribute')}
                       </button>
                     </div>
                   </div>
@@ -261,7 +279,7 @@ export default function CampaignDetailModal({
                 
                 {isCreator && campaign.state === CampaignState.active && (
                   <div className="p-6 bg-amnesty-gray-100 border-4 border-black">
-                    <h4 className="text-xl font-bold text-black mb-4 amnesty-heading">CREATOR ACTIONS</h4>
+                    <h4 className="text-xl font-bold text-black mb-4 amnesty-heading">{t('campaigns.detail.creatorActionsTitle')}</h4>
                     <div className="space-y-3">
                       <button
                         onClick={handleFinalize}
@@ -269,17 +287,19 @@ export default function CampaignDetailModal({
                         className="bg-black text-white px-8 py-3 font-bold uppercase tracking-wide hover:bg-amnesty-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-400 border-4 border-black amnesty-heading disabled:opacity-50 disabled:cursor-not-allowed"
                         title={getFinalizeTooltip()}
                       >
-                        {finalizeMutation.isPending ? 'FINALIZING...' : 'FINALIZE CAMPAIGN'}
+                        {finalizeMutation.isPending ? t('common.loading.finalizing') : t('common.actions.finalizeCampaign')}
                       </button>
                       <p className="text-sm text-black">
                         {canFinalizeLoading ? (
-                          'Checking finalization status...'
+                          t('common.loading.checkingStatus')
                         ) : canFinalize ? (
-                          '✓ Campaign can be finalized now that the funding goal has been reached.'
+                          t('campaigns.detail.finalizeStatusReady')
                         ) : goalMet ? (
-                          'Campaign goal has been met! You can finalize the campaign.'
+                          t('campaigns.detail.finalizeStatusGoalMet')
                         ) : (
-                          `Campaign can be finalized once the funding goal of $${Number(campaign.goalAmount).toLocaleString()} is reached.`
+                          t('campaigns.detail.finalizeStatusPending', {
+                            goal: formatCurrency(campaign.goalAmount, locale)
+                          })
                         )}
                       </p>
                     </div>
@@ -289,7 +309,7 @@ export default function CampaignDetailModal({
                 {!isCreator && campaign.state === CampaignState.active && goalMet && (
                   <div className="p-4 bg-amnesty-gray-100 border-2 border-black">
                     <p className="text-base text-black">
-                      <strong>Note:</strong> The funding goal has been reached. The campaign creator can now finalize this campaign.
+                      <strong>{t('campaigns.detail.noteLabel')}</strong> {t('campaigns.detail.goalReachedNote')}
                     </p>
                   </div>
                 )}
@@ -300,20 +320,20 @@ export default function CampaignDetailModal({
               <div className="space-y-6">
                 {isCreator && (
                   <div className="p-6 bg-amnesty-yellow border-4 border-black">
-                    <h4 className="text-xl font-bold text-black mb-4 amnesty-heading">POST AN UPDATE</h4>
+                    <h4 className="text-xl font-bold text-black mb-4 amnesty-heading">{t('common.actions.postUpdate')}</h4>
                     <textarea
                       value={updateContent}
                       onChange={(e) => setUpdateContent(e.target.value)}
                       className="input-field mb-4"
                       rows={4}
-                      placeholder="Share progress, outcomes, or other updates with backers..."
+                      placeholder={t('campaigns.detail.postUpdatePlaceholder')}
                     />
                     <button
                       onClick={handleAddUpdate}
                       disabled={addUpdateMutation.isPending}
                       className="bg-black text-white px-8 py-3 font-bold uppercase tracking-wide hover:bg-amnesty-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-400 border-4 border-black amnesty-heading disabled:opacity-50"
                     >
-                      {addUpdateMutation.isPending ? 'POSTING...' : 'POST UPDATE'}
+                      {addUpdateMutation.isPending ? t('common.loading.posting') : t('common.actions.postUpdate')}
                     </button>
                   </div>
                 )}
@@ -324,7 +344,7 @@ export default function CampaignDetailModal({
                   </div>
                 ) : !updates || updates.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-lg text-black">No updates posted yet.</p>
+                    <p className="text-lg text-black">{t('common.empty.noUpdates')}</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -332,10 +352,10 @@ export default function CampaignDetailModal({
                       <div key={update.id.toString()} className="p-4 bg-white border-4 border-black">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm font-bold text-black amnesty-heading">
-                            UPDATE #{update.id.toString()}
+                            {t('campaigns.detail.updateLabel', { id: update.id.toString() })}
                           </span>
                           <span className="text-sm text-black">
-                            {new Date(Number(update.timestampNs) / 1_000_000).toLocaleString()}
+                            {formatDateTime(Number(update.timestampNs) / 1_000_000, locale)}
                           </span>
                         </div>
                         <p className="text-base text-black whitespace-pre-wrap">{update.content}</p>
@@ -354,7 +374,7 @@ export default function CampaignDetailModal({
                   </div>
                 ) : !contributions || contributions.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-lg text-black">No contributions yet.</p>
+                    <p className="text-lg text-black">{t('common.empty.noContributions')}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -362,14 +382,14 @@ export default function CampaignDetailModal({
                       <div key={index} className="p-4 bg-white border-2 border-black flex items-center justify-between">
                         <div>
                           <span className="text-base font-bold text-black amnesty-heading">
-                            ${Number(contribution.amount).toLocaleString()}
+                            {formatCurrency(contribution.amount, locale)}
                           </span>
                           <p className="text-sm text-black">
                             {contribution.contributor.toString().substring(0, 20)}...
                           </p>
                         </div>
                         <span className="text-sm text-black">
-                          {new Date(Number(contribution.timestampNs) / 1_000_000).toLocaleString()}
+                          {formatDateTime(Number(contribution.timestampNs) / 1_000_000, locale)}
                         </span>
                       </div>
                     ))}
@@ -380,13 +400,12 @@ export default function CampaignDetailModal({
           </div>
         </div>
         
-        {/* Close Button */}
         <div className="flex justify-end">
           <button
             onClick={onClose}
             className="bg-amnesty-gray-200 text-black px-8 py-3 font-bold uppercase tracking-wide hover:bg-amnesty-gray-300 focus:outline-none focus:ring-4 focus:ring-gray-400 border-4 border-black amnesty-heading"
           >
-            CLOSE
+            {t('common.actions.close')}
           </button>
         </div>
       </div>
