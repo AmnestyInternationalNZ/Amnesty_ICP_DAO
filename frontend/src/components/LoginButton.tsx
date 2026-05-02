@@ -2,7 +2,12 @@ import React from 'react';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
 
-export default function LoginButton() {
+interface LoginButtonProps {
+  className?: string;
+  compact?: boolean;
+}
+
+export default function LoginButton({ className = '', compact = false }: LoginButtonProps) {
   const { login, clear, loginStatus, identity } = useInternetIdentity();
   const queryClient = useQueryClient();
 
@@ -31,11 +36,9 @@ export default function LoginButton() {
     <button
       onClick={handleAuth}
       disabled={disabled}
-      className={`px-8 py-3 font-bold uppercase tracking-wide transition-all duration-200 border-4 ${
-        isAuthenticated
-          ? 'bg-black text-white border-white hover:bg-amnesty-gray-800'
-          : 'bg-amnesty-yellow text-black border-black hover:bg-yellow-300'
-      } disabled:opacity-50 amnesty-heading`}
+      className={`${
+        isAuthenticated ? 'btn-inverted' : 'btn-primary'
+      } ${compact ? 'px-5 py-2 text-sm md:text-base' : 'px-8 py-4 text-base md:text-lg'} ${className}`.trim()}
     >
       {text}
     </button>

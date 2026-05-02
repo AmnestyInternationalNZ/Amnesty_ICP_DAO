@@ -1,0 +1,10 @@
+[package]
+name = "amnesty-dao-application"
+version = "0.1.0"
+description = "Local Motoko backend for Amnesty DAO"
+
+[dependencies]
+base = "0.16.0"
+
+[toolchain]
+moc = "0.16.3"

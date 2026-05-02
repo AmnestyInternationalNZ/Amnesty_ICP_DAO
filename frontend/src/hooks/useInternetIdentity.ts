@@ -50,7 +50,6 @@ export type InternetIdentityContext = {
 };
 
 const ONE_HOUR_IN_NANOSECONDS = BigInt(3_600_000_000_000);
-const DEFAULT_IDENTITY_PROVIDER = process.env.II_URL;
 
 type ProviderValue = InternetIdentityContext;
 const InternetIdentityReactContext = createContext<ProviderValue | undefined>(undefined);
@@ -134,6 +133,7 @@ export function InternetIdentityProvider({
 }>) {
     const [authClient, setAuthClient] = useState<AuthClient | undefined>(undefined);
     const [identity, setIdentity] = useState<Identity | undefined>(undefined);
+    const [identityProvider, setIdentityProvider] = useState<string | undefined>(process.env.II_URL || undefined);
     const [loginStatus, setStatus] = useState<Status>('initializing');
     const [loginError, setError] = useState<Error | undefined>(undefined);
 
@@ -178,15 +178,18 @@ export function InternetIdentityProvider({
         }
 
         const options: AuthClientLoginOptions = {
-            identityProvider: DEFAULT_IDENTITY_PROVIDER,
             onSuccess: handleLoginSuccess,
             onError: handleLoginError,
             maxTimeToLive: ONE_HOUR_IN_NANOSECONDS
         };
 
+        if (identityProvider) {
+            options.identityProvider = identityProvider;
+        }
+
         setStatus('logging-in');
         void authClient.login(options);
-    }, [authClient, handleLoginError, handleLoginSuccess, setErrorMessage]);
+    }, [authClient, handleLoginError, handleLoginSuccess, identityProvider, setErrorMessage]);
 
     const clear = useCallback(() => {
         if (!authClient) {
@@ -212,6 +215,9 @@ export function InternetIdentityProvider({
         void (async () => {
             try {
                 setStatus('initializing');
+                const config = await loadConfig();
+                if (cancelled) return;
+                setIdentityProvider(config.ii_url);
                 let existingClient = authClient;
                 if (!existingClient) {
                     existingClient = await createAuthClient(createOptions);

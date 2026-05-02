@@ -98,8 +98,8 @@ export default function CreateCommunityModal({ isOpen, onClose }: CreateCommunit
                 <div>
                   <h4 className="text-lg font-bold text-black mb-2 amnesty-heading">COMMUNITY CREATION</h4>
                   <p className="text-lg text-black">
-                    You will become the admin of this community and be automatically added as the first member. 
-                    You can manage membership and community settings after creation.
+                    You will become the first community admin and be automatically assigned to the community.
+                    Platform admins can still oversee the community, but local membership management starts here.
                   </p>
                 </div>
               </div>

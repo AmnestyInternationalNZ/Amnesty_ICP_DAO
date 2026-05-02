@@ -1,21 +1,29 @@
+const path = require('node:path');
+
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    path.join(__dirname, 'index.html'),
+    path.join(__dirname, 'src/**/*.{js,ts,jsx,tsx}'),
   ],
   theme: {
     extend: {
       colors: {
-        'amnesty-yellow': '#FFF200',
+        'amnesty-yellow': '#FFFF00',
         'amnesty-black': '#000000',
         'amnesty-white': '#FFFFFF',
+        'amnesty-blue': '#1AA3D6',
+        'amnesty-pink': '#EE4790',
+        'amnesty-green': '#88C540',
+        'amnesty-purple': '#511E84',
+        'amnesty-orange': '#E87722',
         'amnesty-gray': {
+          50: '#F7F7F2',
           100: '#F5F5F5',
-          200: '#E5E5E5',
-          300: '#D4D4D4',
-          400: '#A3A3A3',
-          500: '#737373',
+          200: '#E7E5DE',
+          300: '#D1CEC4',
+          400: '#A8A499',
+          500: '#737067',
           600: '#525252',
           700: '#404040',
           800: '#262626',
@@ -23,12 +31,15 @@ export default {
         },
       },
       fontFamily: {
-        'oswald': ['Oswald', 'Arial Black', 'Arial', 'sans-serif'],
-        'sans': ['Arial', 'sans-serif'],
+        'amnesty-sans': ['"Amnesty Trade Gothic"', 'Arial', 'sans-serif'],
+        'amnesty-condensed': ['"Amnesty Trade Gothic Condensed"', '"Arial Narrow"', 'Arial', 'sans-serif'],
+        'amnesty-serif': ['Archer', 'Georgia', 'serif'],
+        'sans': ['"Amnesty Trade Gothic"', 'Arial', 'sans-serif'],
       },
       boxShadow: {
-        'amnesty': '4px 4px 0px 0px #000000',
-        'amnesty-yellow': '4px 4px 0px 0px #FFF200',
+        'amnesty': '10px 10px 0px 0px #FFFF00',
+        'amnesty-yellow': '14px 14px 0px 0px #FFFF00',
+        'amnesty-dark': '10px 10px 0px 0px #000000',
       },
       borderRadius: {
         'none': '0',

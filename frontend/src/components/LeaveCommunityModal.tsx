@@ -76,10 +76,10 @@ export default function LeaveCommunityModal({
                   </p>
                   <ul className="list-disc list-inside space-y-2 text-black ml-4">
                     <li>Remove you from the community's member list</li>
-                    <li>Set your role in this community to "guest"</li>
+                    <li>Return you to read-only viewer access in this community</li>
                     <li>Revoke your ability to create new proposals in this community</li>
                     <li>Revoke your ability to vote on proposals in this community</li>
-                    <li>Allow you to continue viewing the community as a guest</li>
+                    <li>Allow you to continue viewing the community as an authenticated viewer</li>
                     <li><strong>Preserve</strong> your historical proposals and votes (they will remain visible)</li>
                   </ul>
                   <p className="text-lg text-black mt-4 font-bold">
@@ -152,7 +152,7 @@ export default function LeaveCommunityModal({
                   SUCCESSFULLY LEFT THE COMMUNITY!
                 </p>
                 <p className="text-black mt-2">
-                  You have been removed from the community member list and can now view it as a guest. 
+                  You have been removed from the community member list and can now view it as a read-only viewer.
                   Your historical contributions remain preserved.
                 </p>
               </div>

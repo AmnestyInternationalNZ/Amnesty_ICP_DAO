@@ -1,24 +1,17 @@
-import { createActor, type backendInterface, type CreateActorOptions, ExternalBlob } from './backend';
-import { StorageClient } from './utils/StorageClient';
+import { createActor, type backendInterface, type CreateActorOptions } from './backend';
 import { HttpAgent } from '@icp-sdk/core/agent';
-
-const DEFAULT_STORAGE_GATEWAY_URL = 'https://blob.caffeine.ai';
-const DEFAULT_BUCKET_NAME = 'default-bucket';
-const DEFAULT_PROJECT_ID = '0000000-0000-0000-0000-00000000000';
 
 interface JsonConfig {
     backend_host: string;
     backend_canister_id: string;
-    project_id: string;
+    ii_url: string;
     ii_derivation_origin: string;
 }
 
 interface Config {
     backend_host?: string;
     backend_canister_id: string;
-    storage_gateway_url: string;
-    bucket_name: string;
-    project_id: string;
+    ii_url?: string;
     ii_derivation_origin?: string;
 }
 
@@ -42,9 +35,7 @@ export async function loadConfig(): Promise<Config> {
             backend_canister_id: (config.backend_canister_id == 'undefined'
                 ? backendCanisterId
                 : config.backend_canister_id) as string,
-            storage_gateway_url: process.env.STORAGE_GATEWAY_URL ?? 'nogateway',
-            bucket_name: DEFAULT_BUCKET_NAME,
-            project_id: config.project_id !== 'undefined' ? config.project_id : DEFAULT_PROJECT_ID,
+            ii_url: config.ii_url == 'undefined' ? undefined : config.ii_url,
             ii_derivation_origin: config.ii_derivation_origin == 'undefined' ? undefined : config.ii_derivation_origin
         };
         configCache = fullConfig;
@@ -57,9 +48,7 @@ export async function loadConfig(): Promise<Config> {
         const fallbackConfig = {
             backend_host: undefined,
             backend_canister_id: backendCanisterId,
-            storage_gateway_url: DEFAULT_STORAGE_GATEWAY_URL,
-            bucket_name: DEFAULT_BUCKET_NAME,
-            project_id: DEFAULT_PROJECT_ID,
+            ii_url: process.env.II_URL || undefined,
             ii_derivation_origin: undefined
         };
         return fallbackConfig;
@@ -80,11 +69,9 @@ function processError(e: unknown): never {
 
 export async function createActorWithConfig(options?: CreateActorOptions): Promise<backendInterface> {
     const config = await loadConfig();
-    if (!options) {
-        options = {};
-    }
+    const resolvedOptions = options ?? {};
     const agent = new HttpAgent({
-        ...options.agentOptions,
+        ...resolvedOptions.agentOptions,
         host: config.backend_host
     });
     if (config.backend_host?.includes('localhost')) {
@@ -93,33 +80,9 @@ export async function createActorWithConfig(options?: CreateActorOptions): Promi
             console.error(err);
         });
     }
-    options = {
-        ...options,
+    return createActor(config.backend_canister_id, {
+        ...resolvedOptions,
         agent: agent,
         processError
-    };
-
-    const storageClient = new StorageClient(
-        config.bucket_name,
-        config.storage_gateway_url,
-        config.backend_canister_id,
-        config.project_id,
-        agent
-    );
-
-    const MOTOKO_DEDUPLICATION_SENTINEL = '!caf!';
-
-    const uploadFile = async (file: ExternalBlob): Promise<Uint8Array> => {
-        const { hash } = await storageClient.putFile(await file.getBytes(), file.onProgress);
-        return new TextEncoder().encode(MOTOKO_DEDUPLICATION_SENTINEL + hash);
-    };
-
-    const downloadFile = async (bytes: Uint8Array): Promise<ExternalBlob> => {
-        const hashWithPrefix = new TextDecoder().decode(new Uint8Array(bytes));
-        const hash = hashWithPrefix.substring(MOTOKO_DEDUPLICATION_SENTINEL.length);
-        const url = await storageClient.getDirectURL(hash);
-        return ExternalBlob.fromURL(url);
-    };
-
-    return createActor(config.backend_canister_id, uploadFile, downloadFile, options);
+    });
 }

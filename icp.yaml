@@ -1,0 +1,26 @@
+canisters:
+  - name: backend
+    recipe:
+      type: "@dfinity/motoko@v4.0.0"
+      configuration:
+        main: backend/main.mo
+        candid: declarations/backend/backend.did
+        args: ""
+
+environments:
+  - name: amnesty-local
+    network: amnesty-local
+    canisters:
+      - backend
+
+networks:
+  - name: local
+    mode: managed
+    ii: true
+    gateway:
+      port: 4944
+  - name: amnesty-local
+    mode: managed
+    ii: true
+    gateway:
+      port: 4954

@@ -1,0 +1,7 @@
+.icp/
+.mops/
+.playwright-cli/
+node_modules/
+frontend/dist/
+frontend/public/env.json
+output/

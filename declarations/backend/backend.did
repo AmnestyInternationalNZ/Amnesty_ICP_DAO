@@ -1,24 +1,50 @@
-type UserRole = 
- variant {
-   admin;
-   guest;
-   user;
- };
 type UserProfile = record {name: text;};
-type ProposalState = 
+type TransformationOutput =
+ record {
+   body: blob;
+   headers: vec Header;
+   status: nat;
+ };
+type TransformationInput =
+ record {
+   context: blob;
+   response: TransformationOutput;
+ };
+type StripeSessionStatus =
+ variant {
+   completed: record {
+                response: text;
+                userPrincipal: opt text;
+              };
+   failed: record {error: text;};
+ };
+type StripeConfiguration =
+ record {
+   allowedCountries: vec text;
+   secretKey: text;
+ };
+type ShoppingItem =
+ record {
+   currency: text;
+   priceInCents: nat;
+   productDescription: text;
+   productName: text;
+   quantity: nat;
+ };
+type ProposalState =
  variant {
    active;
    failed;
    passed;
    pendingFinalization;
  };
-type ProposalOverrides = 
+type ProposalOverrides =
  record {
    passPct: opt nat;
    quorum: opt nat;
    windowNs: opt nat;
  };
-type Proposal = 
+type Proposal =
  record {
    communityId: nat;
    creator: principal;
@@ -33,7 +59,41 @@ type Proposal =
    title: text;
    yes: nat;
  };
-type Community = 
+type PlatformRole = variant {platformAdmin;};
+type Header =
+ record {
+   name: text;
+   value: text;
+ };
+type Contribution =
+ record {
+   amount: nat;
+   contributor: principal;
+   timestampNs: int;
+ };
+type CommunityRole =
+ variant {
+   communityAdmin;
+   member;
+ };
+type CommunityMember =
+ record {
+   "principal": principal;
+   profile: opt UserProfile;
+   role: CommunityRole;
+ };
+type CommunityAccess =
+ record {
+   canContributeToCampaign: bool;
+   canCreateCampaign: bool;
+   canCreateProposal: bool;
+   canLeaveCommunity: bool;
+   canManageMembership: bool;
+   canVoteOnProposal: bool;
+   communityRole: opt CommunityRole;
+   isPlatformAdmin: bool;
+ };
+type Community =
  record {
    admin: principal;
    id: nat;
@@ -41,30 +101,76 @@ type Community =
    name: text;
    policy: text;
  };
+type CampaignUpdate =
+ record {
+   campaignId: nat;
+   content: text;
+   creator: principal;
+   id: nat;
+   timestampNs: int;
+ };
+type CampaignState =
+ variant {
+   active;
+   expired;
+   failed;
+   successful;
+ };
+type Campaign =
+ record {
+   communityId: nat;
+   createdNs: int;
+   creator: principal;
+   deadlineNs: int;
+   description: text;
+   goalAmount: nat;
+   id: nat;
+   state: CampaignState;
+   title: text;
+   totalRaised: nat;
+ };
 service : {
-  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  addCampaignUpdate: (campaignId: nat, content: text) -> ();
+  bootstrapPlatformAdmin: () -> ();
+  canFinalizeCampaign: (campaignId: nat) -> (bool) query;
+  contributeToCampaign: (campaignId: nat, amount: nat) -> ();
+  createCampaign: (communityId: nat, title: text, description: text,
+   goalAmount: nat, deadlineNs: int) -> ();
+  createCheckoutSession: (items: vec ShoppingItem, successUrl: text,
+   cancelUrl: text) -> (text);
   createCommunity: (name: text, policy: text) -> ();
   createProposal: (communityId: nat, title: text, description: text,
    overrides: opt ProposalOverrides) -> ();
-  enterCommunityPortal: (communityId: nat) -> (Community) query;
+  finalizeCampaign: (campaignId: nat) -> ();
   finalizeProposal: (proposalId: nat) -> ();
+  getCallerCommunityRole: (communityId: nat) -> (opt CommunityRole) query;
+  getCallerPlatformRole: () -> (opt PlatformRole) query;
   getCallerUserProfile: () -> (opt UserProfile) query;
-  getCallerUserRole: () -> (UserRole) query;
+  getCampaignById: (campaignId: nat) -> (opt Campaign) query;
+  getCampaignContributions: (campaignId: nat) -> (vec Contribution) query;
+  getCampaignUpdates: (campaignId: nat) -> (vec CampaignUpdate) query;
+  getCommunityAccess: (communityId: nat) -> (CommunityAccess) query;
   getCommunityById: (id: nat) -> (opt Community) query;
   getProposalById: (proposalId: nat) -> (opt Proposal) query;
+  getStripeSessionStatus: (sessionId: text) -> (StripeSessionStatus);
   getUserProfile: (user: principal) -> (opt UserProfile) query;
-  initializeAccessControl: () -> ();
-  isCallerAdmin: () -> (bool) query;
-  joinCommunity: (communityId: nat) -> ();
+  isCallerPlatformAdmin: () -> (bool) query;
+  isStripeConfigured: () -> (bool) query;
   leaveCommunity: (communityId: nat) -> ();
   listAllUsers: () -> (vec record {
                              principal;
                              UserProfile;
                            }) query;
+  listCampaignsByCommunity: (communityId: nat) -> (vec Campaign) query;
   listCommunities: () -> (vec Community) query;
+  listCommunityMembers: (communityId: nat) -> (vec CommunityMember) query;
+  listPlatformAdmins: () -> (vec principal) query;
   listProposalsByCommunity: (communityId: nat) -> (vec Proposal) query;
-  removeMemberFromCommunity: (communityId: nat, memberToRemove: principal) ->
-   ();
   saveCallerUserProfile: (profile: UserProfile) -> ();
+  setCommunityRole: (communityId: nat, user: principal, role:
+   opt CommunityRole) -> ();
+  setPlatformAdmin: (user: principal, enabled: bool) -> ();
+  setStripeConfiguration: (config: StripeConfiguration) -> ();
+  transform: (input: TransformationInput) -> (TransformationOutput) query;
   voteOnProposal: (proposalId: nat, voteYes: bool) -> ();
 }

@@ -1,4 +1,4 @@
-import { HttpAgent, isV3ResponseBody } from '@icp-sdk/core/agent';
+import { HttpAgent, isV4ResponseBody } from '@icp-sdk/core/agent';
 import { IDL } from '@icp-sdk/core/candid';
 
 type Headers = Record<string, string>;
@@ -441,11 +441,11 @@ export class StorageClient {
             arg: args
         });
         const respone = result.response.body;
-        if (isV3ResponseBody(respone)) {
+        if (isV4ResponseBody(respone)) {
             console.log('Certificate:', respone.certificate);
             return respone.certificate;
         }
-        throw new Error('Expected v3 response body');
+        throw new Error('Expected v4 response body');
     }
 
     public async putFile(blobBytes: Uint8Array, onProgress?: (percentage: number) => void): Promise<{ hash: string }> {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useGetCampaignById, useGetCampaignUpdates, useGetCampaignContributions, useContributeToCampaign, useAddCampaignUpdate, useFinalizeCampaign, useCanFinalizeCampaign } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { CampaignState, UserRole } from '../backend';
+import { CampaignState, CommunityRole } from '../backend';
 import LoadingSpinner from './LoadingSpinner';
 
 interface CampaignDetailModalProps {
@@ -9,17 +9,15 @@ interface CampaignDetailModalProps {
   onClose: () => void;
   campaignId: bigint;
   canInteract: boolean;
-  userRole?: UserRole;
-  hasLeftCommunity?: boolean;
+  communityRole?: CommunityRole | null;
+  isPlatformAdmin?: boolean;
 }
 
 export default function CampaignDetailModal({ 
   isOpen, 
   onClose, 
   campaignId, 
-  canInteract,
-  userRole,
-  hasLeftCommunity 
+  canInteract
 }: CampaignDetailModalProps) {
   const [contributionAmount, setContributionAmount] = useState('');
   const [updateContent, setUpdateContent] = useState('');
