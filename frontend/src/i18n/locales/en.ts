@@ -100,16 +100,24 @@ export const en = {
         action: {
             login: 'Log in',
             logout: 'Log out',
+            signOut: 'Sign out',
             loggingIn: 'Logging in...'
         }
     },
     app: {
         nav: {
+            admin: 'Admin',
+            boards: 'Boards',
+            calendar: 'Calendar',
+            community: 'Community',
             communities: 'Communities',
             proposals: 'Proposals',
             campaigns: 'Campaigns',
             dashboard: 'Dashboard',
-            platform: 'Platform'
+            hub: 'Hub',
+            platform: 'Platform',
+            profile: 'Profile',
+            workspace: 'Workspace'
         },
         landing: {
             statement: 'Community voice, visible accountability, and collective action belong in the same place.',
@@ -168,7 +176,14 @@ export const en = {
             'Add the name other advocates should see when proposals, campaigns, and decisions are attributed across the platform.',
         nameLabel: 'Your name',
         namePlaceholder: 'How should the community know you?',
-        saveError: 'We could not save your profile yet.'
+        saveError: 'We could not save your profile yet.',
+        page: {
+            kicker: 'Profile',
+            title: 'Manage your community identity',
+            body:
+                'Keep the name people see beside your proposals, campaigns, workspace edits, and community participation up to date.',
+            identityKicker: 'Internet Identity principal'
+        }
     },
     mainTabs: {
         kicker: 'Amnesty Community',
@@ -476,6 +491,11 @@ export const en = {
         }
     },
     boards: {
+        page: {
+            title: 'Coordinate community work on boards',
+            body:
+                'Turn plans into practical tasks with boards scoped to this community and its members.'
+        },
         newPlaceholder: 'New board title',
         newColumnPlaceholder: 'New column title',
         newCardPlaceholder: 'New card title',
@@ -494,6 +514,11 @@ export const en = {
         }
     },
     calendar: {
+        page: {
+            title: 'Keep community events visible',
+            body:
+                'Plan gatherings, actions, meetings, and deadlines in one community calendar.'
+        },
         createTitle: 'Create community event',
         editTitle: 'Edit community event',
         emptyTitle: 'No events yet',

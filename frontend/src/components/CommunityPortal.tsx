@@ -6,17 +6,13 @@ import { useLocalePreference } from '../i18n/preferences';
 import {
   useGetCommunityAccess,
   useGetCommunityById,
-  useListCampaignsByCommunity,
-  useListProposalsByCommunity
+  useListCampaignsByCommunity
 } from '../hooks/useQueries';
 import LoadingSpinner from './LoadingSpinner';
 import CreateCampaignModal from './CreateCampaignModal';
-import CreateProposalModal from './CreateProposalModal';
 import CampaignCard from './CampaignCard';
 import CommunityMembersList from './CommunityMembersList';
-import CommunityWorkspaceTools from './CommunityWorkspaceTools';
 import LeaveCommunityModal from './LeaveCommunityModal';
-import ProposalCard from './ProposalCard';
 
 interface CommunityPortalProps {
   communityId: bigint;
@@ -26,13 +22,11 @@ interface CommunityPortalProps {
 export default function CommunityPortal({ communityId, onBack }: CommunityPortalProps) {
   const { t } = useTranslation();
   const { locale } = useLocalePreference();
-  const [showCreateProposal, setShowCreateProposal] = useState(false);
   const [showCreateCampaign, setShowCreateCampaign] = useState(false);
   const [showLeaveCommunity, setShowLeaveCommunity] = useState(false);
 
   const { data: community, isLoading: communityLoading, error: communityError } = useGetCommunityById(communityId);
   const { data: access, isLoading: accessLoading } = useGetCommunityAccess(communityId);
-  const { data: proposals, isLoading: proposalsLoading } = useListProposalsByCommunity(communityId);
   const { data: campaigns, isLoading: campaignsLoading } = useListCampaignsByCommunity(communityId);
 
   if (communityLoading || accessLoading) {
@@ -151,22 +145,8 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
               </div>
 
               <div className="mt-8 flex flex-col gap-3">
-                {access.canCreateProposal ? (
-                  <button onClick={() => setShowCreateProposal(true)} className="btn-primary rounded-full">
-                    {t('common.actions.createProposal')}
-                  </button>
-                ) : (
-                  <button
-                    disabled
-                    className="btn-secondary rounded-full opacity-50"
-                    title={t('communities.portal.createProposalLockedTitle')}
-                  >
-                    {t('common.buttons.proposalAccessLocked')}
-                  </button>
-                )}
-
                 {access.canCreateCampaign ? (
-                  <button onClick={() => setShowCreateCampaign(true)} className="btn-secondary rounded-full text-white border-white hover:bg-white/10">
+                  <button onClick={() => setShowCreateCampaign(true)} className="btn-primary rounded-full">
                     {t('common.actions.createCampaign')}
                   </button>
                 ) : (
@@ -188,8 +168,6 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
             </div>
           </div>
         </section>
-
-        <CommunityWorkspaceTools communityId={communityId} access={access} />
 
         <section className="amnesty-panel bg-white p-8 md:p-10">
           <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -237,62 +215,8 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
           )}
         </section>
 
-        <section className="amnesty-panel bg-white p-8 md:p-10">
-          <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="amnesty-kicker text-amnesty-pink mb-4">{t('app.nav.proposals')}</p>
-              <h2 className="text-5xl text-amnesty-ink amnesty-heading">{t('communities.portal.proposalsTitle')}</h2>
-              <p className="mt-4 max-w-3xl text-lg leading-8 text-[#38505d]">
-                {access.canCreateProposal
-                  ? t('communities.portal.proposalsBodyEnabled')
-                  : t('communities.portal.proposalsBodyViewer')}
-              </p>
-            </div>
-          </div>
-
-          {proposalsLoading ? (
-            <div className="flex justify-center py-16">
-              <LoadingSpinner size="large" />
-            </div>
-          ) : !proposals || proposals.length === 0 ? (
-            <div className="border border-amnesty-line bg-[#f8f3f8] px-6 py-10 text-center">
-              <h3 className="text-4xl text-amnesty-ink amnesty-heading">{t('common.empty.noProposals')}</h3>
-              <p className="mx-auto mt-4 max-w-3xl text-lg leading-8 text-[#38505d]">
-                {access.canCreateProposal
-                  ? t('communities.portal.emptyProposalsAdmin')
-                  : t('communities.portal.emptyProposalsViewer')}
-              </p>
-              {access.canCreateProposal && (
-                <button onClick={() => setShowCreateProposal(true)} className="btn-inverted mt-8 rounded-full">
-                  {t('common.actions.createFirstProposal')}
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {proposals.map((proposal) => (
-                <ProposalCard
-                  key={proposal.id.toString()}
-                  proposal={proposal}
-                  canVote={access.canVoteOnProposal}
-                  communityRole={access.communityRole}
-                  isPlatformAdmin={access.isPlatformAdmin}
-                />
-              ))}
-            </div>
-          )}
-        </section>
-
         <CommunityMembersList communityId={communityId} />
       </div>
-
-      {showCreateProposal && access.canCreateProposal && (
-        <CreateProposalModal
-          isOpen={showCreateProposal}
-          onClose={() => setShowCreateProposal(false)}
-          communityId={communityId}
-        />
-      )}
 
       {showCreateCampaign && access.canCreateCampaign && (
         <CreateCampaignModal

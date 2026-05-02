@@ -1,37 +1,66 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { PlatformRole } from '../backend';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import {
   useBootstrapPlatformAdmin,
   useGetCallerPlatformRole,
   useIsCallerPlatformAdmin,
   useListPlatformAdmins
 } from '../hooks/useQueries';
-import { PlatformRole } from '../backend';
 import AdminPanel from './AdminPanel';
+import AmnestyLogo from './AmnestyLogo';
+import CommunityPortal from './CommunityPortal';
+import CommunityProposalsPage from './CommunityProposalsPage';
+import CommunityWorkspacePage from './CommunityWorkspacePage';
 import Dashboard from './Dashboard';
 import LoadingSpinner from './LoadingSpinner';
+import ProfilePage from './ProfilePage';
+
+type AppPage = 'hub' | 'community' | 'proposals' | 'workspace' | 'boards' | 'calendar' | 'admin' | 'profile';
+
+const communityScopedPages: AppPage[] = ['community', 'proposals', 'workspace', 'boards', 'calendar'];
 
 export default function MainTabs() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'admin'>('dashboard');
+  const queryClient = useQueryClient();
+  const { clear } = useInternetIdentity();
+  const [activePage, setActivePage] = useState<AppPage>('hub');
+  const [selectedCommunityId, setSelectedCommunityId] = useState<bigint | null>(null);
   const { data: platformRole, isLoading: roleLoading } = useGetCallerPlatformRole();
   const { data: isPlatformAdmin, isLoading: adminLoading } = useIsCallerPlatformAdmin();
   const { data: platformAdmins, isLoading: platformAdminsLoading } = useListPlatformAdmins();
   const bootstrapPlatformAdmin = useBootstrapPlatformAdmin();
 
-  if (roleLoading || adminLoading || platformAdminsLoading) {
-    return (
-      <div className="flex justify-center py-16">
-        <LoadingSpinner size="large" />
-      </div>
-    );
-  }
-
+  const isAdmin = !!isPlatformAdmin;
   const adminCount = platformAdmins?.length ?? 0;
   const needsBootstrap = adminCount === 0;
-  const isAdmin = !!isPlatformAdmin;
+  const isLoadingShell = roleLoading || adminLoading || platformAdminsLoading;
   const roleLabel =
     platformRole === PlatformRole.platformAdmin ? t('common.roles.platformAdmin') : t('common.roles.viewer');
+
+  useEffect(() => {
+    if (selectedCommunityId === null && communityScopedPages.includes(activePage)) {
+      setActivePage('hub');
+    }
+  }, [activePage, selectedCommunityId]);
+
+  useEffect(() => {
+    if (!isAdmin && activePage === 'admin') {
+      setActivePage('hub');
+    }
+  }, [activePage, isAdmin]);
+
+  const handleEnterCommunity = (communityId: bigint) => {
+    setSelectedCommunityId(communityId);
+    setActivePage('community');
+  };
+
+  const handleBackToHub = () => {
+    setSelectedCommunityId(null);
+    setActivePage('hub');
+  };
 
   const handleBootstrap = async () => {
     try {
@@ -41,12 +70,151 @@ export default function MainTabs() {
     }
   };
 
+  const handleSignOut = async () => {
+    await clear();
+    queryClient.clear();
+  };
+
+  const navItems: Array<{ id: AppPage; label: string; contextual?: boolean }> = [
+    { id: 'hub', label: t('app.nav.hub') },
+    ...(selectedCommunityId !== null
+      ? [
+          { id: 'community' as const, label: t('app.nav.community'), contextual: true },
+          { id: 'proposals' as const, label: t('app.nav.proposals'), contextual: true },
+          { id: 'workspace' as const, label: t('app.nav.workspace'), contextual: true },
+          { id: 'boards' as const, label: t('app.nav.boards'), contextual: true },
+          { id: 'calendar' as const, label: t('app.nav.calendar'), contextual: true },
+        ]
+      : []),
+    ...(isAdmin ? [{ id: 'admin' as const, label: t('app.nav.admin') }] : []),
+    { id: 'profile', label: t('app.nav.profile') },
+  ];
+
   return (
-    <div id="platform" className="space-y-12">
+    <div className="min-h-screen bg-amnesty-paper text-amnesty-ink">
+      <header className="sticky top-0 z-40 border-b border-amnesty-line bg-white shadow-[0_10px_30px_rgba(4,31,45,0.05)]">
+        <div className="flex flex-col lg:min-h-[5.5rem] lg:flex-row lg:items-stretch">
+          <button
+            type="button"
+            onClick={() => setActivePage('hub')}
+            className="flex shrink-0 items-center bg-amnesty-yellow px-7 py-5 text-left transition hover:brightness-95 lg:w-[13.125rem]"
+            aria-label={t('app.nav.hub')}
+          >
+            <AmnestyLogo className="w-full max-w-[9.5rem]" imageClassName="w-full" />
+          </button>
+
+          <div className="flex min-w-0 flex-1 flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+            <nav className="flex flex-wrap items-center gap-x-5 gap-y-3 xl:gap-x-8">
+              {navItems.map((item) => {
+                const active = activePage === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setActivePage(item.id)}
+                    className={`rounded-full px-4 py-2 text-base uppercase tracking-[0.04em] transition amnesty-heading ${
+                      active
+                        ? 'bg-amnesty-yellow text-amnesty-ink'
+                        : 'text-amnesty-ink hover:bg-[#f3f3ed]'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </nav>
+
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="inline-flex w-fit items-center justify-center gap-3 rounded-[0.9rem] bg-amnesty-yellow px-6 py-3 text-base text-amnesty-ink transition hover:brightness-95 amnesty-heading"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8.25 15.75 12 12 15.75M15.75 12H3" />
+              </svg>
+              {t('auth.action.signOut')}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+        {isLoadingShell ? (
+          <div className="flex justify-center py-16">
+            <LoadingSpinner size="large" />
+          </div>
+        ) : (
+          <div className="space-y-12">
+            {activePage === 'hub' && (
+              <HubPage
+                adminCount={adminCount}
+                bootstrapPending={bootstrapPlatformAdmin.isPending}
+                needsBootstrap={needsBootstrap}
+                onBootstrap={handleBootstrap}
+                onEnterCommunity={handleEnterCommunity}
+                roleLabel={roleLabel}
+                showMemberRoleNote={!isAdmin && !needsBootstrap}
+              />
+            )}
+
+            {activePage === 'community' && selectedCommunityId !== null && (
+              <CommunityPortal communityId={selectedCommunityId} onBack={handleBackToHub} />
+            )}
+
+            {activePage === 'proposals' && selectedCommunityId !== null && (
+              <CommunityProposalsPage communityId={selectedCommunityId} />
+            )}
+
+            {activePage === 'workspace' && selectedCommunityId !== null && (
+              <CommunityWorkspacePage communityId={selectedCommunityId} kind="documents" />
+            )}
+
+            {activePage === 'boards' && selectedCommunityId !== null && (
+              <CommunityWorkspacePage communityId={selectedCommunityId} kind="boards" />
+            )}
+
+            {activePage === 'calendar' && selectedCommunityId !== null && (
+              <CommunityWorkspacePage communityId={selectedCommunityId} kind="calendar" />
+            )}
+
+            {activePage === 'admin' && isAdmin && <AdminPanel />}
+
+            {activePage === 'profile' && <ProfilePage />}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+interface HubPageProps {
+  adminCount: number;
+  bootstrapPending: boolean;
+  needsBootstrap: boolean;
+  onBootstrap: () => void;
+  onEnterCommunity: (communityId: bigint) => void;
+  roleLabel: string;
+  showMemberRoleNote: boolean;
+}
+
+function HubPage({
+  adminCount,
+  bootstrapPending,
+  needsBootstrap,
+  onBootstrap,
+  onEnterCommunity,
+  roleLabel,
+  showMemberRoleNote,
+}: HubPageProps) {
+  const { t } = useTranslation();
+
+  return (
+    <>
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr] xl:items-start">
         <div>
           <p className="amnesty-kicker text-amnesty-pink mb-4">{t('mainTabs.kicker')}</p>
-          <h1 id="dashboard" className="max-w-4xl text-5xl text-amnesty-ink md:text-7xl amnesty-heading">
+          <h1 className="max-w-4xl text-5xl text-amnesty-ink md:text-7xl amnesty-heading">
             {t('mainTabs.title')}
           </h1>
           <p className="mt-6 max-w-3xl text-xl leading-8 text-amnesty-ink">
@@ -84,49 +252,19 @@ export default function MainTabs() {
               </p>
             </div>
             <button
-              onClick={handleBootstrap}
-              disabled={bootstrapPlatformAdmin.isPending}
+              onClick={onBootstrap}
+              disabled={bootstrapPending}
               className="btn-primary rounded-full"
             >
-              {bootstrapPlatformAdmin.isPending ? t('common.loading.creating') : t('mainTabs.claimAction')}
+              {bootstrapPending ? t('common.loading.creating') : t('mainTabs.claimAction')}
             </button>
           </div>
         </section>
       )}
 
-      <section className="border-b border-amnesty-line">
-        <div className="flex flex-wrap items-end gap-8">
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`pb-4 text-lg amnesty-heading ${
-              activeTab === 'dashboard'
-                ? 'border-b-4 border-amnesty-yellow text-amnesty-ink'
-                : 'border-b-4 border-transparent text-[#6b7f89] hover:text-amnesty-ink'
-            }`}
-          >
-            {t('mainTabs.tabs.dashboard')}
-          </button>
+      <Dashboard onEnterCommunity={onEnterCommunity} />
 
-          {isAdmin && (
-            <button
-              onClick={() => setActiveTab('admin')}
-              className={`pb-4 text-lg amnesty-heading ${
-                activeTab === 'admin'
-                  ? 'border-b-4 border-amnesty-pink text-amnesty-ink'
-                  : 'border-b-4 border-transparent text-[#6b7f89] hover:text-amnesty-ink'
-              }`}
-            >
-              {t('mainTabs.tabs.platformAdmin')}
-            </button>
-          )}
-        </div>
-      </section>
-
-      <div className="min-h-[600px]">
-        {activeTab === 'dashboard' ? <Dashboard /> : isAdmin ? <AdminPanel /> : null}
-      </div>
-
-      {!isAdmin && !needsBootstrap && (
+      {showMemberRoleNote && (
         <section className="border border-amnesty-line bg-white px-6 py-5">
           <p className="amnesty-kicker text-amnesty-blue mb-3">{t('communities.membership.kicker')}</p>
           <p className="text-lg leading-8 text-amnesty-ink">
@@ -134,6 +272,6 @@ export default function MainTabs() {
           </p>
         </section>
       )}
-    </div>
+    </>
   );
 }

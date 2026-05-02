@@ -10,18 +10,16 @@ import {
 } from '../hooks/useQueries';
 import LoadingSpinner from './LoadingSpinner';
 import CreateCommunityModal from './CreateCommunityModal';
-import CommunityPortal from './CommunityPortal';
 
-export default function CommunitiesSection() {
+interface CommunitiesSectionProps {
+  onEnterCommunity: (communityId: bigint) => void;
+}
+
+export default function CommunitiesSection({ onEnterCommunity }: CommunitiesSectionProps) {
   const { t } = useTranslation();
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedCommunityId, setSelectedCommunityId] = useState<bigint | null>(null);
   const { data: communities, isLoading: communitiesLoading } = useListCommunities();
   const { data: isPlatformAdmin, isLoading: platformAdminLoading } = useIsCallerPlatformAdmin();
-
-  if (selectedCommunityId !== null) {
-    return <CommunityPortal communityId={selectedCommunityId} onBack={() => setSelectedCommunityId(null)} />;
-  }
 
   if (communitiesLoading || platformAdminLoading) {
     return (
@@ -77,7 +75,7 @@ export default function CommunitiesSection() {
               <CommunityCard
                 key={community.id.toString()}
                 community={community}
-                onEnter={(communityId) => setSelectedCommunityId(communityId)}
+                onEnter={onEnterCommunity}
               />
             ))}
           </div>

@@ -1,10 +1,14 @@
 import React from 'react';
 import CommunitiesSection from './CommunitiesSection';
 
-export default function Dashboard() {
+interface DashboardProps {
+  onEnterCommunity: (communityId: bigint) => void;
+}
+
+export default function Dashboard({ onEnterCommunity }: DashboardProps) {
   return (
     <div className="space-y-8">
-      <CommunitiesSection />
+      <CommunitiesSection onEnterCommunity={onEnterCommunity} />
     </div>
   );
 }

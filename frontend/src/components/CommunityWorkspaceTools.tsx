@@ -146,7 +146,7 @@ function ShareControls({
   );
 }
 
-function DocumentsTool({ communityId, canManageCommunityWorkspace }: { communityId: bigint; canManageCommunityWorkspace: boolean }) {
+export function DocumentsTool({ communityId, canManageCommunityWorkspace }: { communityId: bigint; canManageCommunityWorkspace: boolean }) {
   const { t } = useTranslation();
   const { data: documents, isLoading } = useListCommunityDocuments(communityId);
   const { data: members } = useListCommunityMembers(communityId);
@@ -342,7 +342,7 @@ function DocumentsTool({ communityId, canManageCommunityWorkspace }: { community
   );
 }
 
-function BoardsTool({ communityId, canManageCommunityWorkspace }: { communityId: bigint; canManageCommunityWorkspace: boolean }) {
+export function BoardsTool({ communityId, canManageCommunityWorkspace }: { communityId: bigint; canManageCommunityWorkspace: boolean }) {
   const { t } = useTranslation();
   const { data: boards, isLoading } = useListCommunityBoards(communityId);
   const createBoard = useCreateCommunityBoard();
@@ -481,7 +481,7 @@ function BoardsTool({ communityId, canManageCommunityWorkspace }: { communityId:
   );
 }
 
-function CalendarTool({ communityId, canManageCommunityWorkspace }: { communityId: bigint; canManageCommunityWorkspace: boolean }) {
+export function CalendarTool({ communityId, canManageCommunityWorkspace }: { communityId: bigint; canManageCommunityWorkspace: boolean }) {
   const { t } = useTranslation();
   const { locale } = useLocalePreference();
   const { data: events } = useListCommunityEvents(communityId);

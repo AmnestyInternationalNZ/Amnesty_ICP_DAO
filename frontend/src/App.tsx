@@ -75,12 +75,6 @@ export default function App() {
     { label: t('app.nav.proposals'), href: '#proposals' },
     { label: t('app.nav.campaigns'), href: '#campaigns' },
   ];
-  const appNav = [
-    { label: t('app.nav.dashboard'), href: '#dashboard' },
-    { label: t('app.nav.communities'), href: '#communities' },
-    { label: t('app.nav.platform'), href: '#platform' },
-  ];
-  const navigation = isAuthenticated ? appNav : landingNav;
 
   if (isInitializing) {
     return (
@@ -92,36 +86,30 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-amnesty-paper text-amnesty-ink">
-      <header className="border-b border-amnesty-line bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col border-x border-amnesty-line lg:flex-row lg:items-stretch lg:justify-between">
-          <div className="border-b border-amnesty-line lg:border-b-0 lg:border-r">
-            <AmnestyLogo
-              className="w-full max-w-[12rem]"
-              imageClassName="block w-full h-auto"
-            />
-          </div>
+      {!isAuthenticated && (
+        <header className="border-b border-amnesty-line bg-white">
+          <div className="mx-auto flex max-w-7xl flex-col border-x border-amnesty-line lg:flex-row lg:items-stretch lg:justify-between">
+            <div className="border-b border-amnesty-line lg:border-b-0 lg:border-r">
+              <AmnestyLogo
+                className="w-full max-w-[12rem]"
+                imageClassName="block w-full h-auto"
+              />
+            </div>
 
-          <div className="flex flex-1 flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-            <nav className="flex flex-wrap items-center gap-x-8 gap-y-3">
-              {navigation.map((item) => (
-                <a key={item.label} href={item.href} className="amnesty-nav-link">
-                  {item.label}
-                </a>
-              ))}
-            </nav>
+            <div className="flex flex-1 flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+              <nav className="flex flex-wrap items-center gap-x-8 gap-y-3">
+                {landingNav.map((item) => (
+                  <a key={item.label} href={item.href} className="amnesty-nav-link">
+                    {item.label}
+                  </a>
+                ))}
+              </nav>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-              {isAuthenticated && userProfile && (
-                <div className="border border-amnesty-line bg-white px-4 py-3">
-                  <p className="amnesty-kicker text-amnesty-blue mb-1">{t('common.labels.signedIn')}</p>
-                  <p className="text-lg text-amnesty-ink amnesty-heading">{userProfile.name}</p>
-                </div>
-              )}
               <LoginButton compact className="rounded-full px-7 py-3" />
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {!isAuthenticated ? (
         <>
@@ -261,12 +249,7 @@ export default function App() {
           </div>
         </main>
       ) : (
-        <>
-          <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-            <MainTabs />
-          </main>
-          <SiteFooter />
-        </>
+        <MainTabs />
       )}
     </div>
   );

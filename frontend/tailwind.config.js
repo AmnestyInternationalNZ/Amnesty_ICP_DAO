@@ -9,7 +9,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'amnesty-yellow': '#FFFF00',
+        'amnesty-yellow': '#FFEC00',
         'amnesty-black': '#000000',
         'amnesty-white': '#FFFFFF',
         'amnesty-blue': '#1AA3D6',
@@ -37,8 +37,8 @@ module.exports = {
         'sans': ['"Amnesty Trade Gothic"', 'Arial', 'sans-serif'],
       },
       boxShadow: {
-        'amnesty': '10px 10px 0px 0px #FFFF00',
-        'amnesty-yellow': '14px 14px 0px 0px #FFFF00',
+        'amnesty': '10px 10px 0px 0px #FFEC00',
+        'amnesty-yellow': '14px 14px 0px 0px #FFEC00',
         'amnesty-dark': '10px 10px 0px 0px #000000',
       },
       borderRadius: {
