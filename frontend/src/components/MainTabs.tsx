@@ -17,17 +17,33 @@ import CommunityWorkspacePage from './CommunityWorkspacePage';
 import Dashboard from './Dashboard';
 import LoadingSpinner from './LoadingSpinner';
 import ProfilePage from './ProfilePage';
-
-type AppPage = 'hub' | 'community' | 'proposals' | 'workspace' | 'boards' | 'calendar' | 'admin' | 'profile';
+import { parseAppPath, routePaths, type AppPage, type ParsedAppRoute } from '../routing/appRoutes';
 
 const communityScopedPages: AppPage[] = ['community', 'proposals', 'workspace', 'boards', 'calendar'];
+const LAST_COMMUNITY_KEY = 'amnesty.lastCommunityId';
+
+function readLastCommunityId(): bigint | null {
+  const value = window.localStorage.getItem(LAST_COMMUNITY_KEY);
+  if (!value) return null;
+  try {
+    return BigInt(value);
+  } catch {
+    return null;
+  }
+}
+
+function readCurrentRoute(): ParsedAppRoute {
+  return parseAppPath(window.location.pathname, readLastCommunityId());
+}
 
 export default function MainTabs() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { clear } = useInternetIdentity();
-  const [activePage, setActivePage] = useState<AppPage>('hub');
-  const [selectedCommunityId, setSelectedCommunityId] = useState<bigint | null>(null);
+  const [activePage, setActivePage] = useState<AppPage>(() => readCurrentRoute().page);
+  const [selectedCommunityId, setSelectedCommunityId] = useState<bigint | null>(() => readCurrentRoute().communityId);
+  const [initialWorkspaceDocumentId, setInitialWorkspaceDocumentId] = useState<bigint | undefined>(() => readCurrentRoute().documentId);
+  const [initialWorkspaceBoardId, setInitialWorkspaceBoardId] = useState<bigint | undefined>(() => readCurrentRoute().boardId);
   const { data: platformRole, isLoading: roleLoading } = useGetCallerPlatformRole();
   const { data: isPlatformAdmin, isLoading: adminLoading } = useIsCallerPlatformAdmin();
   const { data: platformAdmins, isLoading: platformAdminsLoading } = useListPlatformAdmins();
@@ -40,26 +56,70 @@ export default function MainTabs() {
   const roleLabel =
     platformRole === PlatformRole.platformAdmin ? t('common.roles.platformAdmin') : t('common.roles.viewer');
 
+  const applyRoute = (route: ParsedAppRoute) => {
+    setActivePage(route.page);
+    if (route.communityId !== null) {
+      setSelectedCommunityId(route.communityId);
+      window.localStorage.setItem(LAST_COMMUNITY_KEY, route.communityId.toString());
+    } else if (route.page === 'hub') {
+      setSelectedCommunityId(null);
+    }
+    setInitialWorkspaceDocumentId(route.page === 'workspace' ? route.documentId : undefined);
+    setInitialWorkspaceBoardId(route.page === 'boards' ? route.boardId : undefined);
+  };
+
+  const navigateTo = (path: string, mode: 'push' | 'replace' = 'push') => {
+    if (window.location.pathname !== path) {
+      window.history[mode === 'replace' ? 'replaceState' : 'pushState']({}, '', path);
+    }
+    applyRoute(parseAppPath(path, selectedCommunityId));
+  };
+
+  const pathForPage = (page: AppPage): string => {
+    if (page === 'hub') return routePaths.hub();
+    if (page === 'profile') return routePaths.profile();
+    if (page === 'admin') return routePaths.admin();
+    if (selectedCommunityId === null) return routePaths.hub();
+    if (page === 'community') return routePaths.community(selectedCommunityId);
+    if (page === 'proposals') return routePaths.proposals(selectedCommunityId);
+    if (page === 'workspace') return routePaths.workspace(selectedCommunityId);
+    if (page === 'boards') return routePaths.boards(selectedCommunityId);
+    if (page === 'calendar') return routePaths.calendar(selectedCommunityId);
+    return routePaths.hub();
+  };
+
+  useEffect(() => {
+    const route = readCurrentRoute();
+    applyRoute(route);
+    if (route.canonicalPath && route.canonicalPath !== window.location.pathname) {
+      window.history.replaceState({}, '', route.canonicalPath);
+    }
+
+    const onPopState = () => applyRoute(readCurrentRoute());
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+    // Run once to hydrate from the current URL and support browser back/forward.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (selectedCommunityId === null && communityScopedPages.includes(activePage)) {
-      setActivePage('hub');
+      navigateTo(routePaths.hub(), 'replace');
     }
   }, [activePage, selectedCommunityId]);
 
   useEffect(() => {
     if (!isAdmin && activePage === 'admin') {
-      setActivePage('hub');
+      navigateTo(routePaths.hub(), 'replace');
     }
   }, [activePage, isAdmin]);
 
   const handleEnterCommunity = (communityId: bigint) => {
-    setSelectedCommunityId(communityId);
-    setActivePage('community');
+    navigateTo(routePaths.community(communityId));
   };
 
   const handleBackToHub = () => {
-    setSelectedCommunityId(null);
-    setActivePage('hub');
+    navigateTo(routePaths.hub());
   };
 
   const handleBootstrap = async () => {
@@ -96,7 +156,7 @@ export default function MainTabs() {
         <div className="flex flex-col lg:min-h-[5.5rem] lg:flex-row lg:items-stretch">
           <button
             type="button"
-            onClick={() => setActivePage('hub')}
+            onClick={() => navigateTo(routePaths.hub())}
             className="flex shrink-0 items-center bg-amnesty-yellow px-7 py-5 text-left transition hover:brightness-95 lg:w-[13.125rem]"
             aria-label={t('app.nav.hub')}
           >
@@ -111,7 +171,7 @@ export default function MainTabs() {
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => setActivePage(item.id)}
+                    onClick={() => navigateTo(pathForPage(item.id))}
                     className={`rounded-full px-4 py-2 text-base uppercase tracking-[0.04em] transition amnesty-heading ${
                       active
                         ? 'bg-amnesty-yellow text-amnesty-ink'
@@ -139,7 +199,7 @@ export default function MainTabs() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <main className={activePage === 'workspace' ? 'mx-auto max-w-none px-0 py-0' : 'mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14'}>
         {isLoadingShell ? (
           <div className="flex justify-center py-16">
             <LoadingSpinner size="large" />
@@ -167,11 +227,27 @@ export default function MainTabs() {
             )}
 
             {activePage === 'workspace' && selectedCommunityId !== null && (
-              <CommunityWorkspacePage communityId={selectedCommunityId} kind="documents" />
+              <CommunityWorkspacePage
+                communityId={selectedCommunityId}
+                initialDocumentId={initialWorkspaceDocumentId}
+                kind="documents"
+                onOpenDocumentRoute={(documentId) => {
+                  setInitialWorkspaceDocumentId(documentId);
+                  window.history.pushState({}, '', routePaths.document(selectedCommunityId, documentId));
+                }}
+              />
             )}
 
             {activePage === 'boards' && selectedCommunityId !== null && (
-              <CommunityWorkspacePage communityId={selectedCommunityId} kind="boards" />
+              <CommunityWorkspacePage
+                communityId={selectedCommunityId}
+                initialBoardId={initialWorkspaceBoardId}
+                kind="boards"
+                onOpenBoardRoute={(boardId) => {
+                  setInitialWorkspaceBoardId(boardId);
+                  window.history.pushState({}, '', routePaths.board(selectedCommunityId, boardId));
+                }}
+              />
             )}
 
             {activePage === 'calendar' && selectedCommunityId !== null && (

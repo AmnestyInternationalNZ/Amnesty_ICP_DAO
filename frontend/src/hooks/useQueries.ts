@@ -614,7 +614,8 @@ export function useAppendCommunityDocumentUpdate() {
             return actor.appendCommunityDocumentUpdate(communityId, documentId, update);
         },
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['communityDocument', variables.communityId.toString(), variables.documentId.toString()] });
+            // The editor already owns the live Yjs document; refreshing the selected-document
+            // query on every autosave rehydrates the DOM and can steal focus/caret position.
             queryClient.invalidateQueries({ queryKey: ['communityDocuments', variables.communityId.toString()] });
         }
     });
@@ -666,6 +667,22 @@ export function useSetCommunityDocumentGrant() {
             return actor.setCommunityDocumentGrant(communityId, documentId, user, role);
         },
         onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityDocument', variables.communityId.toString(), variables.documentId.toString()] });
+        }
+    });
+}
+
+export function useSetCommunityDocumentParent() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, documentId, parentId }: { communityId: bigint; documentId: bigint; parentId: bigint | null }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.setCommunityDocumentParent(communityId, documentId, parentId);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityDocuments', variables.communityId.toString()] });
             queryClient.invalidateQueries({ queryKey: ['communityDocument', variables.communityId.toString(), variables.documentId.toString()] });
         }
     });

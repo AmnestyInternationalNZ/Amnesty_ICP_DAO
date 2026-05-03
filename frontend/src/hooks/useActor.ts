@@ -26,6 +26,7 @@ export function useActor() {
             });
         },
         staleTime: Infinity,
+        retry: false,
         enabled: true
     });
 

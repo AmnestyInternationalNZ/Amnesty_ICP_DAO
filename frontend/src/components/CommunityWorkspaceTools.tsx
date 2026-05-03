@@ -342,7 +342,17 @@ export function DocumentsTool({ communityId, canManageCommunityWorkspace }: { co
   );
 }
 
-export function BoardsTool({ communityId, canManageCommunityWorkspace }: { communityId: bigint; canManageCommunityWorkspace: boolean }) {
+export function BoardsTool({
+  communityId,
+  canManageCommunityWorkspace,
+  initialBoardId,
+  onOpenBoardRoute,
+}: {
+  communityId: bigint;
+  canManageCommunityWorkspace: boolean;
+  initialBoardId?: bigint;
+  onOpenBoardRoute?: (boardId: bigint) => void;
+}) {
   const { t } = useTranslation();
   const { data: boards, isLoading } = useListCommunityBoards(communityId);
   const createBoard = useCreateCommunityBoard();
@@ -350,11 +360,15 @@ export function BoardsTool({ communityId, canManageCommunityWorkspace }: { commu
   const addCard = useAddCommunityBoardCard();
   const moveCardMutation = useMoveCommunityBoardCard();
   const setShare = useSetCommunityBoardShare();
-  const [selectedBoardId, setSelectedBoardId] = useState<bigint | null>(null);
+  const [selectedBoardId, setSelectedBoardId] = useState<bigint | null>(initialBoardId ?? null);
   const [newTitle, setNewTitle] = useState('');
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [newCardTitle, setNewCardTitle] = useState('');
-  const { data: selectedBoard } = useGetCommunityBoard(communityId, selectedBoardId);
+  const { data: selectedBoard, isLoading: selectedBoardLoading } = useGetCommunityBoard(communityId, selectedBoardId);
+
+  useEffect(() => {
+    setSelectedBoardId(initialBoardId ?? null);
+  }, [initialBoardId]);
 
   useEffect(() => {
     if (!selectedBoardId && boards && boards.length > 0) {
@@ -362,12 +376,17 @@ export function BoardsTool({ communityId, canManageCommunityWorkspace }: { commu
     }
   }, [boards, selectedBoardId]);
 
+  function openBoard(boardId: bigint) {
+    setSelectedBoardId(boardId);
+    onOpenBoardRoute?.(boardId);
+  }
+
   async function create() {
     const title = newTitle.trim();
     if (!title) return;
     const id = await createBoard.mutateAsync({ communityId, title });
     setNewTitle('');
-    setSelectedBoardId(id);
+    openBoard(id);
   }
 
   async function createColumn() {
@@ -410,7 +429,7 @@ export function BoardsTool({ communityId, canManageCommunityWorkspace }: { commu
       <div className="grid gap-6 lg:grid-cols-[0.28fr_0.72fr]">
         <aside className="space-y-2">
           {isLoading ? <LoadingSpinner /> : boards && boards.length > 0 ? boards.map((board) => (
-            <button key={board.id.toString()} type="button" onClick={() => setSelectedBoardId(board.id)} className={`w-full border px-4 py-3 text-left ${selectedBoardId === board.id ? 'border-amnesty-ink bg-white' : 'border-amnesty-line bg-[#f4f7f8]'}`}>
+            <button key={board.id.toString()} type="button" onClick={() => openBoard(board.id)} className={`w-full border px-4 py-3 text-left ${selectedBoardId === board.id ? 'border-amnesty-ink bg-white' : 'border-amnesty-line bg-[#f4f7f8]'}`}>
               <span className="block text-lg amnesty-heading">{board.title}</span>
               <span className="text-xs text-[#5c727d]">{formatNumber(board.cardCount)} {t('boards.labels.cards')}</span>
             </button>
@@ -469,6 +488,14 @@ export function BoardsTool({ communityId, canManageCommunityWorkspace }: { commu
                 </div>
               ))}
             </div>
+          </section>
+        ) : selectedBoardId !== null && !selectedBoardLoading ? (
+          <section className="border border-amnesty-line bg-white p-8 text-center">
+            <p className="amnesty-kicker text-amnesty-pink mb-3">{t('app.nav.boards')}</p>
+            <h3 className="text-4xl amnesty-heading">Board unavailable</h3>
+            <p className="mt-4 text-[#38505d]">
+              This board may be private, archived, deleted, or shared with a different community.
+            </p>
           </section>
         ) : (
           <section className="border border-amnesty-line bg-white p-8 text-center">

@@ -66,11 +66,14 @@ async function createAuthClient(createOptions?: AuthClientCreateOptions): Promis
             disableIdle: true,
             ...createOptions?.idleOptions
         },
-        loginOptions: {
-            derivationOrigin: config.ii_derivation_origin
-        },
         ...createOptions
     };
+    if (config.ii_derivation_origin) {
+        options.loginOptions = {
+            ...createOptions?.loginOptions,
+            derivationOrigin: config.ii_derivation_origin
+        };
+    }
     const authClient = await AuthClient.create(options);
     return authClient;
 }
@@ -142,15 +145,16 @@ export function InternetIdentityProvider({
         setError(new Error(message));
     }, []);
 
-    const handleLoginSuccess = useCallback(() => {
-        const latestIdentity = authClient?.getIdentity();
+    const handleLoginSuccess = useCallback((client: AuthClient) => {
+        const latestIdentity = client.getIdentity();
         if (!latestIdentity) {
             setErrorMessage('Identity not found after successful login');
             return;
         }
         setIdentity(latestIdentity);
         setStatus('success');
-    }, [authClient, setErrorMessage]);
+        setError(undefined);
+    }, [setErrorMessage]);
 
     const handleLoginError = useCallback(
         (maybeError?: string) => {
@@ -167,23 +171,42 @@ export function InternetIdentityProvider({
             return;
         }
 
-        if (await authClient.isAuthenticated()) {
-            setErrorMessage('User is already authenticated');
+        const client = authClient;
+
+        if (await client.isAuthenticated()) {
+            handleLoginSuccess(client);
             return;
         }
 
-        const options: AuthClientLoginOptions = {
-            onSuccess: handleLoginSuccess,
-            onError: handleLoginError,
-            maxTimeToLive: LOCAL_DEV_MAX_TIME_TO_LIVE
-        };
-
-        if (identityProvider) {
-            options.identityProvider = identityProvider;
-        }
-
         setStatus('logging-in');
-        void authClient.login(options);
+        setError(undefined);
+        await new Promise<void>((resolve, reject) => {
+            const options: AuthClientLoginOptions = {
+                onSuccess: () => {
+                    handleLoginSuccess(client);
+                    resolve();
+                },
+                onError: (maybeError?: string) => {
+                    const error = new Error(maybeError ?? 'Login failed');
+                    handleLoginError(error.message);
+                    reject(error);
+                },
+                maxTimeToLive: LOCAL_DEV_MAX_TIME_TO_LIVE
+            };
+
+            if (identityProvider) {
+                options.identityProvider = identityProvider;
+                if (identityProvider.includes('localhost')) {
+                    options.allowPinAuthentication = true;
+                }
+            }
+
+            void client.login(options).catch((unknownError: unknown) => {
+                const error = unknownError instanceof Error ? unknownError : new Error('Login failed');
+                handleLoginError(error.message);
+                reject(error);
+            });
+        });
     }, [authClient, handleLoginError, handleLoginSuccess, identityProvider, setErrorMessage]);
 
     const clear = useCallback(() => {
