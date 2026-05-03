@@ -11,7 +11,7 @@ import {
   type DragStartEvent,
 } from '@dnd-kit/core';
 import { horizontalListSortingStrategy, SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { Copy, Link2, Pin, Plus, RefreshCw, Search, Share2, Trash2 } from 'lucide-react';
+import { Copy, Link2, Pin, Plus, RefreshCw, Search, Share2, Trash2, X } from 'lucide-react';
 import type { CommunityBoardPayload, CommunityDocumentSummary, CommunityEventPayload, CommunityMember, KanbanCard, WorkspaceRole } from '../../backend';
 import { WorkspaceRole as WorkspaceRoleValue } from '../../backend';
 import { compactPrincipal, readableDate, roleName, roleVariant } from '../../workspace/workspaceApi';
@@ -188,6 +188,23 @@ export default function KanbanBoard({
     setCommunityRole(board.communityShare ?? 'private');
   }, [board.id, board.title, board.communityShare]);
 
+  useEffect(() => {
+    if (!shareOpen) return undefined;
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setShareOpen(false);
+      }
+    }
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [shareOpen]);
+
+  useEffect(() => {
+    if (!canManage) {
+      setShareOpen(false);
+    }
+  }, [canManage]);
+
   function addColumn() {
     const trimmed = newColumnTitle.trim();
     if (!trimmed) return;
@@ -314,9 +331,16 @@ export default function KanbanBoard({
       </div>
 
       {shareOpen ? (
-        <div className="share-popover kanban-share-popover">
-          <h3>Share board</h3>
-          <p>Grant direct access, share with community workspace members, or create a public read-only link.</p>
+        <div aria-label="Share board" className="share-popover kanban-share-popover" role="dialog">
+          <div className="share-popover-heading">
+            <div>
+              <h3>Share board</h3>
+              <p>Grant direct access, share with community workspace members, or create a public read-only link.</p>
+            </div>
+            <button aria-label="Close share board" className="icon-button subtle" onClick={() => setShareOpen(false)} type="button">
+              <X size={18} />
+            </button>
+          </div>
           <label>
             Direct member
             <input

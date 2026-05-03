@@ -2217,6 +2217,18 @@
   padding: 20px;
 }
 
+.share-popover-heading {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.share-popover-heading > div {
+  display: grid;
+  gap: 6px;
+}
+
 .kanban-share-popover h3,
 .kanban-share-popover p,
 .share-public p {
