@@ -18,6 +18,7 @@ persistent actor {
     let accessControlState = AccessControl.initState();
     let membershipState = Membership.initState();
     let workspaceState = Workspace.initState();
+    var boardPublicLinks : [Workspace.CommunityBoardPublicLink] = [];
 
     transient let principalMap = OrderedMap.Make<Principal>(Principal.compare);
     transient let natMap = OrderedMap.Make<Nat>(Nat.compare);
@@ -32,6 +33,7 @@ persistent actor {
     public type KanbanColumn = Workspace.KanbanColumn;
     public type KanbanCardInput = Workspace.KanbanCardInput;
     public type KanbanCard = Workspace.KanbanCard;
+    public type CommunityBoardPublicLink = Workspace.CommunityBoardPublicLink;
     public type CommunityBoardSummary = Workspace.CommunityBoardSummary;
     public type CommunityBoardPayload = Workspace.CommunityBoardPayload;
     public type CommunityEventInput = Workspace.CommunityEventInput;
@@ -943,11 +945,11 @@ persistent actor {
     };
 
     public query ({ caller }) func getCommunityBoard(communityId : Nat, boardId : Nat) : async ?CommunityBoardPayload {
-        Workspace.getBoard(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId);
+        Workspace.getBoard(workspaceState, boardPublicLinks, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId);
     };
 
     public query func getPublicCommunityBoard(token : Text) : async ?CommunityBoardPayload {
-        Workspace.getPublicBoard(workspaceState, token);
+        Workspace.getPublicBoard(workspaceState, boardPublicLinks, token);
     };
 
     public shared ({ caller }) func renameCommunityBoard(communityId : Nat, boardId : Nat, title : Text) : async () {
@@ -959,7 +961,9 @@ persistent actor {
     };
 
     public shared ({ caller }) func setCommunityBoardPublicLink(communityId : Nat, boardId : Nat, token : ?Text) : async ?Text {
-        Workspace.setBoardPublicLink(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, token);
+        let (nextLinks, publicToken) = Workspace.setBoardPublicLink(workspaceState, boardPublicLinks, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, token);
+        boardPublicLinks := nextLinks;
+        publicToken;
     };
 
     public shared ({ caller }) func setCommunityBoardGrant(
@@ -1025,7 +1029,7 @@ persistent actor {
     };
 
     public shared ({ caller }) func archiveCommunityBoard(communityId : Nat, boardId : Nat) : async () {
-        Workspace.archiveBoard(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId);
+        boardPublicLinks := Workspace.archiveBoard(workspaceState, boardPublicLinks, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId);
     };
 
     public shared ({ caller }) func createCommunityEvent(communityId : Nat, input : CommunityEventInput) : async Nat {

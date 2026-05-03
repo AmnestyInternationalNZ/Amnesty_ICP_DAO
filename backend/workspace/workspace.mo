@@ -209,7 +209,6 @@ module {
         var documents : [CommunityDocument];
         var nextBoardId : Nat;
         var boards : [CommunityBoard];
-        var boardPublicLinks : [CommunityBoardPublicLink];
         var nextEventId : Nat;
         var events : [CommunityEvent];
     };
@@ -236,7 +235,6 @@ module {
             var documents = [];
             var nextBoardId = 0;
             var boards = [];
-            var boardPublicLinks = [];
             var nextEventId = 0;
             var events = [];
         };
@@ -636,8 +634,8 @@ module {
         };
     };
 
-    func boardPublicTokenFor(state : WorkspaceState, boardId : Nat) : ?Text {
-        for (link in state.boardPublicLinks.vals()) {
+    func boardPublicTokenFor(boardPublicLinks : [CommunityBoardPublicLink], boardId : Nat) : ?Text {
+        for (link in boardPublicLinks.vals()) {
             if (link.boardId == boardId) {
                 return ?link.token;
             };
@@ -645,8 +643,8 @@ module {
         null;
     };
 
-    func publicTokenAlreadyUsed(state : WorkspaceState, boardId : Nat, token : Text) : Bool {
-        for (link in state.boardPublicLinks.vals()) {
+    func publicTokenAlreadyUsed(boardPublicLinks : [CommunityBoardPublicLink], boardId : Nat, token : Text) : Bool {
+        for (link in boardPublicLinks.vals()) {
             if (link.token == token and link.boardId != boardId) {
                 return true;
             };
@@ -654,9 +652,9 @@ module {
         false;
     };
 
-    func setBoardPublicToken(state : WorkspaceState, boardId : Nat, token : ?Text) {
-        state.boardPublicLinks := Array.filter<CommunityBoardPublicLink>(
-            state.boardPublicLinks,
+    func setBoardPublicToken(boardPublicLinks : [CommunityBoardPublicLink], boardId : Nat, token : ?Text) : [CommunityBoardPublicLink] {
+        var nextLinks = Array.filter<CommunityBoardPublicLink>(
+            boardPublicLinks,
             func(link) {
                 link.boardId != boardId;
             },
@@ -664,13 +662,14 @@ module {
         switch (token) {
             case null {};
             case (?value) {
-                state.boardPublicLinks := Array.append(state.boardPublicLinks, [{ boardId; token = value }]);
+                nextLinks := Array.append(nextLinks, [{ boardId; token = value }]);
             };
         };
+        nextLinks;
     };
 
     func toBoardPayload(
-        state : WorkspaceState,
+        boardPublicLinks : [CommunityBoardPublicLink],
         board : CommunityBoard,
         role : WorkspaceRole,
         includeAccess : Bool,
@@ -688,7 +687,7 @@ module {
             role;
             access = if (includeAccess) board.access else [];
             communityShare = if (includeCommunityShare) board.communityShare else null;
-            publicToken = if (includePublicToken) boardPublicTokenFor(state, board.id) else null;
+            publicToken = if (includePublicToken) boardPublicTokenFor(boardPublicLinks, board.id) else null;
             columns = board.columns;
             cards = board.cards;
         };
@@ -1033,19 +1032,19 @@ module {
         visible;
     };
 
-    public func getBoard(state : WorkspaceState, caller : Principal, communityId : Nat, access : CallerAccess, boardId : Nat) : ?CommunityBoardPayload {
+    public func getBoard(state : WorkspaceState, boardPublicLinks : [CommunityBoardPublicLink], caller : Principal, communityId : Nat, access : CallerAccess, boardId : Nat) : ?CommunityBoardPayload {
         requireAuthenticated(caller);
         let board = getBoardOrTrap(state, communityId, boardId);
         requireWorkspaceParticipant(caller, access);
         switch (boardRole(board, caller, access)) {
-            case (?role) ?toBoardPayload(state, board, role, true, true, board.owner == caller);
+            case (?role) ?toBoardPayload(boardPublicLinks, board, role, true, true, board.owner == caller);
             case null null;
         };
     };
 
-    public func getPublicBoard(state : WorkspaceState, token : Text) : ?CommunityBoardPayload {
+    public func getPublicBoard(state : WorkspaceState, boardPublicLinks : [CommunityBoardPublicLink], token : Text) : ?CommunityBoardPayload {
         validatePublicToken(token);
-        for (link in state.boardPublicLinks.vals()) {
+        for (link in boardPublicLinks.vals()) {
             if (link.token == token) {
                 switch (boardIndex(state, link.boardId)) {
                     case null return null;
@@ -1054,7 +1053,7 @@ module {
                         if (board.archived) {
                             return null;
                         };
-                        return ?toBoardPayload(state, board, #viewer, false, false, false);
+                        return ?toBoardPayload(boardPublicLinks, board, #viewer, false, false, false);
                     };
                 };
             };
@@ -1084,7 +1083,7 @@ module {
         role;
     };
 
-    public func setBoardPublicLink(state : WorkspaceState, caller : Principal, communityId : Nat, access : CallerAccess, boardId : Nat, token : ?Text) : ?Text {
+    public func setBoardPublicLink(state : WorkspaceState, boardPublicLinks : [CommunityBoardPublicLink], caller : Principal, communityId : Nat, access : CallerAccess, boardId : Nat, token : ?Text) : ([CommunityBoardPublicLink], ?Text) {
         requireAuthenticated(caller);
         let board = getBoardOrTrap(state, communityId, boardId);
         requireWorkspaceParticipant(caller, access);
@@ -1098,14 +1097,14 @@ module {
             case null {};
             case (?value) {
                 validatePublicToken(value);
-                if (publicTokenAlreadyUsed(state, boardId, value)) {
+                if (publicTokenAlreadyUsed(boardPublicLinks, boardId, value)) {
                     Debug.trap("Public link token is already in use");
                 };
             };
         };
-        setBoardPublicToken(state, board.id, token);
+        let nextPublicLinks = setBoardPublicToken(boardPublicLinks, board.id, token);
         replaceBoard(state, { board with updatedAt = Time.now() });
-        token;
+        (nextPublicLinks, token);
     };
 
     public func setBoardGrant(state : WorkspaceState, caller : Principal, communityId : Nat, access : CallerAccess, boardId : Nat, user : Principal, role : ?WorkspaceRole, targetIsCommunityParticipant : Bool) {
@@ -1339,13 +1338,14 @@ module {
         replaceBoard(state, { board with columns = nextColumns; updatedAt = Time.now() });
     };
 
-    public func archiveBoard(state : WorkspaceState, caller : Principal, communityId : Nat, access : CallerAccess, boardId : Nat) {
+    public func archiveBoard(state : WorkspaceState, boardPublicLinks : [CommunityBoardPublicLink], caller : Principal, communityId : Nat, access : CallerAccess, boardId : Nat) : [CommunityBoardPublicLink] {
         requireAuthenticated(caller);
         let board = getBoardOrTrap(state, communityId, boardId);
         requireWorkspaceParticipant(caller, access);
         requireManager(board.owner, caller, access, "board");
-        setBoardPublicToken(state, board.id, null);
+        let nextPublicLinks = setBoardPublicToken(boardPublicLinks, board.id, null);
         replaceBoard(state, { board with archived = true; updatedAt = Time.now() });
+        nextPublicLinks;
     };
 
     public func createEvent(state : WorkspaceState, caller : Principal, communityId : Nat, access : CallerAccess, input : CommunityEventInput) : Nat {
