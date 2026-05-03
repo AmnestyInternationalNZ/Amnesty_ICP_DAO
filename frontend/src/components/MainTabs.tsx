@@ -200,7 +200,7 @@ export default function MainTabs() {
         </div>
       </header>
 
-      <main className={activePage === 'workspace' ? 'mx-auto max-w-none px-0 py-0' : 'mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14'}>
+      <main className={activePage === 'workspace' || activePage === 'boards' ? 'mx-auto max-w-none px-0 py-0' : 'mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14'}>
         {isLoadingShell ? (
           <div className="flex justify-center py-16">
             <LoadingSpinner size="large" />

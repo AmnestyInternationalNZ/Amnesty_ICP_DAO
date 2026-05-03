@@ -125,6 +125,11 @@ module {
         nextCardId : Nat;
     };
 
+    public type CommunityBoardPublicLink = {
+        boardId : Nat;
+        token : Text;
+    };
+
     public type CommunityBoardSummary = {
         id : Nat;
         communityId : Nat;
@@ -150,6 +155,7 @@ module {
         role : WorkspaceRole;
         access : [WorkspaceAccessEntry];
         communityShare : ?WorkspaceRole;
+        publicToken : ?Text;
         columns : [KanbanColumn];
         cards : [KanbanCard];
     };
@@ -203,6 +209,7 @@ module {
         var documents : [CommunityDocument];
         var nextBoardId : Nat;
         var boards : [CommunityBoard];
+        var boardPublicLinks : [CommunityBoardPublicLink];
         var nextEventId : Nat;
         var events : [CommunityEvent];
     };
@@ -220,6 +227,8 @@ module {
     let MAX_UPDATE_SIZE : Nat = 131_072;
     let MAX_UPDATES_PER_DOC : Nat = 500;
     let MAX_SNAPSHOT_SIZE : Nat = 1_048_576;
+    let MIN_PUBLIC_TOKEN_SIZE : Nat = 32;
+    let MAX_PUBLIC_TOKEN_SIZE : Nat = 160;
 
     public func initState() : WorkspaceState {
         {
@@ -227,6 +236,7 @@ module {
             var documents = [];
             var nextBoardId = 0;
             var boards = [];
+            var boardPublicLinks = [];
             var nextEventId = 0;
             var events = [];
         };
@@ -264,6 +274,13 @@ module {
         let size = Text.size(title);
         if (size == 0 or size > MAX_TITLE_SIZE) {
             Debug.trap("Title must be between 1 and 160 characters");
+        };
+    };
+
+    func validatePublicToken(token : Text) {
+        let size = Text.size(token);
+        if (size < MIN_PUBLIC_TOKEN_SIZE or size > MAX_PUBLIC_TOKEN_SIZE) {
+            Debug.trap("Public link token must be between 32 and 160 characters");
         };
     };
 
@@ -619,7 +636,47 @@ module {
         };
     };
 
-    func toBoardPayload(board : CommunityBoard, role : WorkspaceRole) : CommunityBoardPayload {
+    func boardPublicTokenFor(state : WorkspaceState, boardId : Nat) : ?Text {
+        for (link in state.boardPublicLinks.vals()) {
+            if (link.boardId == boardId) {
+                return ?link.token;
+            };
+        };
+        null;
+    };
+
+    func publicTokenAlreadyUsed(state : WorkspaceState, boardId : Nat, token : Text) : Bool {
+        for (link in state.boardPublicLinks.vals()) {
+            if (link.token == token and link.boardId != boardId) {
+                return true;
+            };
+        };
+        false;
+    };
+
+    func setBoardPublicToken(state : WorkspaceState, boardId : Nat, token : ?Text) {
+        state.boardPublicLinks := Array.filter<CommunityBoardPublicLink>(
+            state.boardPublicLinks,
+            func(link) {
+                link.boardId != boardId;
+            },
+        );
+        switch (token) {
+            case null {};
+            case (?value) {
+                state.boardPublicLinks := Array.append(state.boardPublicLinks, [{ boardId; token = value }]);
+            };
+        };
+    };
+
+    func toBoardPayload(
+        state : WorkspaceState,
+        board : CommunityBoard,
+        role : WorkspaceRole,
+        includeAccess : Bool,
+        includeCommunityShare : Bool,
+        includePublicToken : Bool,
+    ) : CommunityBoardPayload {
         {
             id = board.id;
             communityId = board.communityId;
@@ -629,8 +686,9 @@ module {
             updatedAt = board.updatedAt;
             archived = board.archived;
             role;
-            access = board.access;
-            communityShare = board.communityShare;
+            access = if (includeAccess) board.access else [];
+            communityShare = if (includeCommunityShare) board.communityShare else null;
+            publicToken = if (includePublicToken) boardPublicTokenFor(state, board.id) else null;
             columns = board.columns;
             cards = board.cards;
         };
@@ -980,9 +1038,28 @@ module {
         let board = getBoardOrTrap(state, communityId, boardId);
         requireWorkspaceParticipant(caller, access);
         switch (boardRole(board, caller, access)) {
-            case (?role) ?toBoardPayload(board, role);
+            case (?role) ?toBoardPayload(state, board, role, true, true, board.owner == caller);
             case null null;
         };
+    };
+
+    public func getPublicBoard(state : WorkspaceState, token : Text) : ?CommunityBoardPayload {
+        validatePublicToken(token);
+        for (link in state.boardPublicLinks.vals()) {
+            if (link.token == token) {
+                switch (boardIndex(state, link.boardId)) {
+                    case null return null;
+                    case (?index) {
+                        let board = state.boards[index];
+                        if (board.archived) {
+                            return null;
+                        };
+                        return ?toBoardPayload(state, board, #viewer, false, false, false);
+                    };
+                };
+            };
+        };
+        null;
     };
 
     public func renameBoard(state : WorkspaceState, caller : Principal, communityId : Nat, access : CallerAccess, boardId : Nat, title : Text) {
@@ -1005,6 +1082,30 @@ module {
         requireManager(board.owner, caller, access, "board");
         replaceBoard(state, { board with communityShare = role; updatedAt = Time.now() });
         role;
+    };
+
+    public func setBoardPublicLink(state : WorkspaceState, caller : Principal, communityId : Nat, access : CallerAccess, boardId : Nat, token : ?Text) : ?Text {
+        requireAuthenticated(caller);
+        let board = getBoardOrTrap(state, communityId, boardId);
+        requireWorkspaceParticipant(caller, access);
+        if (board.archived) {
+            Debug.trap("Board not found");
+        };
+        if (board.owner != caller) {
+            Debug.trap("Only the board owner can manage public links");
+        };
+        switch (token) {
+            case null {};
+            case (?value) {
+                validatePublicToken(value);
+                if (publicTokenAlreadyUsed(state, boardId, value)) {
+                    Debug.trap("Public link token is already in use");
+                };
+            };
+        };
+        setBoardPublicToken(state, board.id, token);
+        replaceBoard(state, { board with updatedAt = Time.now() });
+        token;
     };
 
     public func setBoardGrant(state : WorkspaceState, caller : Principal, communityId : Nat, access : CallerAccess, boardId : Nat, user : Principal, role : ?WorkspaceRole, targetIsCommunityParticipant : Bool) {
@@ -1243,6 +1344,7 @@ module {
         let board = getBoardOrTrap(state, communityId, boardId);
         requireWorkspaceParticipant(caller, access);
         requireManager(board.owner, caller, access, "board");
+        setBoardPublicToken(state, board.id, null);
         replaceBoard(state, { board with archived = true; updatedAt = Time.now() });
     };
 

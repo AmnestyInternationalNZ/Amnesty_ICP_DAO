@@ -2,7 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { CommunityRole } from '../backend';
 import { useGetCommunityAccess, useGetCommunityById } from '../hooks/useQueries';
-import { BoardsTool, CalendarTool } from './CommunityWorkspaceTools';
+import { CalendarTool } from './CommunityWorkspaceTools';
+import CommunityBoardsWorkspace from './boards/CommunityBoardsWorkspace';
 import CommunityDocumentsWorkspace from './workspace/CommunityDocumentsWorkspace';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -98,6 +99,19 @@ export default function CommunityWorkspacePage({
     );
   }
 
+  if (kind === 'boards') {
+    return (
+      <CommunityBoardsWorkspace
+        access={access}
+        communityId={communityId}
+        communityName={community.name}
+        canManageCommunityWorkspace={canManageCommunityWorkspace}
+        initialBoardId={initialBoardId}
+        onOpenBoardRoute={onOpenBoardRoute}
+      />
+    );
+  }
+
   return (
     <section className="amnesty-panel bg-white p-8 md:p-10">
       <div className="mb-8">
@@ -107,14 +121,6 @@ export default function CommunityWorkspacePage({
         <p className="mt-3 text-base text-[#5c727d]">{community.name}</p>
       </div>
 
-      {kind === 'boards' && (
-        <BoardsTool
-          communityId={communityId}
-          canManageCommunityWorkspace={canManageCommunityWorkspace}
-          initialBoardId={initialBoardId}
-          onOpenBoardRoute={onOpenBoardRoute}
-        />
-      )}
       {kind === 'calendar' && (
         <CalendarTool communityId={communityId} canManageCommunityWorkspace={canManageCommunityWorkspace} />
       )}

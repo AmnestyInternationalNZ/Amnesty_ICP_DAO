@@ -396,6 +396,7 @@ describe('Amnesty backend regression baseline', () => {
     const adminActor = actorFor(fixture, fixture.adminIdentity);
     const memberActor = actorFor(fixture, fixture.memberIdentity);
     const outsiderActor = actorFor(fixture, fixture.outsiderIdentity);
+    const anonymousActor = actorFor(fixture, fixture.anonymousIdentity);
 
     await adminActor.bootstrapPlatformAdmin();
     await adminActor.createCommunity('Board Community', 'Plan here.');
@@ -434,7 +435,9 @@ describe('Amnesty backend regression baseline', () => {
     });
 
     expect(card.title).toBe('Draft outreach plan');
-    expect((await memberActor.getCommunityBoard(0n, boardId))[0].cards).toHaveLength(1);
+    const ownerBoardPayload = (await memberActor.getCommunityBoard(0n, boardId))[0];
+    expect(ownerBoardPayload.cards).toHaveLength(1);
+    expect(ownerBoardPayload.publicToken).toEqual([]);
 
     await expect(
       memberActor.addCommunityBoardCard(0n, boardId, column.id, {
@@ -447,6 +450,22 @@ describe('Amnesty backend regression baseline', () => {
       }),
     ).rejects.toThrow(/does not belong to this community/i);
 
+    await memberActor.setCommunityBoardGrant(
+      0n,
+      boardId,
+      candidPrincipal(fixture.outsiderIdentity),
+      [{ viewer: null }],
+    );
+    expect((await outsiderActor.getCommunityBoard(0n, boardId))[0].role).toEqual({
+      viewer: null,
+    });
+    await memberActor.setCommunityBoardGrant(
+      0n,
+      boardId,
+      candidPrincipal(fixture.outsiderIdentity),
+      [],
+    );
+
     await memberActor.setCommunityBoardShare(0n, boardId, [{ viewer: null }]);
     expect((await outsiderActor.getCommunityBoard(0n, boardId))[0].role).toEqual({
       viewer: null,
@@ -457,6 +476,27 @@ describe('Amnesty backend regression baseline', () => {
 
     await memberActor.setCommunityBoardShare(0n, boardId, [{ editor: null }]);
     await outsiderActor.moveCommunityBoardCard(0n, boardId, card.id, 0n, 0n);
+
+    await expect(
+      outsiderActor.setCommunityBoardPublicLink(0n, boardId, ['b'.repeat(32)]),
+    ).rejects.toThrow(/Only the board owner can manage public links/i);
+    await expect(
+      memberActor.setCommunityBoardPublicLink(0n, boardId, ['short']),
+    ).rejects.toThrow(/Public link token must be between 32 and 160 characters/i);
+
+    const token = 'a'.repeat(32);
+    expect(await memberActor.setCommunityBoardPublicLink(0n, boardId, [token])).toEqual([token]);
+    expect((await memberActor.getCommunityBoard(0n, boardId))[0].publicToken).toEqual([token]);
+
+    const publicBoard = (await anonymousActor.getPublicCommunityBoard(token))[0];
+    expect(publicBoard.title).toBe('Action board');
+    expect(publicBoard.role).toEqual({ viewer: null });
+    expect(publicBoard.access).toEqual([]);
+    expect(publicBoard.communityShare).toEqual([]);
+    expect(publicBoard.publicToken).toEqual([]);
+
+    expect(await memberActor.setCommunityBoardPublicLink(0n, boardId, [])).toEqual([]);
+    expect(await anonymousActor.getPublicCommunityBoard(token)).toEqual([]);
 
     await expect(outsiderActor.getCommunityBoard(1n, boardId)).rejects.toThrow(
       /does not belong to this community/i,

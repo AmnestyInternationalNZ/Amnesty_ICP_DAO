@@ -189,6 +189,7 @@ type CommunityBoardSummary =
    createdAt: int;
    id: nat;
    owner: principal;
+   publicToken: opt text;
    role: WorkspaceRole;
    title: text;
    updatedAt: int;
@@ -300,6 +301,8 @@ service : {
    (opt CommunityDocumentPayload) query;
   getCommunityEvent: (communityId: nat, eventId: nat) ->
    (opt CommunityEventPayload) query;
+  getPublicCommunityBoard: (token: text) ->
+   (opt CommunityBoardPayload) query;
   getProposalById: (proposalId: nat) -> (opt Proposal) query;
   getStripeSessionStatus: (sessionId: text) -> (StripeSessionStatus);
   getUserProfile: (user: principal) -> (opt UserProfile) query;
@@ -335,6 +338,8 @@ service : {
    snapshot: blob, compactThroughVersion: nat) -> ();
   setCommunityBoardGrant: (communityId: nat, boardId: nat, user: principal,
    role: opt WorkspaceRole) -> ();
+  setCommunityBoardPublicLink: (communityId: nat, boardId: nat, token:
+   opt text) -> (opt text);
   setCommunityBoardShare: (communityId: nat, boardId: nat, role:
    opt WorkspaceRole) -> (opt WorkspaceRole);
   setCommunityDocumentGrant: (communityId: nat, documentId: nat, user:

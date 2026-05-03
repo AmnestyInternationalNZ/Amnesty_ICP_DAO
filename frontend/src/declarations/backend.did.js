@@ -105,6 +105,7 @@ export const idlFactory = ({ IDL }) => {
     'title' : IDL.Text,
     'communityId' : IDL.Nat,
     'owner' : IDL.Principal,
+    'publicToken' : IDL.Opt(IDL.Text),
     'cards' : IDL.Vec(KanbanCard),
     'createdAt' : IDL.Int,
     'role' : WorkspaceRole,
@@ -314,6 +315,11 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Opt(CommunityEventPayload)],
         ['query'],
       ),
+    'getPublicCommunityBoard' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(CommunityBoardPayload)],
+        ['query'],
+      ),
     'getProposalById' : IDL.Func([IDL.Nat], [IDL.Opt(Proposal)], ['query']),
     'getStripeSessionStatus' : IDL.Func([IDL.Text], [StripeSessionStatus], []),
     'getUserProfile' : IDL.Func(
@@ -387,6 +393,11 @@ export const idlFactory = ({ IDL }) => {
     'setCommunityBoardGrant' : IDL.Func(
         [IDL.Nat, IDL.Nat, IDL.Principal, IDL.Opt(WorkspaceRole)],
         [],
+        [],
+      ),
+    'setCommunityBoardPublicLink' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Opt(IDL.Text)],
+        [IDL.Opt(IDL.Text)],
         [],
       ),
     'setCommunityBoardShare' : IDL.Func(

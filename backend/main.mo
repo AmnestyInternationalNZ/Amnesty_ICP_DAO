@@ -946,12 +946,20 @@ persistent actor {
         Workspace.getBoard(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId);
     };
 
+    public query func getPublicCommunityBoard(token : Text) : async ?CommunityBoardPayload {
+        Workspace.getPublicBoard(workspaceState, token);
+    };
+
     public shared ({ caller }) func renameCommunityBoard(communityId : Nat, boardId : Nat, title : Text) : async () {
         Workspace.renameBoard(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, title);
     };
 
     public shared ({ caller }) func setCommunityBoardShare(communityId : Nat, boardId : Nat, role : ?WorkspaceRole) : async ?WorkspaceRole {
         Workspace.setBoardShare(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, role);
+    };
+
+    public shared ({ caller }) func setCommunityBoardPublicLink(communityId : Nat, boardId : Nat, token : ?Text) : async ?Text {
+        Workspace.setBoardPublicLink(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), boardId, token);
     };
 
     public shared ({ caller }) func setCommunityBoardGrant(

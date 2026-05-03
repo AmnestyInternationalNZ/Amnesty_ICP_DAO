@@ -48,6 +48,7 @@ export interface CommunityBoardPayload {
   'title' : string,
   'communityId' : bigint,
   'owner' : Principal,
+  'publicToken' : [] | [string],
   'cards' : Array<KanbanCard>,
   'createdAt' : bigint,
   'role' : WorkspaceRole,
@@ -280,6 +281,10 @@ export interface _SERVICE {
     [bigint, bigint],
     [] | [CommunityEventPayload]
   >,
+  'getPublicCommunityBoard' : ActorMethod<
+    [string],
+    [] | [CommunityBoardPayload]
+  >,
   'getProposalById' : ActorMethod<[bigint], [] | [Proposal]>,
   'getStripeSessionStatus' : ActorMethod<[string], StripeSessionStatus>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
@@ -320,6 +325,10 @@ export interface _SERVICE {
   'setCommunityBoardGrant' : ActorMethod<
     [bigint, bigint, Principal, [] | [WorkspaceRole]],
     undefined
+  >,
+  'setCommunityBoardPublicLink' : ActorMethod<
+    [bigint, bigint, [] | [string]],
+    [] | [string]
   >,
   'setCommunityBoardShare' : ActorMethod<
     [bigint, bigint, [] | [WorkspaceRole]],

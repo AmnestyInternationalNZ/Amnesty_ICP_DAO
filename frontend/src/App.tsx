@@ -8,6 +8,7 @@ import MainTabs from './components/MainTabs';
 import LoadingSpinner from './components/LoadingSpinner';
 import AmnestyLogo from './components/AmnestyLogo';
 import SiteFooter from './components/SiteFooter';
+import PublicBoardPage from './components/boards/PublicBoardPage';
 import { parseAppPath } from './routing/appRoutes';
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
   const isAuthenticated = !!identity;
   const currentRoute = parseAppPath(window.location.pathname);
   const isCommunityDeepLink = currentRoute.communityId !== null;
+  const isPublicBoardRoute = currentRoute.page === 'publicBoard' && Boolean(currentRoute.publicBoardToken);
   const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
   const shouldShowProfileSetup = showProfileSetup && !isCommunityDeepLink;
   const landingNav = [
@@ -25,6 +27,15 @@ export default function App() {
     { label: t('app.nav.proposals'), href: '#proposals' },
     { label: t('app.nav.campaigns'), href: '#campaigns' },
   ];
+
+  if (isPublicBoardRoute && currentRoute.publicBoardToken) {
+    return (
+      <div className="min-h-screen bg-amnesty-paper text-amnesty-ink">
+        <PublicBoardPage token={currentRoute.publicBoardToken} />
+        <SiteFooter />
+      </div>
+    );
+  }
 
   if (isInitializing) {
     return (

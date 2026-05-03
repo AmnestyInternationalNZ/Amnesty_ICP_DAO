@@ -750,6 +750,38 @@ export function useGetCommunityBoard(communityId: bigint, boardId: bigint | null
     });
 }
 
+export function useGetPublicCommunityBoard(token: string | null) {
+    const { actor, isFetching } = useActor();
+
+    return useQuery<CommunityBoardPayload | null>({
+        queryKey: ['publicCommunityBoard', token ?? 'none'],
+        queryFn: async () => {
+            if (!actor) throw new Error('Actor not available');
+            if (!token) return null;
+            return actor.getPublicCommunityBoard(token);
+        },
+        enabled: !!actor && !isFetching && !!token,
+        retry: false,
+        staleTime: 5 * 1000
+    });
+}
+
+export function useRenameCommunityBoard() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, boardId, title }: { communityId: bigint; boardId: bigint; title: string }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.renameCommunityBoard(communityId, boardId, title);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoards', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+        }
+    });
+}
+
 export function useAddCommunityBoardColumn() {
     const { actor } = useActor();
     const queryClient = useQueryClient();
@@ -762,6 +794,52 @@ export function useAddCommunityBoardColumn() {
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
             queryClient.invalidateQueries({ queryKey: ['communityBoards', variables.communityId.toString()] });
+        }
+    });
+}
+
+export function useRenameCommunityBoardColumn() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, boardId, columnId, title }: { communityId: bigint; boardId: bigint; columnId: bigint; title: string }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.renameCommunityBoardColumn(communityId, boardId, columnId, title);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+        }
+    });
+}
+
+export function useDeleteCommunityBoardColumn() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, boardId, columnId }: { communityId: bigint; boardId: bigint; columnId: bigint }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.deleteCommunityBoardColumn(communityId, boardId, columnId);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityBoards', variables.communityId.toString()] });
+        }
+    });
+}
+
+export function useReorderCommunityBoardColumns() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, boardId, columnIds }: { communityId: bigint; boardId: bigint; columnIds: bigint[] }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.reorderCommunityBoardColumns(communityId, boardId, columnIds);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
         }
     });
 }
@@ -793,6 +871,23 @@ export function useUpdateCommunityBoardCard() {
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityBoards', variables.communityId.toString()] });
+        }
+    });
+}
+
+export function useDeleteCommunityBoardCard() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, boardId, cardId }: { communityId: bigint; boardId: bigint; cardId: bigint }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.deleteCommunityBoardCard(communityId, boardId, cardId);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityBoards', variables.communityId.toString()] });
         }
     });
 }
@@ -814,6 +909,56 @@ export function useMoveCommunityBoardCard() {
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityBoards', variables.communityId.toString()] });
+        }
+    });
+}
+
+export function useArchiveCommunityBoard() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, boardId }: { communityId: bigint; boardId: bigint }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.archiveCommunityBoard(communityId, boardId);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoards', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+        }
+    });
+}
+
+export function useSetCommunityBoardGrant() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, boardId, user, role }: { communityId: bigint; boardId: bigint; user: Principal; role: WorkspaceRole | null }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.setCommunityBoardGrant(communityId, boardId, user, role);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+        }
+    });
+}
+
+export function useSetCommunityBoardPublicLink() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, boardId, token }: { communityId: bigint; boardId: bigint; token: string | null }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.setCommunityBoardPublicLink(communityId, boardId, token);
+        },
+        onSuccess: (token, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityBoard', variables.communityId.toString(), variables.boardId.toString()] });
+            if (token) {
+                queryClient.invalidateQueries({ queryKey: ['publicCommunityBoard', token] });
+            }
         }
     });
 }

@@ -189,6 +189,7 @@ export interface CommunityBoardSummary {
 
 export interface CommunityBoardPayload extends CommunityBoardSummary {
     access: WorkspaceAccessEntry[];
+    publicToken: string | null;
     columns: KanbanColumn[];
     cards: KanbanCard[];
 }
@@ -426,6 +427,7 @@ function fromCommunityBoardPayload(value: CandidCommunityBoardPayload): Communit
         archived: value.archived,
         role: fromWorkspaceRole(value.role),
         communityShare: fromOptional(value.communityShare, fromWorkspaceRole),
+        publicToken: fromOptional(value.publicToken, (token) => token),
         columnCount: BigInt(value.columns.length),
         cardCount: BigInt(value.cards.length),
         access: value.access.map(fromWorkspaceAccessEntry),
@@ -498,6 +500,7 @@ export interface backendInterface {
     getCommunityById(id: bigint): Promise<Community | null>;
     getCommunityDocument(communityId: bigint, documentId: bigint): Promise<CommunityDocumentPayload | null>;
     getCommunityEvent(communityId: bigint, eventId: bigint): Promise<CommunityEventPayload | null>;
+    getPublicCommunityBoard(token: string): Promise<CommunityBoardPayload | null>;
     getProposalById(proposalId: bigint): Promise<Proposal | null>;
     getStripeSessionStatus(sessionId: string): Promise<StripeSessionStatus>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
@@ -521,6 +524,7 @@ export interface backendInterface {
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     saveCommunityDocumentSnapshot(communityId: bigint, documentId: bigint, snapshot: Uint8Array | number[], compactThroughVersion: bigint): Promise<void>;
     setCommunityBoardGrant(communityId: bigint, boardId: bigint, user: Principal, role: WorkspaceRole | null): Promise<void>;
+    setCommunityBoardPublicLink(communityId: bigint, boardId: bigint, token: string | null): Promise<string | null>;
     setCommunityBoardShare(communityId: bigint, boardId: bigint, role: WorkspaceRole | null): Promise<WorkspaceRole | null>;
     setCommunityDocumentGrant(communityId: bigint, documentId: bigint, user: Principal, role: WorkspaceRole | null): Promise<void>;
     setCommunityDocumentParent(communityId: bigint, documentId: bigint, parentId: bigint | null): Promise<bigint | null>;
@@ -689,6 +693,10 @@ class Backend implements backendInterface {
         return this.handle(async () => fromOptional(await this.actor.getCommunityEvent(communityId, eventId), fromCommunityEventPayload));
     }
 
+    async getPublicCommunityBoard(token: string): Promise<CommunityBoardPayload | null> {
+        return this.handle(async () => fromOptional(await this.actor.getPublicCommunityBoard(token), fromCommunityBoardPayload));
+    }
+
     async getProposalById(proposalId: bigint): Promise<Proposal | null> {
         return this.handle(async () => fromOptional(await this.actor.getProposalById(proposalId), fromProposal));
     }
@@ -781,6 +789,12 @@ class Backend implements backendInterface {
 
     async setCommunityBoardGrant(communityId: bigint, boardId: bigint, user: Principal, role: WorkspaceRole | null): Promise<void> {
         return this.handle(() => this.actor.setCommunityBoardGrant(communityId, boardId, user, toOptional(role == null ? undefined : toWorkspaceRole(role))));
+    }
+
+    async setCommunityBoardPublicLink(communityId: bigint, boardId: bigint, token: string | null): Promise<string | null> {
+        return this.handle(async () =>
+            fromOptional(await this.actor.setCommunityBoardPublicLink(communityId, boardId, toOptional(token ?? undefined)), (value) => value)
+        );
     }
 
     async setCommunityBoardShare(communityId: bigint, boardId: bigint, role: WorkspaceRole | null): Promise<WorkspaceRole | null> {

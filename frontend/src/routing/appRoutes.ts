@@ -1,4 +1,4 @@
-export type AppPage = 'hub' | 'community' | 'proposals' | 'workspace' | 'boards' | 'calendar' | 'admin' | 'profile';
+export type AppPage = 'hub' | 'community' | 'proposals' | 'workspace' | 'boards' | 'calendar' | 'admin' | 'profile' | 'publicBoard';
 
 export interface ParsedAppRoute {
   page: AppPage;
@@ -6,6 +6,7 @@ export interface ParsedAppRoute {
   documentId?: bigint;
   boardId?: bigint;
   eventId?: bigint;
+  publicBoardToken?: string;
   canonicalPath?: string;
 }
 
@@ -44,6 +45,7 @@ export const routePaths = {
   boards: (communityId: bigint) => `/communities/${communityId.toString()}/workspace/boards`,
   board: (communityId: bigint, boardId: bigint) =>
     `/communities/${communityId.toString()}/workspace/boards/${boardId.toString()}`,
+  publicBoard: (token: string) => `/boards/public/${encodeURIComponent(token)}`,
   calendar: (communityId: bigint) => `/communities/${communityId.toString()}/workspace/calendar`,
   event: (communityId: bigint, eventId: bigint) =>
     `/communities/${communityId.toString()}/workspace/calendar/events/${eventId.toString()}`,
@@ -52,6 +54,9 @@ export const routePaths = {
 export function parseAppPath(pathname: string, legacyCommunityId: bigint | null = null): ParsedAppRoute {
   const segments = splitPath(pathname);
   if (segments.length === 0) return { page: 'hub', communityId: null };
+  if (segments[0] === 'boards' && segments[1] === 'public' && segments[2]) {
+    return { page: 'publicBoard', communityId: null, publicBoardToken: segments[2] };
+  }
   if (segments[0] === 'profile') return { page: 'profile', communityId: null };
   if (segments[0] === 'admin') return { page: 'admin', communityId: null };
 

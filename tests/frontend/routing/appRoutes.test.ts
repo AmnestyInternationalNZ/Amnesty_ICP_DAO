@@ -21,6 +21,15 @@ describe('app routes', () => {
     });
   });
 
+  it('builds and parses public read-only board routes', () => {
+    expect(routePaths.publicBoard('abc-123')).toBe('/boards/public/abc-123');
+    expect(parseAppPath('/boards/public/abc-123')).toMatchObject({
+      page: 'publicBoard',
+      communityId: null,
+      publicBoardToken: 'abc-123',
+    });
+  });
+
   it('parses community-level workspace pages', () => {
     expect(parseAppPath('/communities/5')).toMatchObject({ page: 'community', communityId: 5n });
     expect(parseAppPath('/communities/5/proposals')).toMatchObject({ page: 'proposals', communityId: 5n });
