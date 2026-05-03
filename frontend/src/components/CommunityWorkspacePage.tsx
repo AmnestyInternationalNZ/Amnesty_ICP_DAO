@@ -2,14 +2,17 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { CommunityRole } from '../backend';
 import { useGetCommunityAccess, useGetCommunityById } from '../hooks/useQueries';
-import { BoardsTool, CalendarTool, DocumentsTool } from './CommunityWorkspaceTools';
+import { BoardsTool, CalendarTool } from './CommunityWorkspaceTools';
+import CommunityDocumentsWorkspace from './workspace/CommunityDocumentsWorkspace';
 import LoadingSpinner from './LoadingSpinner';
 
 export type CommunityWorkspacePageKind = 'documents' | 'boards' | 'calendar';
 
 interface CommunityWorkspacePageProps {
   communityId: bigint;
+  initialDocumentId?: bigint;
   kind: CommunityWorkspacePageKind;
+  onOpenDocumentRoute?: (documentId: bigint) => void;
 }
 
 const toolConfig = {
@@ -33,7 +36,7 @@ const toolConfig = {
   },
 } as const;
 
-export default function CommunityWorkspacePage({ communityId, kind }: CommunityWorkspacePageProps) {
+export default function CommunityWorkspacePage({ communityId, initialDocumentId, kind, onOpenDocumentRoute }: CommunityWorkspacePageProps) {
   const { t } = useTranslation();
   const { data: community, isLoading: communityLoading, error: communityError } = useGetCommunityById(communityId);
   const { data: access, isLoading: accessLoading } = useGetCommunityAccess(communityId);
@@ -64,6 +67,18 @@ export default function CommunityWorkspacePage({ communityId, kind }: CommunityW
   const canManageCommunityWorkspace = access.isPlatformAdmin || access.communityRole === CommunityRole.communityAdmin;
   const config = toolConfig[kind];
 
+  if (kind === 'documents') {
+    return (
+      <CommunityDocumentsWorkspace
+        access={access}
+        communityId={communityId}
+        communityName={community.name}
+        initialDocumentId={initialDocumentId}
+        onOpenDocumentRoute={onOpenDocumentRoute}
+      />
+    );
+  }
+
   if (!canUseWorkspace) {
     return (
       <section className="amnesty-panel bg-white p-8 md:p-10">
@@ -83,9 +98,6 @@ export default function CommunityWorkspacePage({ communityId, kind }: CommunityW
         <p className="mt-3 text-base text-[#5c727d]">{community.name}</p>
       </div>
 
-      {kind === 'documents' && (
-        <DocumentsTool communityId={communityId} canManageCommunityWorkspace={canManageCommunityWorkspace} />
-      )}
       {kind === 'boards' && (
         <BoardsTool communityId={communityId} canManageCommunityWorkspace={canManageCommunityWorkspace} />
       )}

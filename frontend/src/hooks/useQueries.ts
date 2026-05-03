@@ -671,6 +671,22 @@ export function useSetCommunityDocumentGrant() {
     });
 }
 
+export function useSetCommunityDocumentParent() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, documentId, parentId }: { communityId: bigint; documentId: bigint; parentId: bigint | null }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.setCommunityDocumentParent(communityId, documentId, parentId);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityDocuments', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityDocument', variables.communityId.toString(), variables.documentId.toString()] });
+        }
+    });
+}
+
 export function useArchiveCommunityDocument() {
     const { actor } = useActor();
     const queryClient = useQueryClient();

@@ -21,13 +21,36 @@ import ProfilePage from './ProfilePage';
 type AppPage = 'hub' | 'community' | 'proposals' | 'workspace' | 'boards' | 'calendar' | 'admin' | 'profile';
 
 const communityScopedPages: AppPage[] = ['community', 'proposals', 'workspace', 'boards', 'calendar'];
+const LAST_COMMUNITY_KEY = 'amnesty.lastCommunityId';
+
+function readRouteDocumentId(): bigint | undefined {
+  const match = window.location.pathname.match(/^\/workspace\/doc\/(\d+)$/);
+  if (!match) return undefined;
+  try {
+    return BigInt(match[1]);
+  } catch {
+    return undefined;
+  }
+}
+
+function readLastCommunityId(): bigint | null {
+  const value = window.localStorage.getItem(LAST_COMMUNITY_KEY);
+  if (!value) return null;
+  try {
+    return BigInt(value);
+  } catch {
+    return null;
+  }
+}
 
 export default function MainTabs() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { clear } = useInternetIdentity();
-  const [activePage, setActivePage] = useState<AppPage>('hub');
-  const [selectedCommunityId, setSelectedCommunityId] = useState<bigint | null>(null);
+  const routeDocumentId = readRouteDocumentId();
+  const [activePage, setActivePage] = useState<AppPage>(routeDocumentId !== undefined ? 'workspace' : 'hub');
+  const [selectedCommunityId, setSelectedCommunityId] = useState<bigint | null>(() => routeDocumentId !== undefined ? readLastCommunityId() : null);
+  const [initialWorkspaceDocumentId, setInitialWorkspaceDocumentId] = useState<bigint | undefined>(routeDocumentId);
   const { data: platformRole, isLoading: roleLoading } = useGetCallerPlatformRole();
   const { data: isPlatformAdmin, isLoading: adminLoading } = useIsCallerPlatformAdmin();
   const { data: platformAdmins, isLoading: platformAdminsLoading } = useListPlatformAdmins();
@@ -54,12 +77,15 @@ export default function MainTabs() {
 
   const handleEnterCommunity = (communityId: bigint) => {
     setSelectedCommunityId(communityId);
+    window.localStorage.setItem(LAST_COMMUNITY_KEY, communityId.toString());
     setActivePage('community');
   };
 
   const handleBackToHub = () => {
     setSelectedCommunityId(null);
+    setInitialWorkspaceDocumentId(undefined);
     setActivePage('hub');
+    window.history.pushState({}, '', '/');
   };
 
   const handleBootstrap = async () => {
@@ -111,7 +137,11 @@ export default function MainTabs() {
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => setActivePage(item.id)}
+                    onClick={() => {
+                      if (item.id !== 'workspace') setInitialWorkspaceDocumentId(undefined);
+                      if (item.id === 'hub') window.history.pushState({}, '', '/');
+                      setActivePage(item.id);
+                    }}
                     className={`rounded-full px-4 py-2 text-base uppercase tracking-[0.04em] transition amnesty-heading ${
                       active
                         ? 'bg-amnesty-yellow text-amnesty-ink'
@@ -139,7 +169,7 @@ export default function MainTabs() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <main className={activePage === 'workspace' ? 'mx-auto max-w-none px-0 py-0' : 'mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14'}>
         {isLoadingShell ? (
           <div className="flex justify-center py-16">
             <LoadingSpinner size="large" />
@@ -167,7 +197,15 @@ export default function MainTabs() {
             )}
 
             {activePage === 'workspace' && selectedCommunityId !== null && (
-              <CommunityWorkspacePage communityId={selectedCommunityId} kind="documents" />
+              <CommunityWorkspacePage
+                communityId={selectedCommunityId}
+                initialDocumentId={initialWorkspaceDocumentId}
+                kind="documents"
+                onOpenDocumentRoute={(documentId) => {
+                  setInitialWorkspaceDocumentId(documentId);
+                  window.history.pushState({}, '', `/workspace/doc/${documentId.toString()}`);
+                }}
+              />
             )}
 
             {activePage === 'boards' && selectedCommunityId !== null && (

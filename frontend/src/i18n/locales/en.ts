@@ -452,6 +452,9 @@ export const en = {
         title: 'Plan, document, and coordinate local action',
         body:
             'Keep working notes, practical task boards, and community events scoped to this community only.',
+        pageTitle: 'Build and coordinate action together.',
+        pageBody:
+            'Manage documents, collaborate with your community, and turn ideas into impact.',
         viewerLockedTitle: 'Workspace access is member-only',
         viewerLockedBody:
             'Docs, boards, and events can include private or member-shared material, so they are only available to assigned community members and admins.',
@@ -468,8 +471,58 @@ export const en = {
         actions: {
             archive: 'Archive',
             compact: 'Compact snapshot',
+            debugExport: 'Download JSON',
             grant: 'Grant access',
+            importMarkdown: 'Import Markdown',
+            markdownExport: 'Download Markdown',
+            menu: 'Actions',
+            pin: 'Pin default',
+            redo: 'Redo',
+            sync: 'Sync',
+            undo: 'Undo',
+            unpin: 'Unpin default',
             updateShare: 'Update share'
+        },
+        library: {
+            mine: 'My documents',
+            shared: 'Shared with me',
+            workspace: 'Workspace documents'
+        },
+        search: {
+            empty: 'No page content matches.',
+            loading: 'Searching documents...',
+            matches: '{{count}} match',
+            matches_plural: '{{count}} matches',
+            placeholder: 'Search page content'
+        },
+        nesting: {
+            title: 'Document nesting',
+            topLevel: 'Top level'
+        },
+        editor: {
+            addFirstBlock: 'Add first block',
+            tailEditable: "Type '/' for commands or press Enter for a new block",
+            tailReadonly: 'Viewer access is read-only for this document.'
+        },
+        selection: {
+            clear: 'Clear selection',
+            copyFallback: 'Clipboard access failed. Copy the Markdown below.',
+            copyMarkdown: 'Copy as Markdown',
+            done: 'Done',
+            formatSelected: 'Format selected text',
+            indent: 'Indent',
+            outdent: 'Outdent',
+            selectBlocks: 'Select blocks',
+            selected: '{{count}} selected'
+        },
+        comments: {
+            add: 'Comment',
+            compose: 'Add comment',
+            empty: 'No open comments yet.',
+            openTitle: 'Open comments',
+            placeholder: 'Write a comment. Cmd/Ctrl+Enter submits.',
+            resolve: 'Resolve',
+            submit: 'Submit comment'
         },
         share: {
             title: 'Community sharing',
@@ -486,7 +539,11 @@ export const en = {
             newPlaceholder: 'New document title',
             bodyPlaceholder: 'Write notes, plans, links, or meeting outcomes...',
             empty: 'No workspace docs are visible to you yet.',
+            emptyMine: 'No documents yet.',
+            emptyShared: 'No documents shared with you yet.',
+            emptyWorkspace: 'No workspace documents yet.',
             emptyTitle: 'No document selected',
+            emptyBodyTitle: 'Choose or create a document',
             emptyBody: 'Create or select a document to start writing inside this community.'
         }
     },
