@@ -17,6 +17,7 @@ import CommunityWorkspacePage from './CommunityWorkspacePage';
 import Dashboard from './Dashboard';
 import LoadingSpinner from './LoadingSpinner';
 import ProfilePage from './ProfilePage';
+import SiteFooter from './SiteFooter';
 import { parseAppPath, routePaths, type AppPage, type ParsedAppRoute } from '../routing/appRoutes';
 
 const communityScopedPages: AppPage[] = ['community', 'proposals', 'workspace', 'boards', 'calendar'];
@@ -260,6 +261,7 @@ export default function MainTabs() {
           </div>
         )}
       </main>
+      <SiteFooter />
     </div>
   );
 }
