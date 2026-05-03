@@ -10,6 +10,7 @@ import {
   moveColumnIds,
   reorderColumnsInBoard,
 } from '../../../frontend/src/components/boards/KanbanBoard';
+import { hasSelectedCommunityBoardId } from '../../../frontend/src/components/boards/CommunityBoardsWorkspace';
 import { cardKey, parseCardKey } from '../../../frontend/src/components/boards/KanbanCard';
 import { columnDropKey, columnKey, parseColumnDropKey, parseColumnKey } from '../../../frontend/src/components/boards/KanbanColumn';
 
@@ -99,5 +100,10 @@ describe('kanban helpers', () => {
     const source = board();
     expect(cardMatchesQuery(source.cards[0], 'side panel')).toBe(true);
     expect(cardsForColumn(source, 1n, 'admin').map((item) => item.id)).toEqual([11n]);
+  });
+
+  it('treats board id 0 as a valid selected board id', () => {
+    expect(hasSelectedCommunityBoardId(0n)).toBe(true);
+    expect(hasSelectedCommunityBoardId(null)).toBe(false);
   });
 });

@@ -67,6 +67,10 @@ function writePinnedBoardId(principal: string | null, communityId: bigint, board
   window.localStorage.setItem(key, boardId.toString());
 }
 
+export function hasSelectedCommunityBoardId(boardId: bigint | null): boardId is bigint {
+  return boardId !== null;
+}
+
 function sortByUpdated<T extends { updatedAt: bigint }>(items: T[]): T[] {
   return [...items].sort((left, right) => Number(right.updatedAt - left.updatedAt));
 }
@@ -175,7 +179,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function renameSelectedBoard(title: string) {
-    if (!selectedBoardId) return;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return;
     const previous = boardDraft;
     setBoardDraft((board) => applyBoardPatch(board, selectedBoardId, (draft) => ({ ...draft, title })));
     try {
@@ -189,7 +193,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function addBoardColumn(title: string) {
-    if (!selectedBoardId) return;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return;
     try {
       await addColumn.mutateAsync({ communityId, boardId: selectedBoardId, title });
     } catch (error) {
@@ -198,7 +202,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function renameBoardColumn(columnId: bigint, title: string) {
-    if (!selectedBoardId) return;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return;
     const previous = boardDraft;
     setBoardDraft((board) => applyBoardPatch(board, selectedBoardId, (draft) => ({
       ...draft,
@@ -215,7 +219,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function deleteBoardColumn(columnId: bigint) {
-    if (!selectedBoardId) return;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return;
     try {
       await deleteColumn.mutateAsync({ communityId, boardId: selectedBoardId, columnId });
     } catch (error) {
@@ -224,7 +228,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function addBoardCard(columnId: bigint, title: string) {
-    if (!selectedBoardId) return;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return;
     const input: KanbanCardInput = {
       title,
       description: null,
@@ -241,7 +245,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function updateBoardCard(cardId: bigint, fields: KanbanCardUpdateFields) {
-    if (!selectedBoardId) return false;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return false;
     const card = boardDraft?.cards.find((candidate) => candidate.id === cardId);
     if (!card) return false;
     const previous = boardDraft;
@@ -267,7 +271,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function deleteBoardCard(cardId: bigint) {
-    if (!selectedBoardId) return;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return;
     const previous = boardDraft;
     setBoardDraft((board) => applyBoardPatch(board, selectedBoardId, (draft) => ({
       ...draft,
@@ -284,7 +288,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function moveBoardCard(cardId: bigint, columnId: bigint, index: number) {
-    if (!selectedBoardId) return;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return;
     const previous = boardDraft;
     setBoardDraft((board) => applyBoardPatch(board, selectedBoardId, (draft) => moveCardInBoard(draft, cardId, columnId, index)));
     try {
@@ -303,7 +307,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function reorderBoardColumns(columnIds: bigint[]) {
-    if (!selectedBoardId) return;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return;
     const previous = boardDraft;
     setBoardDraft((board) => applyBoardPatch(board, selectedBoardId, (draft) => reorderColumnsInBoard(draft, columnIds)));
     try {
@@ -316,7 +320,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function archiveSelectedBoard() {
-    if (!selectedBoardId) return;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return;
     const confirmed = window.confirm('Archive this board? It will disappear from the workspace lists.');
     if (!confirmed) return;
     try {
@@ -332,7 +336,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function grantBoardAccess(principalText: string, role: WorkspaceRole) {
-    if (!selectedBoardId) return;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return;
     setMessage('');
     try {
       await setGrant.mutateAsync({
@@ -348,7 +352,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function updateCommunityShare(role: WorkspaceRole | null) {
-    if (!selectedBoardId) return;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return;
     const previous = boardDraft;
     setBoardDraft((board) => applyBoardPatch(board, selectedBoardId, (draft) => ({ ...draft, communityShare: role })));
     try {
@@ -362,7 +366,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function createPublicLink(token: string) {
-    if (!selectedBoardId) return undefined;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return undefined;
     try {
       const confirmedToken = await setPublicLink.mutateAsync({ communityId, boardId: selectedBoardId, token });
       setBoardDraft((board) => applyBoardPatch(board, selectedBoardId, (draft) => ({ ...draft, publicToken: confirmedToken })));
@@ -375,7 +379,7 @@ export default function CommunityBoardsWorkspace({
   }
 
   async function disablePublicLink() {
-    if (!selectedBoardId) return;
+    if (!hasSelectedCommunityBoardId(selectedBoardId)) return;
     try {
       await setPublicLink.mutateAsync({ communityId, boardId: selectedBoardId, token: null });
       setBoardDraft((board) => applyBoardPatch(board, selectedBoardId, (draft) => ({ ...draft, publicToken: null })));

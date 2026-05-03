@@ -371,7 +371,7 @@ export function BoardsTool({
   }, [initialBoardId]);
 
   useEffect(() => {
-    if (!selectedBoardId && boards && boards.length > 0) {
+    if (selectedBoardId === null && boards && boards.length > 0) {
       setSelectedBoardId(boards[0].id);
     }
   }, [boards, selectedBoardId]);
