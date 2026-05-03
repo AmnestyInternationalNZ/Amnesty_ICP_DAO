@@ -78,6 +78,15 @@ describe('kanban helpers', () => {
     expect(findCardLocation(moved, 11n)).toEqual({ columnId: 2n, index: 1 });
   });
 
+  it('preserves UKU same-column downward card ordering after target index adjustment', () => {
+    const source = board();
+    source.columns[0].cardIds = [10n, 11n, 12n];
+    const moved = moveCardInBoard(source, 10n, 1n, 1);
+
+    expect(moved.columns[0].cardIds).toEqual([11n, 10n, 12n]);
+    expect(source.columns[0].cardIds).toEqual([10n, 11n, 12n]);
+  });
+
   it('reorders columns and resolves card drag targets', () => {
     const source = board();
     expect(moveColumnIds(source, 1n, 3n)).toEqual([2n, 3n, 1n]);

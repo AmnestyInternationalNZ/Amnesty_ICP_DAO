@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useId, useMemo, useState } from 'react';
 import {
   closestCenter,
   DndContext,
@@ -57,6 +57,11 @@ export function moveColumnIds(board: CommunityBoardPayload, activeColumnId: bigi
   const [moved] = nextColumnIds.splice(fromIndex, 1);
   nextColumnIds.splice(toIndex, 0, moved);
   return nextColumnIds;
+}
+
+function dragKind(event: DragEndEvent): 'card' | 'column' | undefined {
+  const kind = event.active.data.current?.kind;
+  return kind === 'card' || kind === 'column' ? kind : undefined;
 }
 
 export function moveCardInBoard(board: CommunityBoardPayload, cardId: bigint, toColumnId: bigint, toIndex: number): CommunityBoardPayload {
@@ -168,6 +173,7 @@ export default function KanbanBoard({
   const [grantPrincipal, setGrantPrincipal] = useState('');
   const [grantRole, setGrantRole] = useState<WorkspaceRole>(WorkspaceRoleValue.viewer);
   const [communityRole, setCommunityRole] = useState<WorkspaceRole | 'private'>(board.communityShare ?? 'private');
+  const memberDatalistId = useId();
   const activeCard = activeDragId ? board.cards.find((card) => cardKey(card.id) === activeDragId) : undefined;
   const activeColumn = activeDragId ? board.columns.find((column) => columnKey(column.id) === activeDragId) : undefined;
   const normalizedSearch = searchQuery.trim().toLowerCase();
@@ -204,6 +210,7 @@ export default function KanbanBoard({
     if (!grantPrincipal.trim()) return;
     onGrantAccess(grantPrincipal.trim(), grantRole);
     setGrantPrincipal('');
+    setShareOpen(false);
   }
 
   function handleDragStart(event: DragStartEvent) {
@@ -212,32 +219,43 @@ export default function KanbanBoard({
 
   function handleDragEnd(event: DragEndEvent) {
     setActiveDragId(undefined);
-    if (!event.over) return;
-    const kind = event.active.data.current?.kind;
+    if (!event.over || !canEdit) return;
+    const kind = dragKind(event);
     const activeId = String(event.active.id);
     const overId = String(event.over.id);
 
     if (kind === 'column') {
       const activeColumnId = parseColumnKey(activeId);
-      const overColumnId = parseColumnKey(overId) ?? parseColumnDropKey(overId);
+      const overColumnId = columnIdForDragTarget(board, overId);
       if (activeColumnId === undefined || overColumnId === undefined || activeColumnId === overColumnId) return;
       const nextColumnIds = moveColumnIds(board, activeColumnId, overColumnId);
+      if (nextColumnIds.every((columnId, index) => columnId === board.columns[index]?.id)) return;
       onReorderColumns(nextColumnIds);
       return;
     }
 
     if (kind === 'card') {
       const cardId = parseCardKey(activeId);
-      const toColumnId = columnIdForDragTarget(board, overId);
-      if (cardId === undefined || toColumnId === undefined) return;
+      if (cardId === undefined) return;
       const overCardId = parseCardKey(overId);
+      if (overCardId !== undefined) {
+        const target = findCardLocation(board, overCardId);
+        if (!target) return;
+        const source = findCardLocation(board, cardId);
+        const targetIndex = source?.columnId === target.columnId && source.index < target.index ? target.index - 1 : target.index;
+        onMoveCard(cardId, target.columnId, targetIndex);
+        return;
+      }
+
+      const toColumnId = parseColumnKey(overId) ?? parseColumnDropKey(overId);
+      if (toColumnId === undefined) return;
       const targetCards = cardsForColumn(board, toColumnId);
-      const overIndex = overCardId === undefined ? targetCards.length : Math.max(0, targetCards.findIndex((card) => card.id === overCardId));
-      onMoveCard(cardId, toColumnId, overIndex < 0 ? targetCards.length : overIndex);
+      onMoveCard(cardId, toColumnId, targetCards.length);
     }
   }
 
   const filteredCardCount = board.cards.filter((card) => cardMatchesQuery(card, normalizedSearch)).length;
+  const cardCountLabel = normalizedSearch ? `${filteredCardCount} of ${board.cards.length}` : board.cards.length.toString();
 
   return (
     <section className="kanban-board">
@@ -262,7 +280,7 @@ export default function KanbanBoard({
             <span>·</span>
             <span>{board.columns.length} columns</span>
             <span>·</span>
-            <span>{filteredCardCount} cards</span>
+            <span>{cardCountLabel} cards</span>
           </div>
         </div>
         <div className="kanban-board-actions">
@@ -270,14 +288,18 @@ export default function KanbanBoard({
             <Search size={16} />
             <input aria-label="Search cards" onChange={(event) => onSearchQueryChange(event.currentTarget.value)} placeholder="Search cards" value={searchQuery} />
           </label>
-          <button className={isPinned ? 'ghost-button selected' : 'ghost-button'} disabled={!canPinDefault} onClick={onTogglePinned} type="button">
-            <Pin size={16} />
-            {isPinned ? 'Pinned' : 'Pin'}
-          </button>
-          <button className="ghost-button selected" disabled={!canManage} onClick={() => setShareOpen((value) => !value)} type="button">
-            <Share2 size={16} />
-            Share
-          </button>
+          {canPinDefault ? (
+            <button className={isPinned ? 'ghost-button selected' : 'ghost-button'} onClick={onTogglePinned} type="button">
+              <Pin size={16} />
+              {isPinned ? 'Pinned' : 'Pin'}
+            </button>
+          ) : null}
+          {canManage ? (
+            <button className="ghost-button selected" onClick={() => setShareOpen((value) => !value)} type="button">
+              <Share2 size={16} />
+              Share
+            </button>
+          ) : null}
           <button className="ghost-button" onClick={onReload} type="button">
             <RefreshCw size={16} />
             Sync
@@ -297,18 +319,24 @@ export default function KanbanBoard({
           <p>Grant direct access, share with community workspace members, or create a public read-only link.</p>
           <label>
             Direct member
-            <select onChange={(event) => setGrantPrincipal(event.currentTarget.value)} value={grantPrincipal}>
-              <option value="">Choose a member</option>
+            <input
+              aria-label="Principal to grant board access"
+              list={memberDatalistId}
+              onChange={(event) => setGrantPrincipal(event.currentTarget.value)}
+              placeholder="Search name or paste principal"
+              value={grantPrincipal}
+            />
+            <datalist id={memberDatalistId}>
               {memberOptions.map((member) => (
-                <option key={member.principal.toText()} value={member.principal.toText()}>{memberLabel(memberOptions, member.principal)}</option>
+                <option key={member.principal.toText()} label={memberLabel(memberOptions, member.principal)} value={member.principal.toText()} />
               ))}
-            </select>
+            </datalist>
           </label>
           <select aria-label="Direct board grant role" onChange={(event) => setGrantRole(roleVariant(event.currentTarget.value as 'viewer' | 'editor'))} value={roleName(grantRole)}>
             <option value="viewer">Viewer</option>
             <option value="editor">Editor</option>
           </select>
-          <button className="btn-secondary rounded-full px-4 py-2 text-sm" disabled={!canManage || !grantPrincipal} onClick={submitGrant} type="button">Grant</button>
+          <button className="btn-secondary rounded-full px-4 py-2 text-sm" disabled={!canManage || !grantPrincipal.trim()} onClick={submitGrant} type="button">Grant</button>
 
           <div className="share-public">
             <strong>Community workspace</strong>
@@ -318,7 +346,17 @@ export default function KanbanBoard({
               <option value="viewer">Viewer</option>
               <option value="editor">Editor</option>
             </select>
-            <button className="ghost-button" disabled={!canManage} onClick={() => onSetCommunityShare(communityRole === 'private' ? null : communityRole)} type="button">Update community share</button>
+            <button
+              className="ghost-button"
+              disabled={!canManage}
+              onClick={() => {
+                onSetCommunityShare(communityRole === 'private' ? null : communityRole);
+                setShareOpen(false);
+              }}
+              type="button"
+            >
+              Update community share
+            </button>
           </div>
 
           <div className="share-public">
@@ -331,11 +369,28 @@ export default function KanbanBoard({
               <>
                 <input aria-label="Public board URL" readOnly value={publicShareUrl} />
                 <div className="share-public-actions">
-                  <button className="ghost-button" onClick={() => void copyText(publicShareUrl)} type="button">
+                  <button
+                    className="ghost-button"
+                    onClick={() => {
+                      void copyText(publicShareUrl);
+                      setShareOpen(false);
+                    }}
+                    type="button"
+                  >
                     <Copy size={16} />
                     Copy link
                   </button>
-                  <button className="ghost-button danger" disabled={!canManagePublicLink} onClick={onDisablePublicLink} type="button">Disable</button>
+                  <button
+                    className="ghost-button danger"
+                    disabled={!canManagePublicLink}
+                    onClick={() => {
+                      onDisablePublicLink();
+                      setShareOpen(false);
+                    }}
+                    type="button"
+                  >
+                    Disable
+                  </button>
                 </div>
               </>
             ) : (
@@ -345,6 +400,7 @@ export default function KanbanBoard({
                 onClick={async () => {
                   const url = await onCreatePublicLink(createPublicShareToken());
                   if (url) void copyText(url);
+                  if (url) setShareOpen(false);
                 }}
                 type="button"
               >
@@ -389,7 +445,7 @@ export default function KanbanBoard({
                   placeholder="New column"
                   value={newColumnTitle}
                 />
-                <button onClick={addColumn} type="button">
+                <button disabled={!newColumnTitle.trim()} onClick={addColumn} type="button">
                   <Plus size={16} />
                   Add column
                 </button>

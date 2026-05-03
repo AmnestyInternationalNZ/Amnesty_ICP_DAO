@@ -94,6 +94,7 @@ describe('kanban rendering', () => {
     expect(html).toContain('Shared with me');
     expect(html).toContain('Workspace Roadmap');
     expect(html).toContain('selected');
+    expect(html).toContain('disabled=""');
   });
 
   it('renders board controls, public link sharing, and read-only card metadata', () => {
@@ -133,5 +134,43 @@ describe('kanban rendering', () => {
     expect(html).toContain('Pinned');
     expect(html).toContain('Share');
     expect(html).toContain('To do');
+  });
+
+  it('hides owner-only board controls in viewer/read-only rendering', () => {
+    const readOnlyBoard = { ...board(), role: WorkspaceRole.viewer };
+    const html = renderToStaticMarkup(
+      <KanbanBoard
+        board={readOnlyBoard}
+        canManageCommunityWorkspace={false}
+        canPinDefault={false}
+        documents={[]}
+        events={[]}
+        isPinned={false}
+        memberOptions={members}
+        onAddCard={() => undefined}
+        onAddColumn={() => undefined}
+        onCreatePublicLink={async () => undefined}
+        onDeleteBoard={() => undefined}
+        onDeleteCard={() => undefined}
+        onDeleteColumn={() => undefined}
+        onDisablePublicLink={() => undefined}
+        onGrantAccess={() => undefined}
+        onMoveCard={() => undefined}
+        onReload={() => undefined}
+        onRenameBoard={() => undefined}
+        onRenameColumn={() => undefined}
+        onReorderColumns={() => undefined}
+        onSearchQueryChange={() => undefined}
+        onSetCommunityShare={() => undefined}
+        onTogglePinned={() => undefined}
+        onUpdateCard={() => false}
+        searchQuery=""
+      />,
+    );
+
+    expect(html).not.toContain('>Share</button>');
+    expect(html).not.toContain('Pin');
+    expect(html).not.toContain('Add column');
+    expect(html).toContain('Workspace Board Bug');
   });
 });

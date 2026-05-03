@@ -2,16 +2,23 @@ import React, { useMemo, useState } from 'react';
 import { ChevronDown, ChevronRight, Plus, Search } from 'lucide-react';
 import type { CommunityBoardSummary, CommunityMember } from '../../backend';
 import { WorkspaceRole } from '../../backend';
-import { compactPrincipal, readableDate } from '../../workspace/workspaceApi';
+import { compactPrincipal, readableDate, roleName } from '../../workspace/workspaceApi';
 
 function memberLabel(members: CommunityMember[] | undefined, principal: unknown): string {
   const text = typeof (principal as { toText?: unknown })?.toText === 'function' ? (principal as { toText: () => string }).toText() : String(principal);
   return members?.find((member) => member.principal.toText() === text)?.profile?.name ?? compactPrincipal(principal);
 }
 
-function boardMatchesSearch(board: CommunityBoardSummary, query: string): boolean {
+function boardMatchesSearch(board: CommunityBoardSummary, query: string, members: CommunityMember[] | undefined): boolean {
   if (!query) return true;
-  return `${board.title} ${board.cardCount.toString()} ${board.columnCount.toString()}`.toLowerCase().includes(query.toLowerCase());
+  return [
+    board.title,
+    memberLabel(members, board.owner),
+    roleName(board.role),
+    board.communityShare ? 'workspace community shared' : 'private direct',
+    `${board.cardCount.toString()} cards`,
+    `${board.columnCount.toString()} columns`,
+  ].join(' ').toLowerCase().includes(query.toLowerCase());
 }
 
 function sortBoards(boards: CommunityBoardSummary[]): CommunityBoardSummary[] {
@@ -104,7 +111,7 @@ export default function BoardLibrarySidebar({
 }) {
   const [search, setSearch] = useState('');
   const [collapsed, setCollapsed] = useState({ mine: false, workspace: false, shared: false });
-  const filtered = useMemo(() => sortBoards(boards.filter((board) => boardMatchesSearch(board, search))), [boards, search]);
+  const filtered = useMemo(() => sortBoards(boards.filter((board) => boardMatchesSearch(board, search, members))), [boards, members, search]);
   const mine = filtered.filter((board) => board.role === WorkspaceRole.owner || (currentPrincipal !== null && board.owner.toText() === currentPrincipal));
   const workspace = filtered.filter((board) => !mine.some((item) => item.id === board.id) && board.communityShare !== null);
   const shared = filtered.filter((board) => !mine.some((item) => item.id === board.id) && !workspace.some((item) => item.id === board.id));
@@ -123,7 +130,7 @@ export default function BoardLibrarySidebar({
             placeholder="New board title"
             value={newBoardTitle}
           />
-          <button className="btn-primary rounded-full" onClick={onCreateBoard} type="button">
+          <button className="btn-primary rounded-full" disabled={!newBoardTitle.trim()} onClick={onCreateBoard} type="button">
             <Plus size={16} />
             Create board
           </button>

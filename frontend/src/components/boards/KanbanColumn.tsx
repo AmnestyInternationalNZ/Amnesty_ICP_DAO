@@ -150,7 +150,7 @@ export default function KanbanColumn({
             placeholder="Add card"
             value={newCardTitle}
           />
-          <button onClick={addCard} type="button">
+          <button disabled={!newCardTitle.trim()} onClick={addCard} type="button">
             <Plus size={15} />
             Add card
           </button>
