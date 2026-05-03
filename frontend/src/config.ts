@@ -17,6 +17,7 @@ interface Config {
 
 const LOCAL_BACKEND_CANISTER_ID = 't63gs-up777-77776-aaaba-cai';
 const LOCAL_INTERNET_IDENTITY_CANISTER_ID = 'rdmx6-jaaaa-aaaaa-aaadq-cai';
+export const RUNTIME_CONFIG_PATH = '/env.json';
 
 let configCache: Config | null = null;
 export const DELEGATION_EXPIRED_EVENT = 'amnesty:delegation-expired';
@@ -96,7 +97,7 @@ function localInternetIdentityUrl(host?: string): string | undefined {
 
 async function readJsonConfig(): Promise<Partial<JsonConfig>> {
     try {
-        const response = await fetch('./env.json', { cache: 'no-store' });
+        const response = await fetch(RUNTIME_CONFIG_PATH, { cache: 'no-store' });
         if (!response.ok) {
             return {};
         }

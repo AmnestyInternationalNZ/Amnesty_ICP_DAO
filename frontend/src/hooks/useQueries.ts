@@ -614,7 +614,8 @@ export function useAppendCommunityDocumentUpdate() {
             return actor.appendCommunityDocumentUpdate(communityId, documentId, update);
         },
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['communityDocument', variables.communityId.toString(), variables.documentId.toString()] });
+            // The editor already owns the live Yjs document; refreshing the selected-document
+            // query on every autosave rehydrates the DOM and can steal focus/caret position.
             queryClient.invalidateQueries({ queryKey: ['communityDocuments', variables.communityId.toString()] });
         }
     });

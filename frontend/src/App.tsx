@@ -7,6 +7,7 @@ import ProfileSetup from './components/ProfileSetup';
 import MainTabs from './components/MainTabs';
 import LoadingSpinner from './components/LoadingSpinner';
 import AmnestyLogo from './components/AmnestyLogo';
+import { parseAppPath } from './routing/appRoutes';
 
 function StatementBand() {
   const { t } = useTranslation();
@@ -69,7 +70,10 @@ export default function App() {
   const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
 
   const isAuthenticated = !!identity;
+  const currentRoute = parseAppPath(window.location.pathname);
+  const isCommunityDeepLink = currentRoute.communityId !== null;
   const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
+  const shouldShowProfileSetup = showProfileSetup && !isCommunityDeepLink;
   const landingNav = [
     { label: t('app.nav.communities'), href: '#communities' },
     { label: t('app.nav.proposals'), href: '#proposals' },
@@ -235,7 +239,7 @@ export default function App() {
 
           <SiteFooter />
         </>
-      ) : showProfileSetup ? (
+      ) : shouldShowProfileSetup ? (
         <>
           <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
             <ProfileSetup />

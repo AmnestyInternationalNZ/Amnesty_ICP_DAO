@@ -11,7 +11,9 @@ export type CommunityWorkspacePageKind = 'documents' | 'boards' | 'calendar';
 interface CommunityWorkspacePageProps {
   communityId: bigint;
   initialDocumentId?: bigint;
+  initialBoardId?: bigint;
   kind: CommunityWorkspacePageKind;
+  onOpenBoardRoute?: (boardId: bigint) => void;
   onOpenDocumentRoute?: (documentId: bigint) => void;
 }
 
@@ -36,7 +38,14 @@ const toolConfig = {
   },
 } as const;
 
-export default function CommunityWorkspacePage({ communityId, initialDocumentId, kind, onOpenDocumentRoute }: CommunityWorkspacePageProps) {
+export default function CommunityWorkspacePage({
+  communityId,
+  initialBoardId,
+  initialDocumentId,
+  kind,
+  onOpenBoardRoute,
+  onOpenDocumentRoute,
+}: CommunityWorkspacePageProps) {
   const { t } = useTranslation();
   const { data: community, isLoading: communityLoading, error: communityError } = useGetCommunityById(communityId);
   const { data: access, isLoading: accessLoading } = useGetCommunityAccess(communityId);
@@ -99,7 +108,12 @@ export default function CommunityWorkspacePage({ communityId, initialDocumentId,
       </div>
 
       {kind === 'boards' && (
-        <BoardsTool communityId={communityId} canManageCommunityWorkspace={canManageCommunityWorkspace} />
+        <BoardsTool
+          communityId={communityId}
+          canManageCommunityWorkspace={canManageCommunityWorkspace}
+          initialBoardId={initialBoardId}
+          onOpenBoardRoute={onOpenBoardRoute}
+        />
       )}
       {kind === 'calendar' && (
         <CalendarTool communityId={communityId} canManageCommunityWorkspace={canManageCommunityWorkspace} />

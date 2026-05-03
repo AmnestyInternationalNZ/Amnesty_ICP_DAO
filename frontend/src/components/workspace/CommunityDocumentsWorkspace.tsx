@@ -132,6 +132,8 @@ import {
   sortDocs,
 } from '../../workspace/workspaceApi';
 import LoadingSpinner from '../LoadingSpinner';
+import { DocumentEditor as SplitDocumentEditor } from './DocumentEditor';
+import { DocumentLibrarySidebar as SplitDocumentLibrarySidebar } from './DocumentLibrarySidebar';
 
 const ROOT_DROP_ID = 'workspace-doc-root';
 const NANOS_PER_MILLI = BigInt(1_000_000);
@@ -568,7 +570,10 @@ export default function CommunityDocumentsWorkspace({
       setSearchLoading(true);
       Promise.all(
         sortedDocuments.map(async (doc) => {
-          const payload = doc.id === selectedDocumentId && selectedDocument ? selectedDocument : await actor.getCommunityDocument(communityId, doc.id);
+          if (doc.id === selectedDocumentId && selectedDocRef.current) {
+            return buildDocumentSearchResult(toSearchDoc(doc), blocks, query);
+          }
+          const payload = await actor.getCommunityDocument(communityId, doc.id);
           if (!payload) return undefined;
           const searchDoc = new Y.Doc();
           try {
@@ -599,7 +604,7 @@ export default function CommunityDocumentsWorkspace({
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [actor, communityId, searchQuery, selectedDocument, selectedDocumentId, sortedDocuments]);
+  }, [actor, blocks, communityId, searchQuery, selectedDocumentId, sortedDocuments]);
 
   const openDocument = async (documentId: bigint) => {
     await flushPendingUpdates();
@@ -733,7 +738,7 @@ export default function CommunityDocumentsWorkspace({
   return (
     <section className="workspace-app community-doc-workspace-app" aria-label={t('workspace.kicker')}>
       <div className="workspace-page-shell community-workspace-page-shell">
-      <DocumentLibrarySidebar
+      <SplitDocumentLibrarySidebar
         canCreateDocuments={canCreateDocuments}
         documentsLoading={documentsLoading}
         members={members}
@@ -761,7 +766,7 @@ export default function CommunityDocumentsWorkspace({
             </div>
           </div>
 
-          <DocumentEditorPanel
+          <SplitDocumentEditor
             blocks={blocks}
             canManageCommunityWorkspace={canManageCommunityWorkspace}
             comments={comments}
@@ -840,7 +845,9 @@ export default function CommunityDocumentsWorkspace({
                 selectionStart: selection?.start,
                 selectionEnd: selection?.end,
                 commentScope: selection ? 'inline' : 'block',
-                markedRanges: selection ? [{ blockId, selectedText: selection.text, selectionStart: selection.start, selectionEnd: selection.end }] : undefined,
+                markedRanges:
+                  selection?.markedRanges ??
+                  (selection ? [{ blockId, selectedText: selection.text, selectionStart: selection.start, selectionEnd: selection.end }] : undefined),
               });
             }}
             onCompact={() => void compactSnapshot()}
@@ -874,6 +881,15 @@ export default function CommunityDocumentsWorkspace({
               const doc = yDocRef.current;
               if (doc && selectedEditable) applyInlineMark(doc, blockId, type, start, end, { color });
             }}
+            onMarkdownShortcut={(blockId, shortcut) => {
+              const doc = yDocRef.current;
+              if (!doc || !selectedEditable) return;
+              updateBlockType(doc, blockId, shortcut.type, {
+                checked: shortcut.checked,
+                text: shortcut.text,
+              });
+              requestBlockFocus(blockId);
+            }}
             onMergeBlock={(blockId) => {
               const doc = yDocRef.current;
               if (!doc || !selectedEditable) return undefined;
@@ -893,6 +909,7 @@ export default function CommunityDocumentsWorkspace({
               }
             }}
             onRename={(title) => void renameSelectedDocument(title)}
+            onRequestBlockFocus={(blockId) => requestBlockFocus(blockId)}
             onResolveComment={(commentId, resolved) => {
               const doc = yDocRef.current;
               if (doc && selectedEditable) setBlockCommentResolved(doc, commentId, resolved);
@@ -912,6 +929,7 @@ export default function CommunityDocumentsWorkspace({
               }
             }}
             parentOptions={parentOptions}
+            requestedDocumentId={selectedDocumentId}
             selectedDocument={selectedDocument}
             syncStatus={syncStatus}
             undoState={undoState}
@@ -1714,7 +1732,11 @@ function DocumentEditorPanel({
           <h1
             aria-label="Document title"
             contentEditable={canEdit}
-            onBlur={() => void onRename(titleDraft.trim() || 'Untitled')}
+            onBlur={(event) => {
+              const nextTitle = event.currentTarget.innerText.replace(/\n/g, ' ').trim() || 'Untitled';
+              setTitleDraft(nextTitle);
+              void onRename(nextTitle);
+            }}
             onInput={(event) => {
               setShareOpen(false);
               setSlashBlockId(undefined);
@@ -1733,9 +1755,7 @@ function DocumentEditorPanel({
             }}
             ref={titleRef}
             suppressContentEditableWarning
-          >
-            {titleDraft}
-          </h1>
+          />
           <p>
             <span className="avatar-dot">{ownerLabel.slice(0, 1).toUpperCase()}</span>
             <span className="status-dot" />
