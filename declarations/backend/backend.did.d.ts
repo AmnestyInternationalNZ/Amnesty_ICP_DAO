@@ -117,6 +117,7 @@ export interface CommunityEventPayload {
   'startUtc' : bigint,
   'createdAt' : bigint,
   'role' : WorkspaceRole,
+  'publicToken' : [] | [string],
   'description' : [] | [string],
   'updatedAt' : bigint,
   'communityShare' : [] | [WorkspaceRole],
@@ -285,6 +286,10 @@ export interface _SERVICE {
     [string],
     [] | [CommunityBoardPayload]
   >,
+  'getPublicCommunityEvent' : ActorMethod<
+    [string],
+    [] | [CommunityEventPayload]
+  >,
   'getProposalById' : ActorMethod<[bigint], [] | [Proposal]>,
   'getStripeSessionStatus' : ActorMethod<[string], StripeSessionStatus>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
@@ -349,6 +354,10 @@ export interface _SERVICE {
   'setCommunityEventGrant' : ActorMethod<
     [bigint, bigint, Principal, [] | [WorkspaceRole]],
     undefined
+  >,
+  'setCommunityEventPublicLink' : ActorMethod<
+    [bigint, bigint, [] | [string]],
+    [] | [string]
   >,
   'setCommunityEventShare' : ActorMethod<
     [bigint, bigint, [] | [WorkspaceRole]],

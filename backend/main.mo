@@ -19,6 +19,7 @@ persistent actor {
     let membershipState = Membership.initState();
     let workspaceState = Workspace.initState();
     var boardPublicLinks : [Workspace.CommunityBoardPublicLink] = [];
+    var eventPublicLinks : [Workspace.CommunityEventPublicLink] = [];
 
     transient let principalMap = OrderedMap.Make<Principal>(Principal.compare);
     transient let natMap = OrderedMap.Make<Nat>(Nat.compare);
@@ -36,6 +37,7 @@ persistent actor {
     public type CommunityBoardPublicLink = Workspace.CommunityBoardPublicLink;
     public type CommunityBoardSummary = Workspace.CommunityBoardSummary;
     public type CommunityBoardPayload = Workspace.CommunityBoardPayload;
+    public type CommunityEventPublicLink = Workspace.CommunityEventPublicLink;
     public type CommunityEventInput = Workspace.CommunityEventInput;
     public type CommunityEventPayload = Workspace.CommunityEventPayload;
 
@@ -1037,11 +1039,15 @@ persistent actor {
     };
 
     public query ({ caller }) func listCommunityEvents(communityId : Nat) : async [CommunityEventPayload] {
-        Workspace.listEvents(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId));
+        Workspace.listEvents(workspaceState, eventPublicLinks, caller, communityId, getWorkspaceAccessForCaller(caller, communityId));
     };
 
     public query ({ caller }) func getCommunityEvent(communityId : Nat, eventId : Nat) : async ?CommunityEventPayload {
-        Workspace.getEvent(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), eventId);
+        Workspace.getEvent(workspaceState, eventPublicLinks, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), eventId);
+    };
+
+    public query func getPublicCommunityEvent(token : Text) : async ?CommunityEventPayload {
+        Workspace.getPublicEvent(workspaceState, eventPublicLinks, token);
     };
 
     public shared ({ caller }) func updateCommunityEvent(communityId : Nat, eventId : Nat, input : CommunityEventInput) : async () {
@@ -1050,6 +1056,12 @@ persistent actor {
 
     public shared ({ caller }) func setCommunityEventShare(communityId : Nat, eventId : Nat, role : ?WorkspaceRole) : async ?WorkspaceRole {
         Workspace.setEventShare(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), eventId, role);
+    };
+
+    public shared ({ caller }) func setCommunityEventPublicLink(communityId : Nat, eventId : Nat, token : ?Text) : async ?Text {
+        let (nextLinks, publicToken) = Workspace.setEventPublicLink(workspaceState, eventPublicLinks, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), eventId, token);
+        eventPublicLinks := nextLinks;
+        publicToken;
     };
 
     public shared ({ caller }) func setCommunityEventGrant(
@@ -1071,7 +1083,7 @@ persistent actor {
     };
 
     public shared ({ caller }) func archiveCommunityEvent(communityId : Nat, eventId : Nat) : async () {
-        Workspace.archiveEvent(workspaceState, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), eventId);
+        eventPublicLinks := Workspace.archiveEvent(workspaceState, eventPublicLinks, caller, communityId, getWorkspaceAccessForCaller(caller, communityId), eventId);
     };
 
     public query ({ caller }) func isStripeConfigured() : async Bool {

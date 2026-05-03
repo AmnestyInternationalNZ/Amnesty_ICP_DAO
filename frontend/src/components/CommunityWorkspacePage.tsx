@@ -2,8 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { CommunityRole } from '../backend';
 import { useGetCommunityAccess, useGetCommunityById } from '../hooks/useQueries';
-import { CalendarTool } from './CommunityWorkspaceTools';
 import CommunityBoardsWorkspace from './boards/CommunityBoardsWorkspace';
+import CommunityCalendarWorkspace from './calendar/CommunityCalendarWorkspace';
 import CommunityDocumentsWorkspace from './workspace/CommunityDocumentsWorkspace';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -13,9 +13,11 @@ interface CommunityWorkspacePageProps {
   communityId: bigint;
   initialDocumentId?: bigint;
   initialBoardId?: bigint;
+  initialEventId?: bigint;
   kind: CommunityWorkspacePageKind;
   onOpenBoardRoute?: (boardId: bigint) => void;
   onOpenDocumentRoute?: (documentId: bigint) => void;
+  onOpenEventRoute?: (eventId: bigint) => void;
 }
 
 const toolConfig = {
@@ -43,9 +45,11 @@ export default function CommunityWorkspacePage({
   communityId,
   initialBoardId,
   initialDocumentId,
+  initialEventId,
   kind,
   onOpenBoardRoute,
   onOpenDocumentRoute,
+  onOpenEventRoute,
 }: CommunityWorkspacePageProps) {
   const { t } = useTranslation();
   const { data: community, isLoading: communityLoading, error: communityError } = useGetCommunityById(communityId);
@@ -112,6 +116,18 @@ export default function CommunityWorkspacePage({
     );
   }
 
+  if (kind === 'calendar') {
+    return (
+      <CommunityCalendarWorkspace
+        canManageCommunityWorkspace={canManageCommunityWorkspace}
+        communityId={communityId}
+        communityName={community.name}
+        initialEventId={initialEventId}
+        onOpenEventRoute={onOpenEventRoute}
+      />
+    );
+  }
+
   return (
     <section className="amnesty-panel bg-white p-8 md:p-10">
       <div className="mb-8">
@@ -120,10 +136,6 @@ export default function CommunityWorkspacePage({
         <p className="mt-4 max-w-3xl text-lg leading-8 text-[#38505d]">{t(config.body)}</p>
         <p className="mt-3 text-base text-[#5c727d]">{community.name}</p>
       </div>
-
-      {kind === 'calendar' && (
-        <CalendarTool communityId={communityId} canManageCommunityWorkspace={canManageCommunityWorkspace} />
-      )}
     </section>
   );
 }

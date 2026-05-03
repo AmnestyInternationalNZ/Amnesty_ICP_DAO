@@ -130,6 +130,11 @@ module {
         token : Text;
     };
 
+    public type CommunityEventPublicLink = {
+        eventId : Nat;
+        token : Text;
+    };
+
     public type CommunityBoardSummary = {
         id : Nat;
         communityId : Nat;
@@ -202,6 +207,7 @@ module {
         role : WorkspaceRole;
         access : [WorkspaceAccessEntry];
         communityShare : ?WorkspaceRole;
+        publicToken : ?Text;
     };
 
     public type WorkspaceState = {
@@ -668,6 +674,40 @@ module {
         nextLinks;
     };
 
+    func eventPublicTokenFor(eventPublicLinks : [CommunityEventPublicLink], eventId : Nat) : ?Text {
+        for (link in eventPublicLinks.vals()) {
+            if (link.eventId == eventId) {
+                return ?link.token;
+            };
+        };
+        null;
+    };
+
+    func publicEventTokenAlreadyUsed(eventPublicLinks : [CommunityEventPublicLink], eventId : Nat, token : Text) : Bool {
+        for (link in eventPublicLinks.vals()) {
+            if (link.token == token and link.eventId != eventId) {
+                return true;
+            };
+        };
+        false;
+    };
+
+    func setEventPublicToken(eventPublicLinks : [CommunityEventPublicLink], eventId : Nat, token : ?Text) : [CommunityEventPublicLink] {
+        var nextLinks = Array.filter<CommunityEventPublicLink>(
+            eventPublicLinks,
+            func(link) {
+                link.eventId != eventId;
+            },
+        );
+        switch (token) {
+            case null {};
+            case (?value) {
+                nextLinks := Array.append(nextLinks, [{ eventId; token = value }]);
+            };
+        };
+        nextLinks;
+    };
+
     func toBoardPayload(
         boardPublicLinks : [CommunityBoardPublicLink],
         board : CommunityBoard,
@@ -693,7 +733,14 @@ module {
         };
     };
 
-    func toEventPayload(event : CommunityEvent, role : WorkspaceRole) : CommunityEventPayload {
+    func toEventPayload(
+        eventPublicLinks : [CommunityEventPublicLink],
+        event : CommunityEvent,
+        role : WorkspaceRole,
+        includeAccess : Bool,
+        includeCommunityShare : Bool,
+        includePublicToken : Bool,
+    ) : CommunityEventPayload {
         {
             id = event.id;
             communityId = event.communityId;
@@ -708,8 +755,9 @@ module {
             updatedAt = event.updatedAt;
             archived = event.archived;
             role;
-            access = event.access;
-            communityShare = event.communityShare;
+            access = if (includeAccess) event.access else [];
+            communityShare = if (includeCommunityShare) event.communityShare else null;
+            publicToken = if (includePublicToken) eventPublicTokenFor(eventPublicLinks, event.id) else null;
         };
     };
 
@@ -1377,13 +1425,18 @@ module {
         id;
     };
 
-    public func listEvents(state : WorkspaceState, caller : Principal, communityId : Nat, access : CallerAccess) : [CommunityEventPayload] {
+    public func listEvents(state : WorkspaceState, eventPublicLinks : [CommunityEventPublicLink], caller : Principal, communityId : Nat, access : CallerAccess) : [CommunityEventPayload] {
         requireWorkspaceParticipant(caller, access);
         var visible : [CommunityEventPayload] = [];
         for (event in state.events.vals()) {
             if (event.communityId == communityId and not event.archived) {
                 switch (eventRole(event, caller, access)) {
-                    case (?role) visible := Array.append(visible, [toEventPayload(event, role)]);
+                    case (?role) {
+                        visible := Array.append(
+                            visible,
+                            [toEventPayload(eventPublicLinks, event, role, true, true, event.owner == caller)],
+                        );
+                    };
                     case null {};
                 };
             };
@@ -1391,14 +1444,33 @@ module {
         visible;
     };
 
-    public func getEvent(state : WorkspaceState, caller : Principal, communityId : Nat, access : CallerAccess, eventId : Nat) : ?CommunityEventPayload {
+    public func getEvent(state : WorkspaceState, eventPublicLinks : [CommunityEventPublicLink], caller : Principal, communityId : Nat, access : CallerAccess, eventId : Nat) : ?CommunityEventPayload {
         requireAuthenticated(caller);
         let event = getEventOrTrap(state, communityId, eventId);
         requireWorkspaceParticipant(caller, access);
         switch (eventRole(event, caller, access)) {
-            case (?role) ?toEventPayload(event, role);
+            case (?role) ?toEventPayload(eventPublicLinks, event, role, true, true, event.owner == caller);
             case null null;
         };
+    };
+
+    public func getPublicEvent(state : WorkspaceState, eventPublicLinks : [CommunityEventPublicLink], token : Text) : ?CommunityEventPayload {
+        validatePublicToken(token);
+        for (link in eventPublicLinks.vals()) {
+            if (link.token == token) {
+                switch (eventIndex(state, link.eventId)) {
+                    case null return null;
+                    case (?index) {
+                        let event = state.events[index];
+                        if (event.archived) {
+                            return null;
+                        };
+                        return ?toEventPayload(eventPublicLinks, event, #viewer, false, false, false);
+                    };
+                };
+            };
+        };
+        null;
     };
 
     public func updateEvent(state : WorkspaceState, caller : Principal, communityId : Nat, access : CallerAccess, eventId : Nat, input : CommunityEventInput) {
@@ -1454,11 +1526,34 @@ module {
         replaceEvent(state, { event with access = setAccess(event.access, user, role); updatedAt = Time.now() });
     };
 
-    public func archiveEvent(state : WorkspaceState, caller : Principal, communityId : Nat, access : CallerAccess, eventId : Nat) {
+    public func setEventPublicLink(state : WorkspaceState, eventPublicLinks : [CommunityEventPublicLink], caller : Principal, communityId : Nat, access : CallerAccess, eventId : Nat, token : ?Text) : ([CommunityEventPublicLink], ?Text) {
+        requireAuthenticated(caller);
+        let event = getEventOrTrap(state, communityId, eventId);
+        requireWorkspaceParticipant(caller, access);
+        if (event.owner != caller) {
+            Debug.trap("Only the event owner can manage public links");
+        };
+        switch (token) {
+            case null {};
+            case (?value) {
+                validatePublicToken(value);
+                if (publicEventTokenAlreadyUsed(eventPublicLinks, eventId, value)) {
+                    Debug.trap("Public link token is already in use");
+                };
+            };
+        };
+        let nextPublicLinks = setEventPublicToken(eventPublicLinks, event.id, token);
+        replaceEvent(state, { event with updatedAt = Time.now() });
+        (nextPublicLinks, token);
+    };
+
+    public func archiveEvent(state : WorkspaceState, eventPublicLinks : [CommunityEventPublicLink], caller : Principal, communityId : Nat, access : CallerAccess, eventId : Nat) : [CommunityEventPublicLink] {
         requireAuthenticated(caller);
         let event = getEventOrTrap(state, communityId, eventId);
         requireWorkspaceParticipant(caller, access);
         requireManager(event.owner, caller, access, "event");
+        let nextPublicLinks = setEventPublicToken(eventPublicLinks, event.id, null);
         replaceEvent(state, { event with archived = true; updatedAt = Time.now() });
+        nextPublicLinks;
     };
 };

@@ -134,6 +134,7 @@ type CommunityEventPayload =
    id: nat;
    location: opt text;
    owner: principal;
+   publicToken: opt text;
    role: WorkspaceRole;
    startUtc: int;
    title: text;
@@ -303,6 +304,8 @@ service : {
    (opt CommunityEventPayload) query;
   getPublicCommunityBoard: (token: text) ->
    (opt CommunityBoardPayload) query;
+  getPublicCommunityEvent: (token: text) ->
+   (opt CommunityEventPayload) query;
   getProposalById: (proposalId: nat) -> (opt Proposal) query;
   getStripeSessionStatus: (sessionId: text) -> (StripeSessionStatus);
   getUserProfile: (user: principal) -> (opt UserProfile) query;
@@ -350,6 +353,8 @@ service : {
    opt WorkspaceRole) -> (opt WorkspaceRole);
   setCommunityEventGrant: (communityId: nat, eventId: nat, user: principal,
    role: opt WorkspaceRole) -> ();
+  setCommunityEventPublicLink: (communityId: nat, eventId: nat, token:
+   opt text) -> (opt text);
   setCommunityEventShare: (communityId: nat, eventId: nat, role:
    opt WorkspaceRole) -> (opt WorkspaceRole);
   setCommunityRole: (communityId: nat, user: principal, role:

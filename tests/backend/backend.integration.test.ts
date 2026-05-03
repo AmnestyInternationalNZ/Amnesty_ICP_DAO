@@ -507,6 +507,7 @@ describe('Amnesty backend regression baseline', () => {
     const adminActor = actorFor(fixture, fixture.adminIdentity);
     const memberActor = actorFor(fixture, fixture.memberIdentity);
     const outsiderActor = actorFor(fixture, fixture.outsiderIdentity);
+    const anonymousActor = actorFor(fixture, fixture.anonymousIdentity);
 
     await adminActor.bootstrapPlatformAdmin();
     await adminActor.createCommunity('Calendar Community', 'Events here.');
@@ -544,6 +545,24 @@ describe('Amnesty backend regression baseline', () => {
     expect((await memberActor.getCommunityEvent(0n, eventId))[0].role).toEqual({
       owner: null,
     });
+    expect((await memberActor.getCommunityEvent(0n, eventId))[0].publicToken).toEqual([]);
+    expect((await outsiderActor.getCommunityEvent(0n, eventId))).toEqual([]);
+
+    await memberActor.setCommunityEventGrant(
+      0n,
+      eventId,
+      candidPrincipal(fixture.outsiderIdentity),
+      [{ viewer: null }],
+    );
+    expect((await outsiderActor.getCommunityEvent(0n, eventId))[0].role).toEqual({
+      viewer: null,
+    });
+    await memberActor.setCommunityEventGrant(
+      0n,
+      eventId,
+      candidPrincipal(fixture.outsiderIdentity),
+      [],
+    );
     expect((await outsiderActor.getCommunityEvent(0n, eventId))).toEqual([]);
 
     await memberActor.setCommunityEventShare(0n, eventId, [{ viewer: null }]);
@@ -571,5 +590,31 @@ describe('Amnesty backend regression baseline', () => {
       allDay: false,
     });
     expect((await adminActor.getCommunityEvent(0n, eventId))[0].title).toBe('Edited by member');
+
+    await expect(
+      outsiderActor.setCommunityEventPublicLink(0n, eventId, ['b'.repeat(32)]),
+    ).rejects.toThrow(/Only the event owner can manage public links/i);
+    await expect(
+      memberActor.setCommunityEventPublicLink(0n, eventId, ['short']),
+    ).rejects.toThrow(/Public link token must be between 32 and 160 characters/i);
+
+    const token = 'c'.repeat(32);
+    expect(await memberActor.setCommunityEventPublicLink(0n, eventId, [token])).toEqual([token]);
+    expect((await memberActor.getCommunityEvent(0n, eventId))[0].publicToken).toEqual([token]);
+
+    const publicEvent = (await anonymousActor.getPublicCommunityEvent(token))[0];
+    expect(publicEvent.title).toBe('Edited by member');
+    expect(publicEvent.role).toEqual({ viewer: null });
+    expect(publicEvent.access).toEqual([]);
+    expect(publicEvent.communityShare).toEqual([]);
+    expect(publicEvent.publicToken).toEqual([]);
+
+    expect(await memberActor.setCommunityEventPublicLink(0n, eventId, [])).toEqual([]);
+    expect(await anonymousActor.getPublicCommunityEvent(token)).toEqual([]);
+
+    const archiveToken = 'd'.repeat(32);
+    await memberActor.setCommunityEventPublicLink(0n, eventId, [archiveToken]);
+    await memberActor.archiveCommunityEvent(0n, eventId);
+    expect(await anonymousActor.getPublicCommunityEvent(archiveToken)).toEqual([]);
   });
 });

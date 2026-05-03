@@ -147,6 +147,7 @@ export const idlFactory = ({ IDL }) => {
     'startUtc' : IDL.Int,
     'createdAt' : IDL.Int,
     'role' : WorkspaceRole,
+    'publicToken' : IDL.Opt(IDL.Text),
     'description' : IDL.Opt(IDL.Text),
     'updatedAt' : IDL.Int,
     'communityShare' : IDL.Opt(WorkspaceRole),
@@ -320,6 +321,11 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Opt(CommunityBoardPayload)],
         ['query'],
       ),
+    'getPublicCommunityEvent' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(CommunityEventPayload)],
+        ['query'],
+      ),
     'getProposalById' : IDL.Func([IDL.Nat], [IDL.Opt(Proposal)], ['query']),
     'getStripeSessionStatus' : IDL.Func([IDL.Text], [StripeSessionStatus], []),
     'getUserProfile' : IDL.Func(
@@ -423,6 +429,11 @@ export const idlFactory = ({ IDL }) => {
     'setCommunityEventGrant' : IDL.Func(
         [IDL.Nat, IDL.Nat, IDL.Principal, IDL.Opt(WorkspaceRole)],
         [],
+        [],
+      ),
+    'setCommunityEventPublicLink' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Opt(IDL.Text)],
+        [IDL.Opt(IDL.Text)],
         [],
       ),
     'setCommunityEventShare' : IDL.Func(

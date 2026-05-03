@@ -45,6 +45,7 @@ export default function MainTabs() {
   const [selectedCommunityId, setSelectedCommunityId] = useState<bigint | null>(() => readCurrentRoute().communityId);
   const [initialWorkspaceDocumentId, setInitialWorkspaceDocumentId] = useState<bigint | undefined>(() => readCurrentRoute().documentId);
   const [initialWorkspaceBoardId, setInitialWorkspaceBoardId] = useState<bigint | undefined>(() => readCurrentRoute().boardId);
+  const [initialWorkspaceEventId, setInitialWorkspaceEventId] = useState<bigint | undefined>(() => readCurrentRoute().eventId);
   const { data: platformRole, isLoading: roleLoading } = useGetCallerPlatformRole();
   const { data: isPlatformAdmin, isLoading: adminLoading } = useIsCallerPlatformAdmin();
   const { data: platformAdmins, isLoading: platformAdminsLoading } = useListPlatformAdmins();
@@ -56,6 +57,7 @@ export default function MainTabs() {
   const isLoadingShell = roleLoading || adminLoading || platformAdminsLoading;
   const roleLabel =
     platformRole === PlatformRole.platformAdmin ? t('common.roles.platformAdmin') : t('common.roles.viewer');
+  const isFullWidthPage = activePage === 'workspace' || activePage === 'boards' || activePage === 'calendar';
 
   const applyRoute = (route: ParsedAppRoute) => {
     setActivePage(route.page);
@@ -67,6 +69,7 @@ export default function MainTabs() {
     }
     setInitialWorkspaceDocumentId(route.page === 'workspace' ? route.documentId : undefined);
     setInitialWorkspaceBoardId(route.page === 'boards' ? route.boardId : undefined);
+    setInitialWorkspaceEventId(route.page === 'calendar' ? route.eventId : undefined);
   };
 
   const navigateTo = (path: string, mode: 'push' | 'replace' = 'push') => {
@@ -200,7 +203,7 @@ export default function MainTabs() {
         </div>
       </header>
 
-      <main className={activePage === 'workspace' || activePage === 'boards' ? 'mx-auto max-w-none px-0 py-0' : 'mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14'}>
+      <main className={isFullWidthPage ? 'mx-auto max-w-none px-0 py-0' : 'mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14'}>
         {isLoadingShell ? (
           <div className="flex justify-center py-16">
             <LoadingSpinner size="large" />
@@ -252,7 +255,15 @@ export default function MainTabs() {
             )}
 
             {activePage === 'calendar' && selectedCommunityId !== null && (
-              <CommunityWorkspacePage communityId={selectedCommunityId} kind="calendar" />
+              <CommunityWorkspacePage
+                communityId={selectedCommunityId}
+                initialEventId={initialWorkspaceEventId}
+                kind="calendar"
+                onOpenEventRoute={(eventId) => {
+                  setInitialWorkspaceEventId(eventId);
+                  window.history.pushState({}, '', routePaths.event(selectedCommunityId, eventId));
+                }}
+              />
             )}
 
             {activePage === 'admin' && isAdmin && <AdminPanel />}

@@ -9,6 +9,7 @@ import LoadingSpinner from './components/LoadingSpinner';
 import AmnestyLogo from './components/AmnestyLogo';
 import SiteFooter from './components/SiteFooter';
 import PublicBoardPage from './components/boards/PublicBoardPage';
+import PublicEventPage from './components/calendar/PublicEventPage';
 import { parseAppPath } from './routing/appRoutes';
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
   const currentRoute = parseAppPath(window.location.pathname);
   const isCommunityDeepLink = currentRoute.communityId !== null;
   const isPublicBoardRoute = currentRoute.page === 'publicBoard' && Boolean(currentRoute.publicBoardToken);
+  const isPublicEventRoute = currentRoute.page === 'publicEvent' && Boolean(currentRoute.publicEventToken);
   const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
   const shouldShowProfileSetup = showProfileSetup && !isCommunityDeepLink;
   const landingNav = [
@@ -32,6 +34,15 @@ export default function App() {
     return (
       <div className="min-h-screen bg-amnesty-paper text-amnesty-ink">
         <PublicBoardPage token={currentRoute.publicBoardToken} />
+        <SiteFooter />
+      </div>
+    );
+  }
+
+  if (isPublicEventRoute && currentRoute.publicEventToken) {
+    return (
+      <div className="min-h-screen bg-amnesty-paper text-amnesty-ink">
+        <PublicEventPage token={currentRoute.publicEventToken} />
         <SiteFooter />
       </div>
     );

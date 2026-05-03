@@ -213,6 +213,7 @@ export interface CommunityEventPayload extends CommunityEventInput {
     role: WorkspaceRole;
     access: WorkspaceAccessEntry[];
     communityShare: WorkspaceRole | null;
+    publicToken: string | null;
     description: string | null;
     location: string | null;
 }
@@ -463,7 +464,8 @@ function fromCommunityEventPayload(value: CandidCommunityEventPayload): Communit
         archived: value.archived,
         role: fromWorkspaceRole(value.role),
         access: value.access.map(fromWorkspaceAccessEntry),
-        communityShare: fromOptional(value.communityShare, fromWorkspaceRole)
+        communityShare: fromOptional(value.communityShare, fromWorkspaceRole),
+        publicToken: fromOptional(value.publicToken, (token) => token)
     };
 }
 
@@ -501,6 +503,7 @@ export interface backendInterface {
     getCommunityDocument(communityId: bigint, documentId: bigint): Promise<CommunityDocumentPayload | null>;
     getCommunityEvent(communityId: bigint, eventId: bigint): Promise<CommunityEventPayload | null>;
     getPublicCommunityBoard(token: string): Promise<CommunityBoardPayload | null>;
+    getPublicCommunityEvent(token: string): Promise<CommunityEventPayload | null>;
     getProposalById(proposalId: bigint): Promise<Proposal | null>;
     getStripeSessionStatus(sessionId: string): Promise<StripeSessionStatus>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
@@ -530,6 +533,7 @@ export interface backendInterface {
     setCommunityDocumentParent(communityId: bigint, documentId: bigint, parentId: bigint | null): Promise<bigint | null>;
     setCommunityDocumentShare(communityId: bigint, documentId: bigint, role: WorkspaceRole | null): Promise<WorkspaceRole | null>;
     setCommunityEventGrant(communityId: bigint, eventId: bigint, user: Principal, role: WorkspaceRole | null): Promise<void>;
+    setCommunityEventPublicLink(communityId: bigint, eventId: bigint, token: string | null): Promise<string | null>;
     setCommunityEventShare(communityId: bigint, eventId: bigint, role: WorkspaceRole | null): Promise<WorkspaceRole | null>;
     setCommunityRole(communityId: bigint, user: Principal, role: CommunityRole | null): Promise<void>;
     setPlatformAdmin(user: Principal, enabled: boolean): Promise<void>;
@@ -697,6 +701,10 @@ class Backend implements backendInterface {
         return this.handle(async () => fromOptional(await this.actor.getPublicCommunityBoard(token), fromCommunityBoardPayload));
     }
 
+    async getPublicCommunityEvent(token: string): Promise<CommunityEventPayload | null> {
+        return this.handle(async () => fromOptional(await this.actor.getPublicCommunityEvent(token), fromCommunityEventPayload));
+    }
+
     async getProposalById(proposalId: bigint): Promise<Proposal | null> {
         return this.handle(async () => fromOptional(await this.actor.getProposalById(proposalId), fromProposal));
     }
@@ -821,6 +829,12 @@ class Backend implements backendInterface {
 
     async setCommunityEventGrant(communityId: bigint, eventId: bigint, user: Principal, role: WorkspaceRole | null): Promise<void> {
         return this.handle(() => this.actor.setCommunityEventGrant(communityId, eventId, user, toOptional(role == null ? undefined : toWorkspaceRole(role))));
+    }
+
+    async setCommunityEventPublicLink(communityId: bigint, eventId: bigint, token: string | null): Promise<string | null> {
+        return this.handle(async () =>
+            fromOptional(await this.actor.setCommunityEventPublicLink(communityId, eventId, toOptional(token ?? undefined)), (value) => value)
+        );
     }
 
     async setCommunityEventShare(communityId: bigint, eventId: bigint, role: WorkspaceRole | null): Promise<WorkspaceRole | null> {

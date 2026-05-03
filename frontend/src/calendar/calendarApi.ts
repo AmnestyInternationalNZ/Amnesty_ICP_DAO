@@ -1,20 +1,17 @@
-import type { Principal } from "@icp-sdk/core/principal";
-import type { CalendarEventInput, CalendarEventPayload, CalendarRole, CalendarRoleName } from "./types";
+import type { CommunityEventInput, CommunityEventPayload } from '../backend';
+import { WorkspaceRole } from '../backend';
+import { routePaths } from '../routing/appRoutes';
 
-const NANOS_PER_MILLI = BigInt(1_000_000);
+export const NANOS_PER_MILLI = BigInt(1_000_000);
 const ONE_HOUR_MS = 60 * 60 * 1000;
 
-export function roleVariant(role: CalendarRoleName): CalendarRole {
-  return { [role]: null } as CalendarRole;
-}
-
-export function optionalText(value: string): [] | [string] {
+export function optionalText(value: string): string | null {
   const trimmed = value.trim();
-  return trimmed.length > 0 ? [trimmed] : [];
+  return trimmed.length > 0 ? trimmed : null;
 }
 
-export function optionalTextValue(value: [] | [string]): string {
-  return value[0] ?? "";
+export function optionalTextValue(value: string | null | undefined): string {
+  return value ?? '';
 }
 
 export function utcNanosFromDate(date: Date): bigint {
@@ -40,44 +37,41 @@ export function fromDatetimeLocalValue(value: string): Date {
 
 export function readableDateTime(value: bigint): string {
   return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
+    dateStyle: 'medium',
+    timeStyle: 'short',
   }).format(dateFromUtcNanos(value));
 }
 
-export function compactPrincipal(value: Principal | string): string {
-  const text = typeof value === "string" ? value : value.toText();
-  if (text.length <= 20) return text;
-  return `${text.slice(0, 10)}...${text.slice(-8)}`;
+export function eventWorkspaceVisible(event: CommunityEventPayload): boolean {
+  return event.communityShare !== null;
 }
 
-export function eventToCalendarItem(event: CalendarEventPayload) {
-  const isCommunityShared = event.communityShare.length > 0;
+export function eventToCalendarItem(event: CommunityEventPayload) {
   return {
     id: event.id.toString(),
     title: event.title,
     start: dateFromUtcNanos(event.startUtc),
     end: dateFromUtcNanos(event.endUtc),
     allDay: event.allDay,
-    backgroundColor: isCommunityShared ? "#111111" : undefined,
+    backgroundColor: eventWorkspaceVisible(event) ? '#111111' : undefined,
     extendedProps: {
       eventId: event.id.toString(),
       role: event.role,
-      communityShare: event.communityShare,
+      workspaceVisible: eventWorkspaceVisible(event),
     },
   };
 }
 
 function dateFromCalendarValue(value: string | Date | undefined, fallback: Date): Date {
   if (value instanceof Date) return value;
-  if (typeof value === "string" && value.length > 0) return new Date(value);
+  if (typeof value === 'string' && value.length > 0) return new Date(value);
   return fallback;
 }
 
 export function eventInputFromMovedEvent(
-  existing: CalendarEventPayload,
+  existing: CommunityEventPayload,
   changed: { start?: string | Date; end?: string | Date; allDay?: boolean },
-): CalendarEventInput {
+): CommunityEventInput {
   const existingStart = dateFromUtcNanos(existing.startUtc);
   const existingEnd = dateFromUtcNanos(existing.endUtc);
   const existingDuration = existingEnd.getTime() - existingStart.getTime();
@@ -102,7 +96,7 @@ export function eventInputFromForm(form: {
   startLocal: string;
   endLocal: string;
   allDay: boolean;
-}): CalendarEventInput {
+}): CommunityEventInput {
   const start = fromDatetimeLocalValue(form.startLocal);
   const end = fromDatetimeLocalValue(form.endLocal);
   return {
@@ -115,16 +109,40 @@ export function eventInputFromForm(form: {
   };
 }
 
-export function formFromEvent(event?: CalendarEventPayload, fallbackStart = new Date()) {
+export function createEventShareToken(): string {
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  let raw = '';
+  for (const byte of bytes) raw += String.fromCharCode(byte);
+  return btoa(raw).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+export function publicEventUrl(token: string): string {
+  return `${window.location.origin}${routePaths.publicEvent(token)}`;
+}
+
+export function calendarEventUrl(communityId: bigint, eventId: bigint): string {
+  return `${window.location.origin}${routePaths.event(communityId, eventId)}`;
+}
+
+export function formFromEvent(event?: CommunityEventPayload, fallbackStart = new Date()) {
   const start = event ? dateFromUtcNanos(event.startUtc) : fallbackStart;
   const end = event ? dateFromUtcNanos(event.endUtc) : defaultEventEnd(start);
   return {
-    title: event?.title ?? "",
-    description: event ? optionalTextValue(event.description) : "",
-    location: event ? optionalTextValue(event.location) : "",
+    title: event?.title ?? '',
+    description: optionalTextValue(event?.description),
+    location: optionalTextValue(event?.location),
     startLocal: toDatetimeLocalValue(start),
     endLocal: toDatetimeLocalValue(end),
     allDay: event?.allDay ?? false,
-    communityShare: event?.communityShare ?? [],
+    workspaceRole: event?.communityShare ?? null,
   };
+}
+
+export function canEditCalendarRole(role: WorkspaceRole | null | undefined): boolean {
+  return role === WorkspaceRole.owner || role === WorkspaceRole.editor;
+}
+
+export function canOwnCalendarRole(role: WorkspaceRole | null | undefined): boolean {
+  return role === WorkspaceRole.owner;
 }

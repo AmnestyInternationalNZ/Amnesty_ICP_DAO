@@ -30,6 +30,24 @@ describe('app routes', () => {
     });
   });
 
+  it('builds and parses community-scoped calendar event routes', () => {
+    expect(routePaths.event(9n, 44n)).toBe('/communities/9/workspace/calendar/events/44');
+    expect(parseAppPath('/communities/9/workspace/calendar/events/44')).toMatchObject({
+      page: 'calendar',
+      communityId: 9n,
+      eventId: 44n,
+    });
+  });
+
+  it('builds and parses public read-only calendar event routes', () => {
+    expect(routePaths.publicEvent('event-token')).toBe('/calendar/public/event-token');
+    expect(parseAppPath('/calendar/public/event-token')).toMatchObject({
+      page: 'publicEvent',
+      communityId: null,
+      publicEventToken: 'event-token',
+    });
+  });
+
   it('parses community-level workspace pages', () => {
     expect(parseAppPath('/communities/5')).toMatchObject({ page: 'community', communityId: 5n });
     expect(parseAppPath('/communities/5/proposals')).toMatchObject({ page: 'proposals', communityId: 5n });

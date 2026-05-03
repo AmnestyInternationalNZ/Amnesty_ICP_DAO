@@ -1009,6 +1009,38 @@ export function useListCommunityEvents(communityId: bigint) {
     });
 }
 
+export function useGetCommunityEvent(communityId: bigint, eventId: bigint | null) {
+    const { actor, enabled } = useAuthedActor();
+
+    return useQuery<CommunityEventPayload | null>({
+        queryKey: ['communityEvent', communityId.toString(), eventId?.toString() ?? 'none'],
+        queryFn: async () => {
+            if (!actor) throw new Error('Actor not available');
+            if (eventId === null) return null;
+            return actor.getCommunityEvent(communityId, eventId);
+        },
+        enabled: enabled && eventId !== null,
+        retry: false,
+        staleTime: 5 * 1000
+    });
+}
+
+export function useGetPublicCommunityEvent(token: string | null) {
+    const { actor, isFetching } = useActor();
+
+    return useQuery<CommunityEventPayload | null>({
+        queryKey: ['publicCommunityEvent', token ?? 'none'],
+        queryFn: async () => {
+            if (!actor) throw new Error('Actor not available');
+            if (!token) return null;
+            return actor.getPublicCommunityEvent(token);
+        },
+        enabled: !!actor && !isFetching && !!token,
+        retry: false,
+        staleTime: 5 * 1000
+    });
+}
+
 export function useUpdateCommunityEvent() {
     const { actor } = useActor();
     const queryClient = useQueryClient();
@@ -1021,6 +1053,57 @@ export function useUpdateCommunityEvent() {
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['communityEvents', variables.communityId.toString()] });
             queryClient.invalidateQueries({ queryKey: ['communityEvent', variables.communityId.toString(), variables.eventId.toString()] });
+        }
+    });
+}
+
+export function useArchiveCommunityEvent() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, eventId }: { communityId: bigint; eventId: bigint }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.archiveCommunityEvent(communityId, eventId);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityEvents', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityEvent', variables.communityId.toString(), variables.eventId.toString()] });
+        }
+    });
+}
+
+export function useSetCommunityEventGrant() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, eventId, user, role }: { communityId: bigint; eventId: bigint; user: Principal; role: WorkspaceRole | null }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.setCommunityEventGrant(communityId, eventId, user, role);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityEvents', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityEvent', variables.communityId.toString(), variables.eventId.toString()] });
+        }
+    });
+}
+
+export function useSetCommunityEventPublicLink() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, eventId, token }: { communityId: bigint; eventId: bigint; token: string | null }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.setCommunityEventPublicLink(communityId, eventId, token);
+        },
+        onSuccess: (token, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['communityEvents', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityEvent', variables.communityId.toString(), variables.eventId.toString()] });
+            if (token) {
+                queryClient.invalidateQueries({ queryKey: ['publicCommunityEvent', token] });
+            }
         }
     });
 }

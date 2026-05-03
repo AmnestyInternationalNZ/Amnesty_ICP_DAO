@@ -1,4 +1,4 @@
-export type AppPage = 'hub' | 'community' | 'proposals' | 'workspace' | 'boards' | 'calendar' | 'admin' | 'profile' | 'publicBoard';
+export type AppPage = 'hub' | 'community' | 'proposals' | 'workspace' | 'boards' | 'calendar' | 'admin' | 'profile' | 'publicBoard' | 'publicEvent';
 
 export interface ParsedAppRoute {
   page: AppPage;
@@ -7,6 +7,7 @@ export interface ParsedAppRoute {
   boardId?: bigint;
   eventId?: bigint;
   publicBoardToken?: string;
+  publicEventToken?: string;
   canonicalPath?: string;
 }
 
@@ -49,6 +50,7 @@ export const routePaths = {
   calendar: (communityId: bigint) => `/communities/${communityId.toString()}/workspace/calendar`,
   event: (communityId: bigint, eventId: bigint) =>
     `/communities/${communityId.toString()}/workspace/calendar/events/${eventId.toString()}`,
+  publicEvent: (token: string) => `/calendar/public/${encodeURIComponent(token)}`,
 };
 
 export function parseAppPath(pathname: string, legacyCommunityId: bigint | null = null): ParsedAppRoute {
@@ -56,6 +58,9 @@ export function parseAppPath(pathname: string, legacyCommunityId: bigint | null 
   if (segments.length === 0) return { page: 'hub', communityId: null };
   if (segments[0] === 'boards' && segments[1] === 'public' && segments[2]) {
     return { page: 'publicBoard', communityId: null, publicBoardToken: segments[2] };
+  }
+  if (segments[0] === 'calendar' && segments[1] === 'public' && segments[2]) {
+    return { page: 'publicEvent', communityId: null, publicEventToken: segments[2] };
   }
   if (segments[0] === 'profile') return { page: 'profile', communityId: null };
   if (segments[0] === 'admin') return { page: 'admin', communityId: null };
