@@ -1,7 +1,7 @@
-import { DEFAULT_LOCALE } from './types';
+import { getIntlLocale } from './types';
 
 function normalizeLocale(locale?: string): string {
-    return locale ?? DEFAULT_LOCALE;
+    return getIntlLocale(locale);
 }
 
 function toSafeNumber(value: number | bigint): number {

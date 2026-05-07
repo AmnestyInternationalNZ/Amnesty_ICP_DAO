@@ -109,6 +109,13 @@ import {
   slashQueryForText,
 } from '../../workspace/editorCommands';
 import { computeNumberedListMarkers } from '../../workspace/numberedLists';
+import {
+  blockCommandGroup,
+  blockCommandHint,
+  blockCommandLabel,
+  blockTypeLabel as localizedBlockTypeLabel,
+  syncStatusLabel,
+} from '../../workspace/localizedEditorCommands';
 import type {
   DocSummary as SearchDocSummary,
   WorkspaceBlock,
@@ -1207,6 +1214,7 @@ function SidebarSectionList({
   title,
   tree,
 }: SidebarSectionListProps) {
+  const { t } = useTranslation();
   const nodes = tree ?? docs.map((doc) => ({ ...doc, children: [] }));
   return (
     <section className="sidebar-section">
@@ -1221,7 +1229,7 @@ function SidebarSectionList({
 
       {!collapsed && canReparent && (
         <>
-          <p className="sidebar-drag-hint">Drag pages onto each other to nest.</p>
+          <p className="sidebar-drag-hint">{t('workspace.nesting.dragHint')}</p>
           <RootDropTarget active={!!isRootDropTarget} />
         </>
       )}
@@ -1730,7 +1738,7 @@ function DocumentEditorPanel({
       }}>
         <header className="document-title-area">
           <h1
-            aria-label="Document title"
+            aria-label={t('workspace.editor.documentTitle')}
             contentEditable={canEdit}
             onBlur={(event) => {
               const nextTitle = event.currentTarget.innerText.replace(/\n/g, ' ').trim() || 'Untitled';
@@ -1763,14 +1771,14 @@ function DocumentEditorPanel({
             <span>·</span>
             <span>{readableDate(selectedDocument.updatedAt, locale)}</span>
             <span>·</span>
-            <span>{syncStatus}</span>
+            <span>{syncStatusLabel(syncStatus, t)}</span>
             <span>·</span>
             <span>{selectedShareLabel(selectedDocument.communityShare, t)}</span>
           </p>
         </header>
 
         {selectionMode ? (
-          <div className="multi-block-toolbar" role="toolbar" aria-label="Selected block actions">
+          <div className="multi-block-toolbar" role="toolbar" aria-label={t('workspace.selection.selectedBlockActions')}>
             <strong>{t('workspace.selection.selected', { count: selectedBlockIds.size })}</strong>
             <button disabled={selectedBlockIds.size === 0} onClick={() => void copySelectedMarkdown()} type="button">
               <Copy size={14} />
@@ -1783,7 +1791,7 @@ function DocumentEditorPanel({
               {t('workspace.selection.indent')}
             </button>
             <span className="multi-block-divider" />
-            <span className="multi-block-label">Turn into</span>
+            <span className="multi-block-label">{t('workspace.blockMenu.turnInto')}</span>
             <div className="multi-block-transform">
               {textBlockCommands.map((command) => (
                 <button
@@ -1793,7 +1801,7 @@ function DocumentEditorPanel({
                   onClick={() => selectedBlocks.forEach((block) => onBlockType(block.id, command.type))}
                   type="button"
                 >
-                  {command.label}
+                  {blockCommandLabel(command, t)}
                 </button>
               ))}
             </div>
@@ -1875,13 +1883,13 @@ function DocumentEditorPanel({
             top: selection.menuPosition ? `${selection.menuPosition.top}px` : '140px',
           }}
         >
-          <button type="button" onClick={() => applyInlineSelectionFormat('bold')}>Bold</button>
-          <button type="button" onClick={() => applyInlineSelectionFormat('italic')}><Italic size={14} /> Italic</button>
+          <button type="button" onClick={() => applyInlineSelectionFormat('bold')}>{t('workspace.selection.bold')}</button>
+          <button type="button" onClick={() => applyInlineSelectionFormat('italic')}><Italic size={14} /> {t('workspace.selection.italic')}</button>
           <span className="selection-menu-divider" />
           <span className="highlight-swatch-row">
             {(['yellow', 'green', 'blue', 'pink', 'purple'] as WorkspaceHighlightColor[]).map((color) => (
               <button
-                aria-label={`Highlight ${color}`}
+                aria-label={t('workspace.selection.colorHighlight', { color: t(`workspace.selection.colors.${color}`) })}
                 className="highlight-swatch"
                 data-highlight-color={color}
                 key={color}
@@ -1899,11 +1907,11 @@ function DocumentEditorPanel({
       ) : null}
 
       {(commentsOpen || commentBlockId) ? (
-        <aside className="comment-panel" aria-label="Document comments">
+        <aside className="comment-panel" aria-label={t('workspace.comments.documentComments')}>
           <div className="comment-panel-head">
             <div>
               <strong>{t('workspace.comments.openTitle')}</strong>
-              <p>{openComments.length} open</p>
+              <p>{t('workspace.comments.openCount', { count: openComments.length })}</p>
             </div>
             <button className="icon-button" onClick={() => { setCommentsOpen(false); setCommentBlockId(null); }} type="button">
               <X size={16} />
@@ -2014,6 +2022,7 @@ function WorkspaceBlockRow({
   setSelected,
   totalBlocks,
 }: WorkspaceBlockRowProps) {
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [slashIndex, setSlashIndex] = useState(0);
   const [textFocused, setTextFocused] = useState(false);
@@ -2084,7 +2093,7 @@ function WorkspaceBlockRow({
     }
   };
 
-  const blockTypeLabel = commandForBlockType(block.type).label;
+  const blockTypeLabel = localizedBlockTypeLabel(block.type, t);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: block.id,
     disabled: !canEdit || selectionMode,
@@ -2121,32 +2130,32 @@ function WorkspaceBlockRow({
           {menuOpen ? (
             <div className="block-popover">
               <div className="block-popover-head">{blockTypeLabel}</div>
-              <button type="button" onClick={onInsertBefore}>Insert above</button>
-              <button type="button" onClick={onInsertAfter}>Insert below</button>
-              <button disabled={index === 0} type="button" onClick={() => onBlockMove(block.id, index - 1)}>Move up</button>
-              <button disabled={index >= totalBlocks - 1} type="button" onClick={() => onBlockMove(block.id, index + 1)}>Move down</button>
-              <button type="button" onClick={() => onDuplicateBlock(block.id)}>Duplicate</button>
-              <button type="button" onClick={() => onAddComment()}><MessageCircle size={14} /> Add comment</button>
-              <button type="button" onClick={() => onBlockIndent(block.id, 1)}>Indent</button>
-              <button type="button" onClick={() => onBlockIndent(block.id, -1)}>Outdent</button>
+              <button type="button" onClick={onInsertBefore}>{t('workspace.blockMenu.insertAbove')}</button>
+              <button type="button" onClick={onInsertAfter}>{t('workspace.blockMenu.insertBelow')}</button>
+              <button disabled={index === 0} type="button" onClick={() => onBlockMove(block.id, index - 1)}>{t('workspace.blockMenu.moveUp')}</button>
+              <button disabled={index >= totalBlocks - 1} type="button" onClick={() => onBlockMove(block.id, index + 1)}>{t('workspace.blockMenu.moveDown')}</button>
+              <button type="button" onClick={() => onDuplicateBlock(block.id)}>{t('workspace.blockMenu.duplicate')}</button>
+              <button type="button" onClick={() => onAddComment()}><MessageCircle size={14} /> {t('workspace.comments.add')}</button>
+              <button type="button" onClick={() => onBlockIndent(block.id, 1)}>{t('workspace.selection.indent')}</button>
+              <button type="button" onClick={() => onBlockIndent(block.id, -1)}>{t('workspace.selection.outdent')}</button>
               {block.type === 'numbered' ? (
                 <>
                   <div className="block-popover-divider" />
-                  <button type="button" onClick={() => onBlockNumbering(block.id, undefined)}>Numbering: auto</button>
-                  <button type="button" onClick={() => onBlockNumbering(block.id, 'continue')}>Continue previous list</button>
-                  <button type="button" onClick={() => onBlockNumbering(block.id, 'restart')}>Restart at 1</button>
+                  <button type="button" onClick={() => onBlockNumbering(block.id, undefined)}>{t('workspace.blockMenu.autoListNumbering')}</button>
+                  <button type="button" onClick={() => onBlockNumbering(block.id, 'continue')}>{t('workspace.blockMenu.continuePreviousList')}</button>
+                  <button type="button" onClick={() => onBlockNumbering(block.id, 'restart')}>{t('workspace.blockMenu.restartAtOne')}</button>
                 </>
               ) : null}
               {detectedHref ? (
                 <button type="button" onClick={() => onBlockLinkToggle(block.id, !block.linkDisabled)}>
-                  {block.linkDisabled ? 'Enable detected hyperlink' : 'Disable detected hyperlink'}
+                  {block.linkDisabled ? t('workspace.blockMenu.enableHyperlink') : t('workspace.blockMenu.disableHyperlink')}
                 </button>
               ) : null}
               <div className="block-popover-divider" />
-              <div className="block-type-groups" aria-label="Change block type">
+              <div className="block-type-groups" aria-label={t('workspace.blockMenu.turnInto')}>
                 {commandGroups(SLASH_COMMANDS).map(({ group, commands }) => (
                   <div className="block-type-group" key={group}>
-                    <span>{group}</span>
+                    <span>{blockCommandGroup({ ...commands[0], group }, t)}</span>
                     {commands.map((command) => (
                       <button
                         className={command.type === block.type ? 'selected' : undefined}
@@ -2157,14 +2166,14 @@ function WorkspaceBlockRow({
                         }}
                         type="button"
                       >
-                        <span>{command.label}</span>
-                        <small>{command.markdown ?? command.hint}</small>
+                        <span>{blockCommandLabel(command, t)}</span>
+                        <small>{command.markdown ?? blockCommandHint(command, t)}</small>
                       </button>
                     ))}
                   </div>
                 ))}
               </div>
-              <button disabled={totalBlocks === 1} type="button" onClick={() => onBlockRemove(block.id)}>Delete</button>
+              <button disabled={totalBlocks === 1} type="button" onClick={() => onBlockRemove(block.id)}>{t('common.actions.delete')}</button>
             </div>
           ) : null}
         </div>
@@ -2192,11 +2201,11 @@ function WorkspaceBlockRow({
 
         {isSlashOpen && block.text.startsWith('/') ? (
           <div className="slash-menu">
-            <div className="slash-menu-search">/{slashQuery || 'commands'}</div>
-            {slashCommands.length === 0 ? <p className="slash-menu-empty">No matching commands</p> : null}
+            <div className="slash-menu-search">/{slashQuery || t('workspace.commands.placeholder')}</div>
+            {slashCommands.length === 0 ? <p className="slash-menu-empty">{t('workspace.commands.noMatches')}</p> : null}
             {slashCommandGroups.map(({ group, commands }) => (
               <div className="slash-menu-group" key={group}>
-                <span>{group}</span>
+                <span>{blockCommandGroup({ ...commands[0], group }, t)}</span>
                 {commands.map((command) => {
                   const commandIndex = slashCommands.findIndex((candidate) => candidate.type === command.type);
                   return (
@@ -2211,8 +2220,8 @@ function WorkspaceBlockRow({
                       onMouseEnter={() => setSlashIndex(commandIndex)}
                       type="button"
                     >
-                      <span>{command.label}</span>
-                      <small>{command.markdown ?? command.hint}</small>
+                      <span>{blockCommandLabel(command, t)}</span>
+                      <small>{command.markdown ?? blockCommandHint(command, t)}</small>
                     </button>
                   );
                 })}
@@ -2273,6 +2282,7 @@ const BlockContent = React.forwardRef<HTMLTextAreaElement, BlockContentProps>(fu
   onSelection,
   textFocused,
 }, ref) {
+  const { t } = useTranslation();
   const textClass = 'editable-block-text workspace-textarea';
   const showInlinePreview = !textFocused && isTextEditableBlock(block.type) && (block.inlineMarks?.length ?? 0) > 0;
   const textShellClassName = showInlinePreview ? 'text-editor-shell has-inline-preview' : 'text-editor-shell';
@@ -2304,7 +2314,7 @@ const BlockContent = React.forwardRef<HTMLTextAreaElement, BlockContentProps>(fu
               if (block.text === '/') onOpenSlash();
             }}
             rows={1}
-            placeholder="Toggle heading"
+            placeholder={t('workspace.commands.items.toggle.label')}
             className={textClass}
           />
           {showInlinePreview ? <span className="marked-block-text" aria-hidden="true">{renderMarkedText(block.text, block.inlineMarks ?? [])}</span> : null}
@@ -2323,18 +2333,18 @@ const BlockContent = React.forwardRef<HTMLTextAreaElement, BlockContentProps>(fu
             disabled={!canEdit}
             onChange={(event) => onBlockMedia(block.id, { url: event.currentTarget.value })}
             className="media-url-field"
-            placeholder={block.type === 'image' ? 'Image URL' : 'File URL'}
+            placeholder={block.type === 'image' ? t('workspace.blockRenderer.imageUrl') : t('workspace.blockRenderer.fileUrl')}
           />
           <input
             value={block.caption ?? block.text}
             disabled={!canEdit}
             onChange={(event) => onBlockMedia(block.id, { caption: event.currentTarget.value, text: event.currentTarget.value })}
             className="media-caption-field"
-            placeholder="Caption"
+            placeholder={t('workspace.blockRenderer.addCaption')}
           />
         </div>
         {block.type === 'image' && href && (
-          <img src={href} alt={block.caption || block.text || 'Workspace image'} />
+          <img src={href} alt={block.caption || block.text || t('workspace.blockRenderer.workspaceImage')} />
         )}
         {block.type === 'fileLink' && href && (
           <a href={href} target="_blank" rel="noreferrer">
@@ -2382,7 +2392,7 @@ const BlockContent = React.forwardRef<HTMLTextAreaElement, BlockContentProps>(fu
           onKeyDown={onKeyDown}
           onSelect={(event) => onSelection(selectionFromTextarea(block.id, event.currentTarget))}
           rows={Math.max(1, block.text.split('\n').length)}
-          placeholder={`Type '/' for commands${blockTypeLabel ? ` · ${blockTypeLabel}` : ''}`}
+          placeholder={`${t('workspace.blockRenderer.typeForCommands')}${blockTypeLabel ? ` · ${blockTypeLabel}` : ''}`}
           className={textClass}
         />
         {showInlinePreview ? <span className="marked-block-text" aria-hidden="true">{renderMarkedText(block.text, block.inlineMarks ?? [])}</span> : null}

@@ -2,6 +2,7 @@ import { Principal } from '@dfinity/principal';
 import { CalendarDays, Edit3, Globe2, Link as LinkIcon, Plus, Save, Share2, Trash2, Users } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { EventCalendarChangeInfo, EventCalendarClickInfo, EventCalendarDateInfo, EventCalendarSelectInfo } from '@event-calendar/core';
+import { useTranslation } from 'react-i18next';
 import type { CommunityEventPayload, CommunityMember, WorkspaceRole } from '../../backend';
 import { WorkspaceRole as WorkspaceRoleValue } from '../../backend';
 import {
@@ -57,8 +58,8 @@ function memberLabel(members: CommunityMember[], principal: Principal): string {
   return member?.profile?.name || compactPrincipal(text);
 }
 
-function roleLabel(role: WorkspaceRole | null | undefined): string {
-  return role ?? 'viewer';
+function roleLabel(role: WorkspaceRole | null | undefined, t: ReturnType<typeof useTranslation>['t']): string {
+  return t(`workspace.roles.${role ?? 'viewer'}`);
 }
 
 async function copyTextToClipboard(text: string): Promise<boolean> {
@@ -83,6 +84,7 @@ export default function CommunityCalendarWorkspace({
   initialEventId?: bigint;
   onOpenEventRoute?: (eventId: bigint) => void;
 }) {
+  const { t } = useTranslation();
   const listEvents = useListCommunityEvents(communityId);
   const eventDetail = useGetCommunityEvent(communityId, initialEventId ?? null);
   const { data: members = [] } = useListCommunityMembers(communityId);
@@ -182,7 +184,7 @@ export default function CommunityCalendarWorkspace({
         await updateEvent.mutateAsync({ communityId, eventId: existing.id, input });
         setEvents((current) => sortEvents(current.map((event) => (event.id === existing.id ? movedEvent : event))));
         openExisting(movedEvent);
-        setMessage('Event time saved.');
+        setMessage(t('calendar.messages.timeSaved'));
       } catch (error) {
         info.revert?.();
         setMessage(error instanceof Error ? error.message : String(error));
@@ -195,7 +197,7 @@ export default function CommunityCalendarWorkspace({
   );
 
   const handleEventDragStart = useCallback(() => {
-    setMessage('Release the event to save the new time.');
+    setMessage(t('calendar.messages.releaseToSave'));
   }, []);
 
   const handleEventDragStop = useCallback(() => {
@@ -212,7 +214,7 @@ export default function CommunityCalendarWorkspace({
         if (canManageSelected && selectedEvent.communityShare !== form.workspaceRole) {
           await setEventShare.mutateAsync({ communityId, eventId: selectedEvent.id, role: form.workspaceRole });
         }
-        setMessage('Event updated.');
+        setMessage(t('calendar.messages.updated'));
       } else {
         const id = await createEvent.mutateAsync({ communityId, input });
         if (form.workspaceRole) {
@@ -220,7 +222,7 @@ export default function CommunityCalendarWorkspace({
         }
         setSelectedEventId(id);
         onOpenEventRoute?.(id);
-        setMessage('Event created.');
+        setMessage(t('calendar.messages.created'));
       }
       await refreshEvents();
     } catch (error) {
@@ -240,7 +242,7 @@ export default function CommunityCalendarWorkspace({
       setForm(formFromEvent(undefined, new Date()));
       window.history.pushState({}, '', routePaths.calendar(communityId));
       await refreshEvents();
-      setMessage('Event deleted.');
+      setMessage(t('calendar.messages.deleted'));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
@@ -252,7 +254,7 @@ export default function CommunityCalendarWorkspace({
     if (!selectedEvent) return;
     const principal = grantPrincipal.trim();
     if (!principal) {
-      setMessage('Choose a person or paste a principal to share this event.');
+      setMessage(t('calendar.messages.chooseParticipant'));
       return;
     }
 
@@ -267,7 +269,7 @@ export default function CommunityCalendarWorkspace({
       });
       setGrantPrincipal('');
       await refreshEvents();
-      setMessage(`Granted ${grantRole} access.`);
+      setMessage(t('calendar.messages.grantedAccess', { role: roleLabel(grantRole, t) }));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
@@ -277,7 +279,7 @@ export default function CommunityCalendarWorkspace({
 
   async function copyText(text: string, label: string) {
     if (await copyTextToClipboard(text)) {
-      setMessage(`${label} copied.`);
+      setMessage(t('calendar.messages.copied', { label }));
     } else {
       setMessage(text);
     }
@@ -291,7 +293,7 @@ export default function CommunityCalendarWorkspace({
       const token = selectedEvent.publicToken ?? createEventShareToken();
       await setEventPublicLink.mutateAsync({ communityId, eventId: selectedEvent.id, token });
       await refreshEvents();
-      await copyText(publicEventUrl(token), 'Public event link');
+      await copyText(publicEventUrl(token), t('calendar.share.publicEventLink'));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
@@ -306,7 +308,7 @@ export default function CommunityCalendarWorkspace({
     try {
       await setEventPublicLink.mutateAsync({ communityId, eventId: selectedEvent.id, token: null });
       await refreshEvents();
-      setMessage('Public event link disabled.');
+      setMessage(t('calendar.messages.publicLinkDisabled'));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
@@ -317,31 +319,31 @@ export default function CommunityCalendarWorkspace({
   return (
     <section className="calendar-shell">
       <div className="calendar-layout">
-        <aside className="calendar-sidebar" aria-label="Event editor">
+        <aside className="calendar-sidebar" aria-label={t('calendar.editor.aria')}>
           <div className="calendar-sidebar-head">
             <div>
-              <div className="amnesty-kicker">New event</div>
-              <h2>{selectedEvent?.title || 'Plan a meeting'}</h2>
+              <div className="amnesty-kicker">{selectedEvent ? t('calendar.editTitle') : t('calendar.createTitle')}</div>
+              <h2>{selectedEvent?.title || t('calendar.editor.planMeeting')}</h2>
             </div>
             <button className="ghost-button compact-icon-button" disabled={saving} onClick={() => openCreate()} type="button">
               <Plus size={17} />
-              New
+              {t('calendar.actions.new')}
             </button>
           </div>
 
           <label className="field-label">
-            Title
+            {t('calendar.fields.title')}
             <input
               disabled={!canEditSelected || saving}
               onChange={(event) => setForm((current) => ({ ...current, title: event.currentTarget.value }))}
-              placeholder="Meeting title"
+              placeholder={t('calendar.fields.meetingTitlePlaceholder')}
               value={form.title}
             />
           </label>
 
           <div className="calendar-time-grid">
             <label className="field-label">
-              Start
+              {t('calendar.fields.start')}
               <input
                 disabled={!canEditSelected || saving}
                 onChange={(event) => setForm((current) => ({ ...current, startLocal: event.currentTarget.value }))}
@@ -350,7 +352,7 @@ export default function CommunityCalendarWorkspace({
               />
             </label>
             <label className="field-label">
-              End
+              {t('calendar.fields.end')}
               <input
                 disabled={!canEditSelected || saving}
                 onChange={(event) => setForm((current) => ({ ...current, endLocal: event.currentTarget.value }))}
@@ -367,25 +369,25 @@ export default function CommunityCalendarWorkspace({
               onChange={(event) => setForm((current) => ({ ...current, allDay: event.currentTarget.checked }))}
               type="checkbox"
             />
-            All-day event
+            {t('calendar.fields.allDay')}
           </label>
 
           <label className="field-label">
-            Location
+            {t('calendar.fields.location')}
             <input
               disabled={!canEditSelected || saving}
               onChange={(event) => setForm((current) => ({ ...current, location: event.currentTarget.value }))}
-              placeholder="Room, call link, or place"
+              placeholder={t('calendar.fields.locationPlaceholder')}
               value={form.location}
             />
           </label>
 
           <label className="field-label">
-            Notes
+            {t('calendar.fields.notes')}
             <textarea
               disabled={!canEditSelected || saving}
               onChange={(event) => setForm((current) => ({ ...current, description: event.currentTarget.value }))}
-              placeholder="Purpose, agenda, or preparation notes"
+              placeholder={t('calendar.fields.notesPlaceholder')}
               rows={4}
               value={form.description}
             />
@@ -401,18 +403,18 @@ export default function CommunityCalendarWorkspace({
               }}
               type="checkbox"
             />
-            Share to workspace
+            {t('calendar.fields.shareToWorkspace')}
           </label>
 
           <div className="button-row">
             <button className="cta" disabled={!canEditSelected || saving || form.title.trim().length === 0} onClick={saveEvent} type="button">
               <Save size={17} />
-              {saving ? 'Saving...' : selectedEvent ? 'Save event' : 'Create event'}
+              {saving ? t('common.loading.saving') : selectedEvent ? t('calendar.actions.saveEvent') : t('calendar.actions.create')}
             </button>
             {selectedEvent && canManageSelected ? (
               <button className="ghost-button danger-button" disabled={saving} onClick={deleteEvent} type="button">
                 <Trash2 size={17} />
-                Delete
+                {t('common.actions.delete')}
               </button>
             ) : null}
           </div>
@@ -420,34 +422,34 @@ export default function CommunityCalendarWorkspace({
           {selectedEvent ? (
             <div className="calendar-meta-panel">
               <div className="mini-row">
-                <span>Role</span>
-                <strong>{roleLabel(selectedEvent.role)}</strong>
+                <span>{t('calendar.meta.role')}</span>
+                <strong>{roleLabel(selectedEvent.role, t)}</strong>
               </div>
               <div className="mini-row">
-                <span>Owner</span>
+                <span>{t('calendar.meta.owner')}</span>
                 <strong>{memberLabel(members, selectedEvent.owner)}</strong>
               </div>
               <div className="mini-row">
-                <span>Start</span>
+                <span>{t('calendar.meta.start')}</span>
                 <strong>{readableDateTime(selectedEvent.startUtc)}</strong>
               </div>
               <div className="mini-row">
-                <span>Visibility</span>
-                <strong>{eventWorkspaceVisible(selectedEvent) ? 'Workspace' : 'Private/shared'}</strong>
+                <span>{t('calendar.meta.visibility')}</span>
+                <strong>{eventWorkspaceVisible(selectedEvent) ? t('calendar.meta.workspace') : t('calendar.meta.privateShared')}</strong>
               </div>
               <div className="calendar-participants">
-                <span>Participants</span>
+                <span>{t('calendar.meta.participants')}</span>
                 {selectedEvent.access.length > 0 ? (
                   <div>
                     {selectedEvent.access.map((entry) => (
                       <p key={principalText(entry.user)}>
                         <span>{memberLabel(members, entry.user)}</span>
-                        <small>{entry.role}</small>
+                        <small>{roleLabel(entry.role, t)}</small>
                       </p>
                     ))}
                   </div>
                 ) : (
-                  <strong>Owner only</strong>
+                  <strong>{t('calendar.meta.ownerOnly')}</strong>
                 )}
               </div>
             </div>
@@ -455,27 +457,27 @@ export default function CommunityCalendarWorkspace({
 
           {selectedEvent ? (
             <div className="share-panel">
-              <div className="amnesty-kicker">Share links</div>
+              <div className="amnesty-kicker">{t('calendar.share.title')}</div>
               <div className="calendar-link-actions">
-                <button className="ghost-button" onClick={() => copyText(calendarEventUrl(communityId, selectedEvent.id), 'Event link')} type="button">
+                <button className="ghost-button" onClick={() => copyText(calendarEventUrl(communityId, selectedEvent.id), t('calendar.share.eventLink'))} type="button">
                   <LinkIcon size={17} />
-                  Copy event link
+                  {t('calendar.share.copyEventLink')}
                 </button>
                 {canOwnSelected ? (
                   selectedEvent.publicToken ? (
                     <>
-                      <button className="ghost-button" onClick={() => copyText(publicEventUrl(selectedEvent.publicToken!), 'Public event link')} type="button">
+                      <button className="ghost-button" onClick={() => copyText(publicEventUrl(selectedEvent.publicToken!), t('calendar.share.publicEventLink'))} type="button">
                         <Globe2 size={17} />
-                        Copy public link
+                        {t('calendar.share.copyPublicLink')}
                       </button>
                       <button className="ghost-button danger-button" disabled={saving} onClick={disablePublicLink} type="button">
-                        Disable public link
+                        {t('calendar.share.disablePublicLink')}
                       </button>
                     </>
                   ) : (
                     <button className="ghost-button" disabled={saving} onClick={enablePublicLink} type="button">
                       <Globe2 size={17} />
-                      Create public link
+                      {t('calendar.share.createPublicLink')}
                     </button>
                   )
                 ) : null}
@@ -483,13 +485,13 @@ export default function CommunityCalendarWorkspace({
 
               {canManageSelected ? (
                 <>
-                  <div className="amnesty-kicker">Add participant</div>
+                  <div className="amnesty-kicker">{t('calendar.share.addParticipant')}</div>
                   <div className="share-row">
                     <input
-                      aria-label="Principal to grant calendar event access"
+                      aria-label={t('calendar.share.principalToGrant')}
                       list="calendar-share-members"
                       onChange={(event) => setGrantPrincipal(event.currentTarget.value)}
-                      placeholder="Search name or paste principal"
+                      placeholder={t('calendar.share.principalPlaceholder')}
                       value={grantPrincipal}
                     />
                     <datalist id="calendar-share-members">
@@ -497,14 +499,14 @@ export default function CommunityCalendarWorkspace({
                         <option key={principalText(member.principal)} label={member.profile?.name ?? principalText(member.principal)} value={principalText(member.principal)} />
                       ))}
                     </datalist>
-                    <select aria-label="Calendar event role" onChange={(event) => setGrantRole(event.currentTarget.value as WorkspaceRole)} value={grantRole}>
-                      <option value={WorkspaceRoleValue.viewer}>Viewer</option>
-                      <option value={WorkspaceRoleValue.editor}>Editor</option>
+                    <select aria-label={t('calendar.share.eventRole')} onChange={(event) => setGrantRole(event.currentTarget.value as WorkspaceRole)} value={grantRole}>
+                      <option value={WorkspaceRoleValue.viewer}>{t('workspace.roles.viewer')}</option>
+                      <option value={WorkspaceRoleValue.editor}>{t('workspace.roles.editor')}</option>
                     </select>
                   </div>
                   <button className="ghost-button" disabled={saving} onClick={grantAccess} type="button">
                     <Share2 size={17} />
-                    Grant access
+                    {t('calendar.share.grantAccess')}
                   </button>
                 </>
               ) : null}
@@ -517,22 +519,22 @@ export default function CommunityCalendarWorkspace({
         <div className="calendar-main">
           <div className="workspace-hero calendar-hero">
             <div>
-              <div className="amnesty-kicker text-amnesty-orange">Calendar</div>
-              <h1>Plan with purpose.</h1>
-              <p>Schedule events, meetings, and actions so your community can take action together.</p>
+              <div className="amnesty-kicker text-amnesty-orange">{t('calendar.hero.kicker')}</div>
+              <h1>{t('calendar.hero.title')}</h1>
+              <p>{t('calendar.hero.body')}</p>
               <small>{communityName}</small>
             </div>
           </div>
 
           <div className="calendar-toolbar">
             <div>
-              <div className="amnesty-kicker text-amnesty-orange">UTC-backed calendar</div>
-              <h2>{isLoading ? 'Loading events...' : `${visibleEvents.length} visible event${visibleEvents.length === 1 ? '' : 's'}`}</h2>
+              <div className="amnesty-kicker text-amnesty-orange">{t('calendar.hero.utcBacked')}</div>
+              <h2>{isLoading ? t('calendar.loadingEvents') : t('calendar.visibleEvents', { count: visibleEvents.length })}</h2>
             </div>
             <div className="calendar-legend">
-              <span><CalendarDays size={15} /> My events</span>
-              <span><Users size={15} /> Workspace visible</span>
-              <span><Edit3 size={15} /> Drag to reschedule</span>
+              <span><CalendarDays size={15} /> {t('calendar.legend.myEvents')}</span>
+              <span><Users size={15} /> {t('calendar.legend.workspaceVisible')}</span>
+              <span><Edit3 size={15} /> {t('calendar.legend.dragToReschedule')}</span>
             </div>
           </div>
 
@@ -540,7 +542,7 @@ export default function CommunityCalendarWorkspace({
             <div className="calendar-empty"><LoadingSpinner /></div>
           ) : listEvents.error || eventDetail.error ? (
             <div className="calendar-empty">
-              <h3>Could not load calendar.</h3>
+              <h3>{t('calendar.errors.loadFailed')}</h3>
               <p>{String(listEvents.error ?? eventDetail.error)}</p>
             </div>
           ) : (

@@ -13,7 +13,9 @@ import {
   Pilcrow,
   Quote,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { WorkspaceBlockType, WorkspaceHighlightColor, WorkspaceTextMarkType } from '../../workspace/types';
+import { blockTypeLabel } from '../../workspace/localizedEditorCommands';
 
 export interface SelectionFormatState {
   blockId: string;
@@ -61,35 +63,36 @@ export function SelectionFormatMenu({
     color?: WorkspaceHighlightColor,
   ) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div
       className="selection-format-menu"
       style={{ left: selection.left, top: selection.top }}
       onMouseDown={(event) => event.preventDefault()}
       role="toolbar"
-      aria-label="Selected text formatting"
+      aria-label={t('workspace.selection.formatSelected')}
     >
-      <button aria-label="Bold selected text" onClick={() => onInlineFormat(selection.blockId, 'bold', selection.start, selection.end)} type="button">
+      <button aria-label={t('workspace.selection.boldSelected')} onClick={() => onInlineFormat(selection.blockId, 'bold', selection.start, selection.end)} type="button">
         <Bold size={15} />
-        <span>Bold</span>
+        <span>{t('workspace.selection.bold')}</span>
       </button>
-      <button aria-label="Italicize selected text" onClick={() => onInlineFormat(selection.blockId, 'italic', selection.start, selection.end)} type="button">
+      <button aria-label={t('workspace.selection.italicSelected')} onClick={() => onInlineFormat(selection.blockId, 'italic', selection.start, selection.end)} type="button">
         <Italic size={15} />
-        <span>Italic</span>
+        <span>{t('workspace.selection.italic')}</span>
       </button>
-      <button aria-label="Highlight selected text" onClick={() => onInlineFormat(selection.blockId, 'highlight', selection.start, selection.end, 'yellow')} type="button">
+      <button aria-label={t('workspace.selection.highlightSelected')} onClick={() => onInlineFormat(selection.blockId, 'highlight', selection.start, selection.end, 'yellow')} type="button">
         <Highlighter size={15} />
-        <span>Highlight</span>
+        <span>{t('workspace.selection.highlight')}</span>
       </button>
-      <div className="highlight-swatch-row" aria-label="Highlight colors">
+      <div className="highlight-swatch-row" aria-label={t('workspace.selection.highlightColors')}>
         {HIGHLIGHT_COLORS.map((item) => (
           <button
-            aria-label={`${item.label} highlight`}
+            aria-label={t('workspace.selection.colorHighlight', { color: t(`workspace.selection.colors.${item.color}`) })}
             className="highlight-swatch"
             data-highlight-color={item.color}
             key={item.color}
             onClick={() => onInlineFormat(selection.blockId, 'highlight', selection.start, selection.end, item.color)}
-            title={`${item.label} highlight`}
+            title={t('workspace.selection.colorHighlight', { color: t(`workspace.selection.colors.${item.color}`) })}
             type="button"
           />
         ))}
@@ -98,25 +101,25 @@ export function SelectionFormatMenu({
       {FORMAT_ACTIONS.map((action) => {
         const Icon = action.icon;
         return (
-          <button aria-label={`Format block as ${action.label}`} key={action.type} onClick={() => onFormat(selection.blockId, action.type)} type="button">
+          <button aria-label={t('workspace.selection.formatBlockAs', { label: blockTypeLabel(action.type, t) })} key={action.type} onClick={() => onFormat(selection.blockId, action.type)} type="button">
             <Icon size={15} />
-            <span>{action.label}</span>
+            <span>{blockTypeLabel(action.type, t)}</span>
           </button>
         );
       })}
       <span className="selection-menu-divider" />
-      <button aria-label="Decrease block indent" onClick={() => onIndent(selection.blockId, -1)} type="button">
+      <button aria-label={t('workspace.selection.decreaseIndent')} onClick={() => onIndent(selection.blockId, -1)} type="button">
         <IndentDecrease size={15} />
-        <span>Outdent</span>
+        <span>{t('workspace.selection.outdent')}</span>
       </button>
-      <button aria-label="Increase block indent" onClick={() => onIndent(selection.blockId, 1)} type="button">
+      <button aria-label={t('workspace.selection.increaseIndent')} onClick={() => onIndent(selection.blockId, 1)} type="button">
         <IndentIncrease size={15} />
-        <span>Indent</span>
+        <span>{t('workspace.selection.indent')}</span>
       </button>
       <span className="selection-menu-divider" />
-      <button aria-label="Comment on selected text" onClick={() => onComment(selection.blockId, selection.selectedText, selection.start, selection.end)} type="button">
+      <button aria-label={t('workspace.selection.commentSelected')} onClick={() => onComment(selection.blockId, selection.selectedText, selection.start, selection.end)} type="button">
         <MessageCircle size={15} />
-        <span>Comment</span>
+        <span>{t('workspace.comments.add')}</span>
       </button>
     </div>
   );

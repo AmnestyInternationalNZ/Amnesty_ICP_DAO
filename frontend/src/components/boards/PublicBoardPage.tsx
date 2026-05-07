@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Eye, ShieldCheck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useGetPublicCommunityBoard } from '../../hooks/useQueries';
 import AmnestyLogo from '../AmnestyLogo';
 import LoadingSpinner from '../LoadingSpinner';
@@ -10,32 +11,30 @@ interface PublicBoardPageProps {
 }
 
 export default function PublicBoardPage({ token }: PublicBoardPageProps) {
+  const { t } = useTranslation();
   const { data: board, isLoading, error, refetch } = useGetPublicCommunityBoard(token);
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <>
       <header className="public-board-header">
-        <a href="/" aria-label="Amnesty DAO home">
+        <a href="/" aria-label={t('boards.public.homeAria')}>
           <AmnestyLogo className="max-w-[10rem]" imageClassName="w-full" />
         </a>
         <div>
-          <span><Eye size={16} /> Public read-only board</span>
-          <strong>Shared workspace view</strong>
+          <span><Eye size={16} /> {t('boards.public.readOnlyBoard')}</span>
+          <strong>{t('boards.public.sharedWorkspaceView')}</strong>
         </div>
       </header>
 
       <main className="public-board-page">
         <section className="public-board-intro">
-          <p className="amnesty-kicker text-amnesty-green mb-3">Boards</p>
-          <h1 className="text-4xl text-amnesty-ink md:text-5xl amnesty-heading">A shared board, safely view-only.</h1>
-          <p>
-            Anyone with this link can read the board. Editing, sharing settings, member grants,
-            and private workspace metadata stay available only to authorised community members.
-          </p>
+          <p className="amnesty-kicker text-amnesty-green mb-3">{t('boards.hero.kicker')}</p>
+          <h1 className="text-4xl text-amnesty-ink md:text-5xl amnesty-heading">{t('boards.public.title')}</h1>
+          <p>{t('boards.public.body')}</p>
           <div>
             <ShieldCheck size={18} />
-            <span>No sign-in required for this public read-only view.</span>
+            <span>{t('boards.public.noSignIn')}</span>
           </div>
         </section>
 
@@ -45,8 +44,8 @@ export default function PublicBoardPage({ token }: PublicBoardPageProps) {
           </div>
         ) : error || !board ? (
           <section className="kanban-empty-state public-loading">
-            <h2>Board link unavailable</h2>
-            <p>This public board link may have been disabled, mistyped, or archived.</p>
+            <h2>{t('boards.public.unavailableTitle')}</h2>
+            <p>{t('boards.public.unavailableBody')}</p>
           </section>
         ) : (
           <KanbanBoard

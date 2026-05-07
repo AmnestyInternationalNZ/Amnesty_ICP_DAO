@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useGetCallerUserProfile, useSaveCallerUserProfile } from '../hooks/useQueries';
+import LanguageSwitcher from './LanguageSwitcher';
 import LoadingSpinner from './LoadingSpinner';
 
 export default function ProfilePage() {
@@ -44,6 +45,13 @@ export default function ProfilePage() {
       </div>
 
       <form onSubmit={handleSubmit} className="mt-10 max-w-3xl space-y-6">
+        <div className="border border-amnesty-line bg-[#f7f7f2] p-5">
+          <p className="amnesty-kicker text-amnesty-purple mb-3">{t('i18n.language.label')}</p>
+          <p className="mb-4 text-base leading-7 text-[#38505d]">{t('i18n.language.helper')}</p>
+          <LanguageSwitcher />
+          <p className="mt-4 text-sm leading-6 text-[#526471]">{t('i18n.language.machineTranslationNote')}</p>
+        </div>
+
         <div>
           <label htmlFor="profile-name" className="mb-3 block text-lg text-amnesty-ink amnesty-heading">
             {t('profile.nameLabel')}

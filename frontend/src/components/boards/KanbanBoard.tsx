@@ -12,6 +12,7 @@ import {
 } from '@dnd-kit/core';
 import { horizontalListSortingStrategy, SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { Copy, Link2, Pin, Plus, RefreshCw, Search, Share2, Trash2, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { CommunityBoardPayload, CommunityDocumentSummary, CommunityEventPayload, CommunityMember, KanbanCard, WorkspaceRole } from '../../backend';
 import { WorkspaceRole as WorkspaceRoleValue } from '../../backend';
 import { compactPrincipal, readableDate, roleName, roleVariant } from '../../workspace/workspaceApi';
@@ -163,6 +164,7 @@ export default function KanbanBoard({
   publicShareUrl?: string;
   searchQuery: string;
 }) {
+  const { t } = useTranslation();
   const canEdit = isEditable(board.role);
   const canManage = board.role === WorkspaceRoleValue.owner || canManageCommunityWorkspace;
   const canManagePublicLink = board.role === WorkspaceRoleValue.owner;
@@ -272,14 +274,16 @@ export default function KanbanBoard({
   }
 
   const filteredCardCount = board.cards.filter((card) => cardMatchesQuery(card, normalizedSearch)).length;
-  const cardCountLabel = normalizedSearch ? `${filteredCardCount} of ${board.cards.length}` : board.cards.length.toString();
+  const cardCountLabel = normalizedSearch
+    ? t('boards.labels.filteredCardsCount', { count: filteredCardCount, total: board.cards.length })
+    : board.cards.length.toString();
 
   return (
     <section className="kanban-board">
       <div className="kanban-board-head">
         <div>
           <input
-            aria-label="Board title"
+            aria-label={t('boards.board.title')}
             disabled={!canEdit}
             onBlur={commitBoardTitle}
             onChange={(event) => setTitle(event.currentTarget.value)}
@@ -289,65 +293,65 @@ export default function KanbanBoard({
             value={title}
           />
           <div className="kanban-board-meta">
-            <span>By</span>
+            <span>{t('common.labels.byPrefix')}</span>
             <span className="kanban-avatar">{memberLabel(memberOptions, board.owner).slice(0, 1).toUpperCase()}</span>
             <strong>{memberLabel(memberOptions, board.owner)}</strong>
             <span>·</span>
-            <span>{roleName(board.role)}</span>
+            <span>{t(`workspace.roles.${roleName(board.role)}`)}</span>
             <span>·</span>
-            <span>{board.columns.length} columns</span>
+            <span>{t('boards.labels.columnsCount', { count: board.columns.length })}</span>
             <span>·</span>
-            <span>{cardCountLabel} cards</span>
+            <span>{t('boards.labels.cardsCountWithValue', { value: cardCountLabel })}</span>
           </div>
         </div>
         <div className="kanban-board-actions">
           <label className="kanban-card-search">
             <Search size={16} />
-            <input aria-label="Search cards" onChange={(event) => onSearchQueryChange(event.currentTarget.value)} placeholder="Search cards" value={searchQuery} />
+            <input aria-label={t('boards.board.searchCards')} onChange={(event) => onSearchQueryChange(event.currentTarget.value)} placeholder={t('boards.board.searchCards')} value={searchQuery} />
           </label>
           {canPinDefault ? (
             <button className={isPinned ? 'ghost-button selected' : 'ghost-button'} onClick={onTogglePinned} type="button">
               <Pin size={16} />
-              {isPinned ? 'Pinned' : 'Pin'}
+              {isPinned ? t('boards.actions.pinned') : t('boards.actions.pin')}
             </button>
           ) : null}
           {canManage ? (
             <button className="ghost-button selected" onClick={() => setShareOpen((value) => !value)} type="button">
               <Share2 size={16} />
-              Share
+              {t('common.actions.share')}
             </button>
           ) : null}
           <button className="ghost-button" onClick={onReload} type="button">
             <RefreshCw size={16} />
-            Sync
+            {t('workspace.actions.sync')}
           </button>
           {canManage ? (
             <button className="ghost-button danger" onClick={onDeleteBoard} type="button">
               <Trash2 size={16} />
-              Delete
+              {t('common.actions.delete')}
             </button>
           ) : null}
         </div>
       </div>
 
       {shareOpen ? (
-        <div aria-label="Share board" className="share-popover kanban-share-popover" role="dialog">
+        <div aria-label={t('boards.share.title')} className="share-popover kanban-share-popover" role="dialog">
           <div className="share-popover-heading">
             <div>
-              <h3>Share board</h3>
-              <p>Grant direct access, share with community workspace members, or create a public read-only link.</p>
+              <h3>{t('boards.share.title')}</h3>
+              <p>{t('boards.share.description')}</p>
             </div>
-            <button aria-label="Close share board" className="icon-button subtle" onClick={() => setShareOpen(false)} type="button">
+            <button aria-label={t('boards.share.close')} className="icon-button subtle" onClick={() => setShareOpen(false)} type="button">
               <X size={18} />
             </button>
           </div>
           <label>
-            Direct member
+            {t('boards.share.directMember')}
             <input
-              aria-label="Principal to grant board access"
+              aria-label={t('boards.share.principalToGrant')}
               list={memberDatalistId}
               onChange={(event) => setGrantPrincipal(event.currentTarget.value)}
-              placeholder="Search name or paste principal"
+              placeholder={t('boards.share.principalPlaceholder')}
               value={grantPrincipal}
             />
             <datalist id={memberDatalistId}>
@@ -356,19 +360,19 @@ export default function KanbanBoard({
               ))}
             </datalist>
           </label>
-          <select aria-label="Direct board grant role" onChange={(event) => setGrantRole(roleVariant(event.currentTarget.value as 'viewer' | 'editor'))} value={roleName(grantRole)}>
-            <option value="viewer">Viewer</option>
-            <option value="editor">Editor</option>
+          <select aria-label={t('boards.share.directGrantRole')} onChange={(event) => setGrantRole(roleVariant(event.currentTarget.value as 'viewer' | 'editor'))} value={roleName(grantRole)}>
+            <option value="viewer">{t('workspace.roles.viewer')}</option>
+            <option value="editor">{t('workspace.roles.editor')}</option>
           </select>
-          <button className="btn-secondary rounded-full px-4 py-2 text-sm" disabled={!canManage || !grantPrincipal.trim()} onClick={submitGrant} type="button">Grant</button>
+          <button className="btn-secondary rounded-full px-4 py-2 text-sm" disabled={!canManage || !grantPrincipal.trim()} onClick={submitGrant} type="button">{t('workspace.actions.grant')}</button>
 
           <div className="share-public">
-            <strong>Community workspace</strong>
-            <p>Workspace sharing is visible to signed-in members of this community.</p>
-            <select aria-label="Community board access role" onChange={(event) => setCommunityRole(event.currentTarget.value === 'private' ? 'private' : roleVariant(event.currentTarget.value as 'viewer' | 'editor'))} value={communityRole === 'private' ? 'private' : roleName(communityRole)}>
-              <option value="private">Private</option>
-              <option value="viewer">Viewer</option>
-              <option value="editor">Editor</option>
+            <strong>{t('boards.share.communityWorkspace')}</strong>
+            <p>{t('boards.share.workspaceVisibility')}</p>
+            <select aria-label={t('boards.share.communityBoardRole')} onChange={(event) => setCommunityRole(event.currentTarget.value === 'private' ? 'private' : roleVariant(event.currentTarget.value as 'viewer' | 'editor'))} value={communityRole === 'private' ? 'private' : roleName(communityRole)}>
+              <option value="private">{t('workspace.share.private')}</option>
+              <option value="viewer">{t('workspace.roles.viewer')}</option>
+              <option value="editor">{t('workspace.roles.editor')}</option>
             </select>
             <button
               className="ghost-button"
@@ -379,19 +383,19 @@ export default function KanbanBoard({
               }}
               type="button"
             >
-              Update community share
+              {t('boards.share.updateCommunityShare')}
             </button>
           </div>
 
           <div className="share-public">
-            <strong>Anyone with link</strong>
+            <strong>{t('boards.share.anyoneWithLink')}</strong>
             <p>
-              Public board links are read-only and expose only this board.
-              {canManagePublicLink ? '' : ' Only the board owner can manage this link.'}
+              {t('boards.share.publicLinksBody')}
+              {canManagePublicLink ? '' : ` ${t('boards.share.ownerOnlyPublicLink')}`}
             </p>
             {publicShareUrl ? (
               <>
-                <input aria-label="Public board URL" readOnly value={publicShareUrl} />
+                <input aria-label={t('boards.share.publicBoardUrl')} readOnly value={publicShareUrl} />
                 <div className="share-public-actions">
                   <button
                     className="ghost-button"
@@ -402,7 +406,7 @@ export default function KanbanBoard({
                     type="button"
                   >
                     <Copy size={16} />
-                    Copy link
+                    {t('boards.share.copyLink')}
                   </button>
                   <button
                     className="ghost-button danger"
@@ -413,7 +417,7 @@ export default function KanbanBoard({
                     }}
                     type="button"
                   >
-                    Disable
+                    {t('boards.share.disable')}
                   </button>
                 </div>
               </>
@@ -429,7 +433,7 @@ export default function KanbanBoard({
                 type="button"
               >
                 <Link2 size={16} />
-                Create public link
+                {t('boards.share.createPublicLink')}
               </button>
             )}
           </div>
@@ -440,7 +444,7 @@ export default function KanbanBoard({
 
       <DndContext collisionDetection={closestCenter} onDragCancel={() => setActiveDragId(undefined)} onDragEnd={handleDragEnd} onDragStart={handleDragStart} sensors={sensors}>
         <SortableContext items={columnItems} strategy={horizontalListSortingStrategy}>
-          <div aria-label="Board columns" className="kanban-columns">
+          <div aria-label={t('boards.board.columns')} className="kanban-columns">
             {board.columns.map((column) => (
               <KanbanColumn
                 canEdit={canEdit}
@@ -461,17 +465,17 @@ export default function KanbanBoard({
             {canEdit ? (
               <section className="kanban-column kanban-new-column">
                 <input
-                  aria-label="New column title"
+                  aria-label={t('boards.board.newColumnTitle')}
                   onChange={(event) => setNewColumnTitle(event.currentTarget.value)}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter') addColumn();
                   }}
-                  placeholder="New column"
+                  placeholder={t('boards.board.newColumn')}
                   value={newColumnTitle}
                 />
                 <button disabled={!newColumnTitle.trim()} onClick={addColumn} type="button">
                   <Plus size={16} />
-                  Add column
+                  {t('boards.actions.addColumn')}
                 </button>
               </section>
             ) : null}

@@ -1,0 +1,960 @@
+{
+  "admin": {
+    "assignmentEffectTitle": "이것이 무엇을 하는가",
+    "assignmentEffects": {
+      "communityAdmin": "선택한 커뮤니티에 커뮤니티 관리자 권한을 할당합니다.",
+      "member": "선택한 커뮤니티에 회원 참여를 할당합니다.",
+      "platformAdmin": "플랫폼 전체 관리자 권한을 부여합니다. 이 사람은 플랫폼 전체에서 커뮤니티를 만들고 멤버십을 관리할 수 있습니다.",
+      "removePlatformAdmin": "커뮤니티 범위 할당을 그대로 유지하면서 플랫폼 전체 관리자 권한을 제거합니다.",
+      "viewer": "할당된 커뮤니티 역할을 제거합니다. 해당 사용자는 인증된 뷰어로서 커뮤니티를 계속 읽을 수 있습니다."
+    },
+    "assignmentKicker": "과제",
+    "assignmentLabel": "과제",
+    "assignmentTitle": "이 범위에 대한 액세스 업데이트",
+    "chooseScopeTitle": "작업 범위를 선택하세요",
+    "currentInScope": "현재 범위: {{assignment}}",
+    "errors": {
+      "lookup": "사용자 프로필을 조회하지 못했습니다.",
+      "save": "역할 할당을 저장하지 못했습니다."
+    },
+    "focusBody": "플랫폼 관리자는 모든 커뮤니티를 관리할 수 있습니다. 커뮤니티 역할은 선택한 커뮤니티 공간에 대해 로컬로 유지됩니다.",
+    "focusKicker": "현재 초점",
+    "heroBody": "플랫폼 전체에 대한 액세스 권한을 가진 사람을 검토하고, 로컬 명단을 검사하고, 이 공간을 떠나지 않고도 뷰어, 회원 및 커뮤니티 관리자 역할 간에 인력을 전환할 수 있습니다.",
+    "heroKicker": "플랫폼 관리",
+    "heroTitle": "한 곳에서 플랫폼 관리자와 커뮤니티 역할을 할당하세요.",
+    "noPlatformAdmins": "현재 할당된 플랫폼 관리자가 없습니다.",
+    "platformAdminsCount": "플랫폼 관리자",
+    "principalHelp": "저장된 프로필 목록에 아직 표시되지 않은 사용자를 관리하려면 유효한 주체를 입력하세요.",
+    "principalLabel": "사용자 주체 ID",
+    "principalPlaceholder": "주체 ID를 입력하세요.",
+    "roles": {
+      "viewerOnly": "뷰어 전용"
+    },
+    "rosterKicker": "커뮤니티 명단",
+    "rosterNobody": "아직 이 커뮤니티에는 할당된 역할이 없습니다.",
+    "rosterPrompt": "현재 역할 할당을 검사하려면 커뮤니티 범위를 선택하세요. 뷰어 액세스는 암시적으로 유지되며 명단에 나열되지 않습니다.",
+    "rosterShowing": "이 커뮤니티에 할당된 사용자 {{total}}명 중 {{visible}}명을 표시합니다.",
+    "scopeLabel": "작업 범위",
+    "selectedScopeFallback": "커뮤니티",
+    "selectedUserKicker": "선택된 사용자",
+    "stewardsKicker": "플랫폼 관리자",
+    "stewardsTitle": "현재 청지기",
+    "userSelectionKicker": "사용자 선택",
+    "userSelectionTitle": "업데이트할 사람을 선택하세요",
+    "whatChangesCommunity": "커뮤니티 역할 변경은 선택한 커뮤니티에만 영향을 미칩니다. 플랫폼 관리자 액세스 권한이 있는 경우 변경되지 않습니다.",
+    "whatChangesKicker": "여기서 무엇이 바뀌나요?",
+    "whatChangesPlatform": "플랫폼 관리자 변경 사항은 플랫폼 전체 관리에만 영향을 미칩니다. 모든 커뮤니티별 역할은 그대로 유지됩니다.",
+    "workingScope": "작업 범위"
+  },
+  "app": {
+    "footer": {
+      "actionBody": "캠페인을 지원하고, 긴급 작업에 함께 자금을 지원하고, 책임에 기반한 커뮤니티 활동을 유지하세요.",
+      "actionTitle": "액션",
+      "communityBody": "커뮤니티 공간을 탐색하고, 각 그룹 뒤에 있는 카우파파를 읽고, 참여할 수 있는 곳을 알아보세요.",
+      "communityTitle": "커뮤니티",
+      "governanceBody": "눈에 띄는 투표 창, 정족수 설정 및 명확한 원인 결정을 통해 제안에 대해 토론하세요.",
+      "governanceTitle": "거버넌스",
+      "intro": "아오테아로아 전역의 제안, 캠페인, 민중의 힘을 위해 형성된 앰네스티 커뮤니티의 현지 표현입니다."
+    },
+    "landing": {
+      "accessBody": "시청자는 모든 커뮤니티를 탐색할 수 있습니다. 할당된 구성원과 커뮤니티 관리자는 함께 제안하고, 투표하고, 기여할 수 있습니다.",
+      "actionBody": "실시간 Amnesty 사이트는 긴급성과 개방성의 균형을 유지합니다. 이제 이 애플리케이션은 동일한 리듬을 따릅니다. 즉, 더 많은 편집 공간, 더 명확한 클릭 유도 문구, 박스형 대시보드 느낌이 줄어듭니다.",
+      "actionKicker": "함께 행동하세요",
+      "actionTitle": "커뮤니티, 제안, 캠페인 전반에 걸쳐 지역 추진력을 구축하세요.",
+      "artBody": "집단적 결정을 내리고, 긴급 캠페인을 지원하고, 책임에 기반한 커뮤니티 활동을 유지하세요.",
+      "artKicker": "사람의 힘",
+      "artTitle": "질문할 만큼 관심이 있다면 행동할 수도 있습니다.",
+      "cards": {
+        "campaignsBody": "공유된 목표, 가시적인 진행 상황, 커뮤니티 주도의 모금 결정을 통해 긴급 작업을 함께 지원하세요.",
+        "campaignsTitle": "관대함을 실천하라",
+        "communitiesBody": "커뮤니티 공간을 조직하고, 의도적으로 참여를 유도하며, 인권 활동이 사람의 힘에 뿌리를 내리도록 하세요.",
+        "communitiesTitle": "지역 추진력 구축",
+        "proposalsBody": "명확한 창, 가시적인 투표 결과 및 커뮤니티 책임을 통해 아이디어를 토론에서 결정으로 이동하세요.",
+        "proposalsTitle": "커뮤니티 목소리 사용"
+      },
+      "heroBody": "앰네스티 커뮤니티를 하나로 모아 지역 행사를 조직하고, 제안에 대해 토론하고, 가시적인 책임감을 갖고 긴급 조치에 자금을 지원하세요.",
+      "heroKicker": "아오테아로아의 인권 운동",
+      "heroTitle": "커뮤니티 거버넌스를 위한 인력의 힘",
+      "joinBody": "지역사회는 지역 활동, 명확한 참여, 실질적인 연대를 중심으로 조직화할 수 있는 공유 장소를 만듭니다.",
+      "joinKicker": "앰네스티 커뮤니티에 가입하세요",
+      "joinTitle": "다른 인권옹호자들을 만나보세요",
+      "statement": "공동체의 목소리, 가시적인 책임, 집단적 행동은 같은 곳에 속합니다.",
+      "visibilityBody": "커뮤니티 공간을 읽고, 지역 카우파파를 이해하고, 제안, 캠페인 및 인력을 조직하는 데 도움을 줄 수 있는 곳을 알아보세요.",
+      "visibilityCallout": "커뮤니티를 공개적으로 살펴보세요. 신뢰할 수 있는 역할에 참여하세요.",
+      "visibilityTitle": "커뮤니티의 목소리가 가시화되면 행동이 더 빠르게 진행될 수 있습니다."
+    },
+    "nav": {
+      "admin": "관리자",
+      "boards": "보드",
+      "calendar": "달력",
+      "campaigns": "캠페인",
+      "communities": "커뮤니티",
+      "community": "커뮤니티",
+      "dashboard": "대시보드",
+      "hub": "허브",
+      "platform": "플랫폼",
+      "profile": "프로필",
+      "proposals": "제안",
+      "workspace": "작업공간"
+    }
+  },
+  "auth": {
+    "action": {
+      "loggingIn": "로그인 중...",
+      "login": "로그인",
+      "logout": "로그아웃",
+      "signOut": "로그아웃"
+    }
+  },
+  "boards": {
+    "actions": {
+      "addCard": "카드 추가",
+      "addColumn": "열 추가",
+      "createBoard": "보드 만들기",
+      "moveLeft": "왼쪽으로 이동",
+      "moveRight": "오른쪽으로 이동",
+      "pin": "핀",
+      "pinned": "고정됨"
+    },
+    "board": {
+      "columns": "보드 컬럼",
+      "newColumn": "새 열",
+      "newColumnTitle": "새 열 제목",
+      "searchCards": "카드 검색",
+      "title": "보드 제목"
+    },
+    "card": {
+      "addDetails": "세부정보 추가",
+      "assignees": "양수인",
+      "closeDetails": "카드 세부정보 닫기",
+      "created": "생성됨",
+      "creator": "창조자",
+      "descriptionMode": "설명 모드",
+      "detailTitle": "카드 세부정보 제목",
+      "details": "카드 세부정보",
+      "dragCard": "드래그 카드",
+      "due": "마감일 {{date}}",
+      "dueDate": "마감일",
+      "editMarkdownSyntax": "마크다운 구문 편집",
+      "linkedDocument": "연결된 문서",
+      "linkedDocumentNotVisible": "연결된 문서가 더 이상 표시되지 않습니다.",
+      "linkedEvent": "연계된 이벤트",
+      "linkedEventNotVisible": "연결된 이벤트가 더 이상 표시되지 않습니다.",
+      "markdownDescription": "마크다운 설명",
+      "markdownPlaceholder": "마크다운으로 카드 설명을 작성하세요...",
+      "noDescription": "아직 설명이 없습니다.",
+      "noDetailsYet": "아직 세부정보가 없습니다.",
+      "noLinkedDocument": "연결된 문서가 없습니다.",
+      "noLinkedEvent": "연결된 이벤트 없음",
+      "openDetails": "카드 세부정보 열기",
+      "openDocument": "문서 열기",
+      "openEvent": "오픈이벤트",
+      "preview": "시사",
+      "saveCard": "카드 저장",
+      "title": "카드 제목",
+      "updated": "업데이트됨"
+    },
+    "column": {
+      "addCardTo": "{{columnTitle}}에 카드 추가",
+      "deleteColumn": "열 삭제",
+      "deleteEmpty": "빈 열 삭제",
+      "dragColumn": "열 드래그",
+      "moveCardsBeforeDelete": "이 열을 삭제하기 전에 카드를 이동하세요",
+      "title": "열 제목"
+    },
+    "empty": {
+      "chooseBoard": "작업 조정을 시작하려면 사이드바에서 보드를 선택하세요.",
+      "createFirst": "{{communityName}}용 보드를 만들어 작업, 방해 요소, 다음 단계를 조정하세요.",
+      "noSelectionTitle": "선택한 보드가 없습니다.",
+      "unavailableBody": "이 보드는 보관되었거나 삭제되었거나 귀하와 공유되지 않았을 수 있습니다.",
+      "unavailableTitle": "탑승 불가"
+    },
+    "emptyBody": "이 커뮤니티의 작업을 조정하기 위한 보드를 만드세요.",
+    "emptyTitle": "선택한 보드가 없습니다.",
+    "hero": {
+      "boardStats": "보드 통계",
+      "body": "작업을 정리하고, 방해 요소를 표면화하고, 커뮤니티 작업을 영향력 있는 쪽으로 옮기세요.",
+      "kicker": "무대",
+      "manageAccessBody": "보드, 컬럼, 카드, 회원을 관리할 수 있습니다.",
+      "shareAccessBody": "보드 공유 설정에 따라 보거나 기여할 수 있습니다.",
+      "title": "작업을 조정하고 진행 상황을 함께 추적하세요.",
+      "yourAccess": "귀하의 액세스"
+    },
+    "labels": {
+      "activeCardsCount": "{{count}} 활성 카드",
+      "boardsCount": "{{count}} 보드",
+      "cards": "카드",
+      "cardsCountWithValue": "{{value}} 카드",
+      "columnsCount": "{{count}} 열",
+      "filteredCardsCount": "{{total}} 카드 중 {{count}}",
+      "workspaceCardsCount": "{{count}} 작업 공간 카드"
+    },
+    "messages": {
+      "archiveConfirm": "이 보드를 보관하시겠습니까? 활성 보드 목록에서 사라집니다.",
+      "archived": "보드가 보관되었습니다.",
+      "communityShareUpdated": "커뮤니티 보드 공유가 {{role}}로 업데이트되었습니다.",
+      "grantedAccess": "{{role}} 액세스 권한이 부여되었습니다.",
+      "pinned": "기본 보드로 고정되었습니다.",
+      "private": "보드는 이제 비공개입니다.",
+      "publicLinkCreated": "공개 보드 링크가 생성 및 복사되었습니다.",
+      "publicLinkDisabled": "공개 보드 링크가 비활성화되었습니다.",
+      "synced": "보드가 동기화되었습니다.",
+      "unpinned": "기본 보드에서 제거되었습니다."
+    },
+    "newCardPlaceholder": "새 카드 제목",
+    "newColumnPlaceholder": "새 열 제목",
+    "newPlaceholder": "새 보드 제목",
+    "page": {
+      "body": "이 커뮤니티와 그 구성원을 대상으로 하는 이사회를 통해 계획을 실용적인 작업으로 전환하세요.",
+      "title": "이사회에서 커뮤니티 활동 조정"
+    },
+    "public": {
+      "body": "이 보드는 읽기 전용 공개 링크로 공유됩니다. 커뮤니티 작업 공간 내에서 공동 작업하려면 로그인하세요.",
+      "homeAria": "Amnesty DAO 홈 열기",
+      "noSignIn": "이 읽기 전용 보기에는 로그인이 필요하지 않습니다.",
+      "readOnlyBoard": "읽기 전용 보드",
+      "sharedWorkspaceView": "공유 작업공간 보기",
+      "title": "공개 보드 보기",
+      "unavailableBody": "이 공개 보드 링크가 비활성화되었거나 보드가 더 이상 표시되지 않을 수 있습니다.",
+      "unavailableTitle": "공개 게시판 이용 불가"
+    },
+    "share": {
+      "anyoneWithLink": "링크가 있는 모든 사용자",
+      "close": "보드 공유 닫기",
+      "communityBoardRole": "커뮤니티보드 역할",
+      "communityWorkspace": "커뮤니티 작업 공간",
+      "copyLink": "링크 복사",
+      "createPublicLink": "공개 링크 만들기",
+      "description": "직접 액세스 권한을 부여하거나, 커뮤니티 작업 공간 구성원과 공유하거나, 공개 읽기 전용 링크를 생성하세요.",
+      "directGrantRole": "직접 부여 역할",
+      "directMember": "직속회원",
+      "disable": "장애를 입히다",
+      "ownerOnlyPublicLink": "보드 소유자만이 공개 링크를 관리할 수 있습니다.",
+      "principalPlaceholder": "aaaaa-aa 또는 회원 교장",
+      "principalToGrant": "액세스 권한을 부여할 주 구성원",
+      "publicBoardUrl": "공개보드 URL",
+      "publicLinksBody": "커뮤니티 외부 사용자를 위한 읽기 전용 공개 링크를 만듭니다.",
+      "title": "보드 공유",
+      "updateCommunityShare": "커뮤니티 공유 업데이트",
+      "workspaceVisibility": "워크스페이스 구성원에게 이 보드가 표시되는지 여부를 제어합니다."
+    },
+    "sidebar": {
+      "aria": "보드 라이브러리",
+      "emptyMine": "아직 귀하가 소유한 보드가 없습니다.",
+      "emptyShared": "직접 공유된 보드가 없습니다.",
+      "emptyWorkspace": "작업공간 보드를 찾을 수 없습니다.",
+      "meta": "{{role}} · {{columns}} 열 · {{cards}} 카드",
+      "myBoards": "내 보드",
+      "newBoardTitle": "새 보드 제목",
+      "search": "게시판 검색",
+      "sharedWithMe": "나와 공유됨",
+      "title": "무대",
+      "workspaceBoards": "작업 공간 보드"
+    }
+  },
+  "calendar": {
+    "actions": {
+      "create": "이벤트 만들기",
+      "new": "새로운",
+      "saveEvent": "이벤트 저장",
+      "update": "업데이트 이벤트"
+    },
+    "createTitle": "커뮤니티 이벤트 만들기",
+    "editTitle": "커뮤니티 이벤트 수정",
+    "editor": {
+      "aria": "이벤트 편집자",
+      "planMeeting": "회의 계획"
+    },
+    "emptyBody": "예정된 커뮤니티 작업을 공개하려면 첫 번째 이벤트를 만드세요.",
+    "emptyTitle": "아직 이벤트가 없습니다",
+    "errors": {
+      "loadFailed": "캘린더 이벤트를 로드할 수 없습니다."
+    },
+    "fields": {
+      "allDay": "하루 종일",
+      "description": "설명",
+      "end": "끝",
+      "location": "위치",
+      "locationPlaceholder": "회의실, 통화 링크 또는 장소",
+      "meetingTitlePlaceholder": "회의 제목",
+      "notes": "메모",
+      "notesPlaceholder": "목적, 의제 또는 준비 메모",
+      "shareToWorkspace": "작업공간에 공유",
+      "start": "시작",
+      "title": "이벤트 제목"
+    },
+    "hero": {
+      "body": "커뮤니티가 함께 조치를 취할 수 있도록 이벤트, 회의, 활동을 계획하세요.",
+      "kicker": "달력",
+      "title": "목적을 가지고 계획하세요.",
+      "utcBacked": "UTC 기반 달력"
+    },
+    "legend": {
+      "dragToReschedule": "일정을 변경하려면 드래그하세요.",
+      "myEvents": "내 이벤트",
+      "workspaceVisible": "작업공간 표시"
+    },
+    "loadingEvents": "이벤트 로드 중...",
+    "messages": {
+      "chooseParticipant": "액세스 권한을 부여할 참가자를 선택하세요.",
+      "copied": "{{label}} 복사되었습니다.",
+      "created": "이벤트가 생성되었습니다.",
+      "deleted": "이벤트가 삭제되었습니다.",
+      "grantedAccess": "{{role}} 액세스 권한이 부여되었습니다.",
+      "publicLinkDisabled": "공개 이벤트 링크가 비활성화되었습니다.",
+      "releaseToSave": "새로운 시간을 저장하려면 손을 떼세요.",
+      "timeSaved": "이벤트 시간이 저장되었습니다.",
+      "updated": "이벤트가 업데이트되었습니다."
+    },
+    "meta": {
+      "owner": "소유자",
+      "ownerOnly": "소유자만 공개 링크를 관리할 수 있습니다.",
+      "participants": "참가자들",
+      "privateShared": "비공개/공유",
+      "role": "역할",
+      "start": "시작",
+      "visibility": "시계",
+      "workspace": "작업공간"
+    },
+    "page": {
+      "body": "하나의 커뮤니티 달력에서 모임, 활동, 회의 및 마감일을 계획하세요.",
+      "title": "커뮤니티 이벤트를 눈에 띄게 유지"
+    },
+    "public": {
+      "calendar": "공개캘린더",
+      "detailsAria": "공개 이벤트 세부정보",
+      "event": "이벤트",
+      "noEdits": "이 보기에는 수정사항이 없습니다.",
+      "notFoundBody": "이 공개 이벤트 링크가 비활성화되었거나 이벤트가 더 이상 표시되지 않을 수 있습니다.",
+      "notFoundTitle": "공개 이벤트를 이용할 수 없습니다.",
+      "openingBody": "공유 이벤트 세부정보를 로드하는 중입니다.",
+      "openingTitle": "공개행사를 열다...",
+      "readOnly": "읽기 전용",
+      "readOnlyRole": "읽기 전용 뷰어"
+    },
+    "share": {
+      "addParticipant": "참가자 추가",
+      "copyEventLink": "이벤트 링크 복사",
+      "copyPublicLink": "공개 링크 복사",
+      "createPublicLink": "공개 링크 만들기",
+      "disablePublicLink": "공개 링크 비활성화",
+      "eventLink": "이벤트 링크",
+      "eventRole": "이벤트 역할",
+      "grantAccess": "액세스 권한 부여",
+      "principalPlaceholder": "aaaaa-aa 또는 회원 교장",
+      "principalToGrant": "이벤트 액세스 권한을 부여할 주체",
+      "publicEventLink": "공개 이벤트 링크",
+      "title": "이벤트 공유"
+    },
+    "visibleEvents": "{{count}} 표시되는 이벤트"
+  },
+  "campaigns": {
+    "card": {
+      "allOrNothing": "전부 아니면 전무: 목표가 마감일까지 달성된 경우에만 자금이 수집됩니다.",
+      "contributeLockedTitle": "할당된 커뮤니티 구성원과 관리자만 캠페인에 참여할 수 있습니다.",
+      "daysLeft": "{{days}}일 남음",
+      "ended": "종료됨",
+      "progress": "{{raised}} / {{goal}}",
+      "progressPercentage": "{{percentage}}%",
+      "yourCampaign": "귀하의 캠페인"
+    },
+    "create": {
+      "durationLabel": "캠페인 기간(일) *",
+      "durationPlaceholder": "일수를 입력하세요.",
+      "error": "캠페인 생성 실패: {{message}}",
+      "fundingBody": "귀하의 캠페인은 전부 아니면 전무 모델을 따릅니다. 기한까지 목표금액을 달성한 경우에만 자금이 징수됩니다. 목표가 달성되지 않으면 자금이 수집되지 않습니다.",
+      "fundingTitle": "전부 아니면 전무한 자금 조달",
+      "goalLabel": "목표 금액($) *",
+      "goalPlaceholder": "목표 금액을 입력하세요",
+      "storyHelp": "설명, 혜택 대상, 예산 개요 포함",
+      "storyLabel": "캠페인 스토리 *",
+      "storyPlaceholder": "캠페인이 누구에게 도움이 될지, 자금이 어떻게 사용될지 설명하세요...",
+      "title": "모금 캠페인 만들기",
+      "titleLabel": "캠페인 제목 *",
+      "titlePlaceholder": "캠페인 제목을 입력하세요",
+      "validationAllFields": "모든 필드를 작성해 주세요.",
+      "validationDays": "유효한 일수를 입력하세요.",
+      "validationGoalAmount": "유효한 목표 금액을 입력하세요."
+    },
+    "detail": {
+      "amountLabel": "금액($)",
+      "amountPlaceholder": "금액 입력",
+      "campaignEnded": "캠페인 종료됨",
+      "contributeError": "참여 실패: {{message}}",
+      "contributeSuccess": "기여에 성공했습니다!",
+      "contributeTitle": "이 캠페인에 참여하세요",
+      "contributionValidation": "유효한 기부 금액을 입력하세요.",
+      "contributionsTab": "기부금({{count}})",
+      "creatorActionsTitle": "크리에이터 활동",
+      "creatorTooltip": {
+        "goalNotMet": "캠페인은 자금 목표가 달성된 후에만 완료될 수 있습니다.",
+        "notActive": "캠페인이 이미 확정되었습니다",
+        "notCreator": "캠페인 생성자만이 캠페인을 완료할 수 있습니다.",
+        "ready": "펀딩 목표가 달성되었으므로 이제 캠페인을 마무리하세요."
+      },
+      "detailsTab": "세부정보",
+      "finalizeConfirm": "이 캠페인을 완료하시겠습니까? 그러면 캠페인이 성공하고 완료된 것으로 표시됩니다. 이 작업은 취소할 수 없습니다.",
+      "finalizeError": "캠페인을 완료하지 못했습니다: {{message}}",
+      "finalizeStatusGoalMet": "캠페인 목표가 달성되었습니다! 캠페인을 마무리할 수 있습니다.",
+      "finalizeStatusPending": "{{goal}}의 자금 목표가 달성되면 캠페인이 마무리될 수 있습니다.",
+      "finalizeStatusReady": "이제 펀딩 목표가 달성되었으므로 캠페인을 마무리할 수 있습니다.",
+      "finalizeSuccess": "캠페인이 성공적으로 마무리되었습니다!",
+      "fundingBody": "이 캠페인은 전부 아니면 전무 모델을 따릅니다. 목표 금액이 마감일까지 충족되거나 캠페인 작성자가 목표 달성 후 조기에 확정하는 경우에만 자금이 수집됩니다. 목표가 달성되지 않으면 자금이 수집되지 않습니다.",
+      "fundingTitle": "전부 아니면 전무한 자금 조달",
+      "goalReached": "펀딩 목표 달성! 이제 캠페인을 마무리할 수 있습니다.",
+      "goalReachedNote": "펀딩 목표가 달성되었습니다. 이제 캠페인 작성자는 이 캠페인을 마무리할 수 있습니다.",
+      "noteLabel": "참고:",
+      "postUpdatePlaceholder": "후원자와 진행 상황, 결과 또는 기타 업데이트를 공유하세요...",
+      "postUpdateTitle": "업데이트 게시",
+      "progressSummary": "{{raised}} / {{goal}}",
+      "stateLabel": "상태: {{state}}",
+      "storyTitle": "캠페인 스토리",
+      "updateError": "업데이트 게시 실패: {{message}}",
+      "updateLabel": "#{{id}} 업데이트",
+      "updateSuccess": "업데이트가 성공적으로 게시되었습니다!",
+      "updateValidation": "업데이트 내용을 입력해주세요",
+      "updatesTab": "업데이트({{count}})"
+    }
+  },
+  "common": {
+    "actions": {
+      "back": "뒤로",
+      "cancel": "취소",
+      "close": "닫기",
+      "continue": "계속",
+      "contribute": "기여",
+      "create": "만들기",
+      "createCampaign": "캠페인 만들기",
+      "createCommunity": "커뮤니티 만들기",
+      "createFirstCampaign": "첫 번째 캠페인 만들기",
+      "createFirstCommunity": "첫 번째 커뮤니티 만들기",
+      "createFirstProposal": "첫 번째 제안서 작성",
+      "createProposal": "제안서 작성",
+      "delete": "삭제",
+      "edit": "편집하다",
+      "enterPrincipal": "교장 입력",
+      "finalizeCampaign": "캠페인 마무리",
+      "finalizeProposal": "제안 확정",
+      "leaveCommunity": "커뮤니티 탈퇴",
+      "logIn": "로그인",
+      "logOut": "로그아웃",
+      "lookUp": "찾아보세요",
+      "openCommunity": "오픈 커뮤니티",
+      "postUpdate": "업데이트 후",
+      "save": "저장",
+      "saveAssignment": "과제 저장",
+      "selectFromList": "목록에서 선택",
+      "share": "공유하다",
+      "viewDetails": "세부정보 보기"
+    },
+    "buttons": {
+      "campaignAccessLocked": "캠페인 액세스가 잠겼습니다.",
+      "proposalAccessLocked": "제안서 액세스가 잠겼습니다."
+    },
+    "empty": {
+      "noCampaigns": "아직 캠페인이 없습니다.",
+      "noCommunities": "아직 게시된 커뮤니티가 없습니다.",
+      "noContributions": "아직 참여가 없습니다.",
+      "noProposals": "아직 제안이 없습니다.",
+      "noUpdates": "아직 업데이트가 게시되지 않았습니다.",
+      "noUsers": "아직 저장된 사용자 프로필이 없습니다."
+    },
+    "errors": {
+      "genericFinalizeProposal": "제안을 완료하는 중에 오류가 발생했습니다. 다시 시도해 주세요.",
+      "genericVote": "투표를 처리하는 동안 오류가 발생했습니다. 다시 시도해 주세요."
+    },
+    "labels": {
+      "accessModel": "액세스 모델",
+      "by": "작성자: {{name}}",
+      "byPrefix": "에 의해",
+      "campaign": "캠페인",
+      "campaignId": "캠페인 ID: {{id}}",
+      "characters": "{{count}}/{{max}}자",
+      "community": "커뮤니티",
+      "contribution": "기여",
+      "platformAccess": "플랫폼 접근",
+      "principal": "교장",
+      "proposal": "제안",
+      "roleAccess": "역할 액세스",
+      "scope": "범위: {{scope}}",
+      "signedIn": "로그인됨",
+      "totalVotes": "총 투표수",
+      "unknown": "알 수 없음",
+      "updates": "업데이트",
+      "viewerOnly": "뷰어 전용"
+    },
+    "loading": {
+      "checkingAccess": "접근 확인 중",
+      "checkingRole": "역할 확인 중",
+      "checkingStatus": "완료 상태 확인 중...",
+      "contributing": "기여 중...",
+      "creating": "만드는 중...",
+      "finalizing": "마무리 중...",
+      "leaving": "떠나는 중...",
+      "loggingIn": "로그인 중...",
+      "posting": "게시 중...",
+      "saving": "저장 중...",
+      "voting": "투표 중..."
+    },
+    "roles": {
+      "communityAdmin": "커뮤니티 관리자",
+      "member": "회원",
+      "platformAdmin": "플랫폼 관리자",
+      "viewer": "뷰어"
+    },
+    "states": {
+      "campaign": {
+        "active": "활성",
+        "expired": "만료됨",
+        "failed": "실패",
+        "successful": "성공"
+      },
+      "proposal": {
+        "active": "활성",
+        "failed": "실패",
+        "passed": "합격",
+        "pendingFinalization": "확정 대기 중"
+      }
+    }
+  },
+  "communities": {
+    "body": "커뮤니티 역할은 명시적이지만 탐색은 인증된 모든 사람에게 공개되어 아이디어, 캠페인 및 현지 상황이 계속 표시됩니다.",
+    "card": {
+      "accessLoading": "귀하의 커뮤니티 액세스를 확인하는 중입니다.",
+      "accessParticipant": "이 커뮤니티에서 제안과 캠페인을 형성하는 데 도움을 줄 수 있습니다.",
+      "accessViewer": "역할이 할당될 때까지 읽기 전용 뷰어 액세스 권한이 있습니다.",
+      "assignedCount": "{{count}} 할당됨",
+      "kicker": "커뮤니티 공간"
+    },
+    "create": {
+      "error": "커뮤니티를 만들지 못했습니다. 권한을 확인하고 다시 시도해 주세요.",
+      "nameLabel": "커뮤니티 이름 *",
+      "namePlaceholder": "커뮤니티 이름을 입력하세요",
+      "panelBody": "귀하는 첫 번째 커뮤니티 관리자가 되며 자동으로 커뮤니티에 할당됩니다. 플랫폼 관리자는 여전히 커뮤니티를 감독할 수 있지만 로컬 멤버십 관리는 여기에서 시작됩니다.",
+      "panelTitle": "커뮤니티 만들기",
+      "policyLabel": "커뮤니티 정책 *",
+      "policyPlaceholder": "커뮤니티의 목적, 거버넌스 규칙 및 지침을 설명합니다.",
+      "title": "새 커뮤니티 만들기"
+    },
+    "emptyAdmin": "역할 할당, 제안 형성 및 캠페인 조정을 시작하는 첫 번째 커뮤니티를 만드세요.",
+    "emptyViewer": "플랫폼 관리자는 구성원을 할당하기 전에 첫 번째 커뮤니티를 만들어야 합니다.",
+    "kicker": "커뮤니티",
+    "leave": {
+      "bulletBrowse": "인증된 뷰어로 커뮤니티를 계속 볼 수 있도록 허용합니다.",
+      "bulletPreserve": "과거 제안 및 투표를 보존합니다(계속 표시됨).",
+      "bulletProposal": "이 커뮤니티에서 새 제안을 작성할 수 있는 권한을 취소합니다.",
+      "bulletRemove": "커뮤니티 회원 목록에서 귀하를 제거하세요.",
+      "bulletViewer": "이 커뮤니티에서 읽기 전용 뷰어 액세스로 돌아갑니다.",
+      "bulletVote": "이 커뮤니티의 제안에 투표할 수 있는 권한을 취소합니다.",
+      "confirmHelp": "이 확인은 우발적인 커뮤니티 이탈을 방지하는 데 도움이 됩니다.",
+      "confirmLabel": "확인하려면 \"LEAVE\"를 입력하세요. *",
+      "confirmPlaceholder": "확인하려면 LEAVE를 입력하세요.",
+      "errorBody": "귀하가 이 커뮤니티의 회원인지, 탈퇴할 수 있는 올바른 권한이 있는지 확인하세요.",
+      "errorTitle": "커뮤니티를 탈퇴하지 못했습니다. 권한을 확인하고 다시 시도해 주세요.",
+      "leaving": "떠나는 중...",
+      "successBody": "귀하는 커뮤니티 회원 목록에서 제거되었으며 이제 읽기 전용 뷰어로 볼 수 있습니다. 귀하의 역사적 기여는 그대로 유지됩니다.",
+      "successTitle": "성공적으로 커뮤니티를 탈퇴했습니다!",
+      "title": "커뮤니티 탈퇴",
+      "warningIntro": "'{{communityName}}'에서 나가려고 합니다. 이 작업은 다음을 수행합니다.",
+      "warningOutro": "다시 참여하려면 회원으로 다시 가입하려면 관리자의 도움이 필요합니다.",
+      "warningTitle": "커뮤니티 이탈 확인"
+    },
+    "membership": {
+      "body": "이 커뮤니티에 대한 역할 기반 멤버십 할당입니다.",
+      "communityAdmins": "커뮤니티 관리자",
+      "emptyCommunityAdmins": "할당된 커뮤니티 관리자가 없습니다.",
+      "emptyMembers": "이 커뮤니티에 할당된 회원이 없습니다.",
+      "kicker": "롤모델",
+      "loadError": "커뮤니티 멤버십 정보를 로드할 수 없습니다.",
+      "members": "회원",
+      "title": "커뮤니티 멤버십",
+      "unnamedMember": "이름이 없는 회원",
+      "viewerAccessBody": "뷰어는 암시적이므로 여기에 나열되지 않습니다. 이 명단에는 커뮤니티 역할이 할당된 주체(커뮤니티 관리자 및 구성원)만 표시됩니다.",
+      "viewerAccessTitle": "뷰어 액세스는 암시적으로 유지됩니다."
+    },
+    "portal": {
+      "accessBanners": {
+        "communityAdminBody": "이 공간 내에서 거버넌스에 참여하고 커뮤니티 역할 할당을 관리할 수 있습니다.",
+        "communityAdminTitle": "지역사회 관리",
+        "memberBody": "제안서를 작성하고, 투표하고, 캠페인에 참여하고, 필요한 경우 이 커뮤니티에서 물러날 수 있습니다.",
+        "memberTitle": "지역사회 참여",
+        "platformAdminBody": "귀하는 플랫폼 관리자 역할을 보유하고 있으므로 여기에 참여하고 커뮤니티 멤버십을 관리할 수 있습니다.",
+        "platformAdminTitle": "플랫폼 전반에 걸친 관리",
+        "viewerBody": "커뮤니티 상황, 제안, 캠페인을 읽을 수 있습니다. 역할이 할당되면 참여가 시작됩니다.",
+        "viewerTitle": "뷰어 액세스"
+      },
+      "assignedParticipants": "할당된 참가자",
+      "backToCommunities": "커뮤니티로 돌아가기",
+      "campaignsBodyEnabled": "이 커뮤니티를 위한 캠페인을 지원하거나 새로운 캠페인을 시작하세요.",
+      "campaignsBodyViewer": "여기에서 캠페인 진행 상황을 확인하세요. 커뮤니티 역할이 할당되면 기여가 열립니다.",
+      "campaignsKicker": "캠페인",
+      "campaignsTitle": "지역 활동에 자금을 지원하세요",
+      "capabilities": "당신의 능력",
+      "capabilitiesEnabled": "제안서를 작성하고, 투표하고, 커뮤니티 활동을 형성하는 데 도움을 주세요.",
+      "capabilitiesViewer": "뷰어 모드를 유지하면서 전체 커뮤니티 내용을 읽어보세요.",
+      "createCampaignLockedTitle": "할당된 커뮤니티 구성원과 관리자만 캠페인을 만들 수 있습니다.",
+      "createProposalLockedTitle": "할당된 커뮤니티 구성원과 관리자만 제안서를 만들 수 있습니다.",
+      "emptyCampaignsAdmin": "집단적 지원이 필요한 순간에 이 커뮤니티를 위한 첫 번째 모금 캠페인을 시작하세요.",
+      "emptyCampaignsViewer": "이 커뮤니티에 대해 아직 생성된 캠페인이 없습니다.",
+      "emptyProposalsAdmin": "이 커뮤니티 공간에 가장 먼저 제안을 제출해 보세요.",
+      "emptyProposalsViewer": "아직 이 커뮤니티에 대한 제안이 생성되지 않았습니다.",
+      "kicker": "커뮤니티 포털",
+      "loadErrorBody": "요청한 커뮤니티가 없거나 지금은 로드할 수 없습니다.",
+      "loadErrorTitle": "이 커뮤니티를 로드할 수 없습니다.",
+      "platformAccessTitle": "플랫폼 접근",
+      "proposalsBodyEnabled": "제안서를 작성하거나 이 커뮤니티가 다음에 취해야 할 방향에 대해 투표하세요.",
+      "proposalsBodyViewer": "현재 제안 슬레이트를 읽고 의사 결정이 눈에 띄게 유지되는 것을 지켜보세요.",
+      "proposalsKicker": "제안",
+      "proposalsTitle": "커뮤니티 결정 형성",
+      "roleAccessTitle": "역할 액세스"
+    },
+    "setupKicker": "커뮤니티 설정",
+    "title": "모든 커뮤니티를 읽어보세요. 당신이 행동할 수 있다고 신뢰받는 곳에 참여하십시오."
+  },
+  "i18n": {
+    "language": {
+      "helper": "이 기기에서 Amnesty DAO에 사용할 언어를 선택하세요.",
+      "label": "언어",
+      "machineTranslationNote": "검토자가 더 빠르게 시작할 수 있도록 초안 기계 번역을 제공합니다. 게시 전에 커뮤니티에 표시되는 문구를 검토하세요."
+    }
+  },
+  "mainTabs": {
+    "body": "시청자로서 커뮤니티를 읽고, 역할을 맡을 때마다 의사 결정에 참여하고, 사람의 힘을 바탕으로 플랫폼 참여를 유지하세요.",
+    "claimAction": "청구 플랫폼 관리자",
+    "kicker": "앰네스티 커뮤니티",
+    "platformRoles": "플랫폼 역할",
+    "platformRolesBody": "플랫폼 관리자는 플랫폼 전체의 액세스를 관리하고 모든 커뮤니티의 멤버십을 지원할 수 있습니다.",
+    "roleModelBody": "플랫폼 전체에 대한 액세스는 커뮤니티 역할을 관리하는 사람들을 위해 예약되어 있습니다. 참여 자체는 커뮤니티 범위로 유지되므로 회원은 지역 조직 및 의사 결정에 집중할 수 있습니다.",
+    "roleModelKicker": "롤모델",
+    "setupBody": "아직 플랫폼 관리자가 없습니다. 커뮤니티 및 구성원 할당을 관리하기 전에 명시적으로 첫 번째 역할을 요청하세요.",
+    "setupKicker": "플랫폼 설정",
+    "setupTitle": "첫 번째 플랫폼 관리자를 확보하세요",
+    "tabs": {
+      "dashboard": "대시보드",
+      "platformAdmin": "플랫폼 관리자"
+    },
+    "title": "함께 행동하세요",
+    "yourAccess": "귀하의 액세스",
+    "yourAccessBody": "시청자는 플랫폼 전체에서 읽을 수 있습니다. 커뮤니티 역할을 통해 제안, 투표, 기금 모금 및 멤버십 관리 기능이 활성화됩니다."
+  },
+  "profile": {
+    "body": "제안, 캠페인 및 결정이 플랫폼 전반에 걸쳐 표시될 때 다른 옹호자가 볼 수 있는 이름을 추가합니다.",
+    "kicker": "앰네스티 커뮤니티",
+    "nameLabel": "당신의 이름",
+    "namePlaceholder": "지역 사회는 당신을 어떻게 알아야합니까?",
+    "page": {
+      "body": "제안서, 캠페인, 작업 공간 편집 및 커뮤니티 참여 옆에 사람들이 볼 수 있는 이름을 최신 상태로 유지하세요.",
+      "identityKicker": "인터넷 ID 주체",
+      "kicker": "프로필",
+      "title": "커뮤니티 정체성을 관리하세요"
+    },
+    "saveError": "아직 프로필을 저장할 수 없습니다.",
+    "title": "운동에 오신 것을 환영합니다"
+  },
+  "proposals": {
+    "card": {
+      "alreadyVotedBody": "시스템은 제안당 1인당 하나의 투표를 시행합니다. 귀하의 투표가 기록되고 집계되었습니다.",
+      "alreadyVotedCreator": "제안 작성자로서 귀하는 자신의 제안에 투표할 수 있었습니다.",
+      "alreadyVotedTitle": "이 제안에 이미 투표하셨습니다.",
+      "creatorUnknown": "알 수 없는 회원",
+      "daysCount": "{{count}}일",
+      "finalizeErrorTitle": "제안을 확정하지 못했습니다.",
+      "finalizeSuccessBody": "제안서는 확정되었으며, 투표 결과에 따라 최종 상태가 결정됩니다.",
+      "finalizeSuccessTitle": "제안이 성공적으로 마무리되었습니다!",
+      "governanceSettings": "거버넌스 설정",
+      "lessThanMinute": "1m 미만 남았습니다.",
+      "no": "아니요: {{count}}({{percentage}}%)",
+      "passThreshold": "통과 기준점",
+      "passThresholdValue": "{{count}}% 찬성 투표",
+      "quorum": "정족수",
+      "timeDaysHours": "{{days}}d {{hours}}h 남음",
+      "timeHoursMinutes": "{{hours}}h {{minutes}}m 남음",
+      "timeMinutes": "{{minutes}}m 남음",
+      "timeRemaining": "남은 시간: {{value}}",
+      "totalVotesRequired": "총 투표 수: {{total}} / {{required}} 필요",
+      "viewerAccess": "뷰어 액세스",
+      "voteButtonTitles": {
+        "alreadyVoted": "이 제안에 이미 투표하셨습니다.",
+        "no": "이 제안에 반대 투표하세요",
+        "viewer": "할당된 커뮤니티 구성원과 관리자만 투표할 수 있습니다.",
+        "votingClosed": "투표창이 닫혔습니다",
+        "votingNotStarted": "아직 투표가 시작되지 않았습니다",
+        "yes": "이 제안에 찬성 투표하세요"
+      },
+      "voteErrorTitle": "투표에 실패했습니다. 다시 시도해 주세요.",
+      "voteNo": "반대 투표",
+      "voteSuccessBody": "귀하의 투표가 기록되었습니다. 시스템은 제안당 1인당 1표를 보장합니다.",
+      "voteSuccessCreator": "제안 작성자로서 귀하는 자신의 제안에 대해 성공적으로 투표했습니다.",
+      "voteSuccessTitle": "투표가 성공적으로 진행되었습니다!",
+      "voteYes": "찬성 투표",
+      "votedBadge": "투표하셨습니다",
+      "votesMinimum": "{{count}} 최소 투표수",
+      "votingClosed": "투표 종료",
+      "votingNotStarted": "투표가 시작되지 않았습니다",
+      "votingResults": "투표 결과",
+      "votingWindow": "투표 창구",
+      "yes": "예: {{count}}({{percentage}}%)",
+      "yourProposal": "당신의 제안"
+    },
+    "create": {
+      "customizeGovernance": "거버넌스 설정 사용자 정의",
+      "defaultPassThreshold": "50%의 투표가 찬성해야 합니다.",
+      "defaultQuorum": "최소 1표",
+      "defaultSettings": "기본 설정",
+      "defaultVotingWindow": "3일",
+      "descriptionLabel": "제안서 설명 *",
+      "descriptionPlaceholder": "제안 내용을 자세히 설명하세요. 당신은 무엇을 제안하고 있습니까? 왜 지역사회가 이를 지원해야 합니까?",
+      "error": "제안서를 생성하지 못했습니다. 권한을 확인하고 다시 시도해 주세요.",
+      "minimumVotesHelp": "제안이 유효하려면 최소 총 투표수가 필요합니다.",
+      "minimumVotesLabel": "최소 투표수(정족수)",
+      "passThreshold": "통과 기준점",
+      "passThresholdHelp": "통과하는 데 필요한 찬성표 비율(1-100%)",
+      "passThresholdLabel": "합격 기준(%)",
+      "quorum": "정족수",
+      "submissionBody": "제출되면 커뮤니티 구성원은 투표 기간 동안 제안에 대해 찬성 또는 반대 투표를 할 수 있습니다. 투표 기간이 끝나면 모든 회원은 제안을 마무리하여 통과 여부를 결정할 수 있습니다.",
+      "submissionTitle": "제안서 제출",
+      "title": "새 제안 만들기",
+      "titleLabel": "제안서 제목 *",
+      "titlePlaceholder": "제안 제목을 입력하세요",
+      "votingWindow": "투표 창구",
+      "votingWindowDaysLabel": "투표 기간(일)",
+      "votingWindowHelp": "회원이 투표할 수 있는 기간(1~30일)"
+    }
+  },
+  "workspace": {
+    "actions": {
+      "archive": "아카이브",
+      "compact": "컴팩트 스냅샷",
+      "copyLink": "링크 복사",
+      "debugExport": "JSON 다운로드",
+      "grant": "액세스 권한 부여",
+      "importMarkdown": "마크다운 가져오기",
+      "markdownExport": "마크다운 다운로드",
+      "menu": "작업",
+      "pin": "핀 기본값",
+      "redo": "다시 실행",
+      "sync": "동기화",
+      "undo": "실행 취소",
+      "unpin": "기본값 고정 해제",
+      "updateShare": "공유 업데이트"
+    },
+    "blockMenu": {
+      "autoListNumbering": "자동 번호 매기기",
+      "continuePreviousList": "이전 목록 계속",
+      "copyBlockLink": "블록 링크 복사",
+      "disableHyperlink": "하이퍼링크 비활성화",
+      "duplicate": "복제하다",
+      "enableHyperlink": "하이퍼링크 활성화",
+      "formatBlock": "블록 형식",
+      "insertAbove": "위에 삽입",
+      "insertBelow": "아래에 삽입",
+      "listNumbering": "목록 번호 매기기",
+      "moveDown": "아래로 이동",
+      "moveUp": "위로 이동",
+      "restartAtOne": "1시에 다시 시작",
+      "turnInto": "변신하다"
+    },
+    "blockRenderer": {
+      "addCaption": "캡션 추가",
+      "blockAria": "{{index}} 차단: {{label}}",
+      "blockControls": "블록 컨트롤",
+      "blockMenu": "블록 메뉴",
+      "collapseToggle": "축소 토글",
+      "dividerBlock": "디바이더 블록",
+      "dragBlock": "드래그 블록",
+      "dragToReorder": "드래그하여 재정렬하세요.",
+      "expandToggle": "확장 토글",
+      "fileLabel": "파일 라벨",
+      "fileUrl": "파일 URL",
+      "imageCaption": "이미지 캡션",
+      "imageUrl": "이미지 URL",
+      "markChecked": "체크 표시",
+      "markUnchecked": "선택 해제로 표시",
+      "pasteFileUrl": "파일 URL을 붙여넣어 연결하세요.",
+      "pasteImageUrl": "삽입하려면 이미지 URL을 붙여넣으세요.",
+      "typeForCommands": "명령에 '/'를 입력하세요.",
+      "workspaceImage": "작업공간 이미지"
+    },
+    "body": "이 커뮤니티에만 적용되는 작업 메모, 실용적인 작업 보드 및 커뮤니티 이벤트를 유지하세요.",
+    "commands": {
+      "aria": "슬래시 명령",
+      "groups": {
+        "Lists": "기울기",
+        "Media": "메디아",
+        "Structure": "구조",
+        "Text": "텍스트"
+      },
+      "items": {
+        "bullet": {
+          "hint": "단순 목록 항목",
+          "label": "글머리 기호 목록"
+        },
+        "callout": {
+          "hint": "가벼운 메모 상자",
+          "label": "호출"
+        },
+        "checklist": {
+          "hint": "작업 추적",
+          "label": "체크리스트"
+        },
+        "divider": {
+          "hint": "수평선",
+          "label": "분할기"
+        },
+        "fileLink": {
+          "hint": "외부 파일 URL",
+          "label": "파일 링크"
+        },
+        "heading1": {
+          "hint": "큰 섹션 제목",
+          "label": "제목 1"
+        },
+        "heading2": {
+          "hint": "중간 섹션 제목",
+          "label": "제목 2"
+        },
+        "heading3": {
+          "hint": "작은 섹션 제목",
+          "label": "제목 3"
+        },
+        "image": {
+          "hint": "외부 이미지 URL",
+          "label": "영상"
+        },
+        "numbered": {
+          "hint": "주문 목록 항목",
+          "label": "번호가 매겨진 목록"
+        },
+        "paragraph": {
+          "hint": "일반 단락",
+          "label": "텍스트"
+        },
+        "quote": {
+          "hint": "들여쓰기된 인용문",
+          "label": "인용하다"
+        },
+        "toggle": {
+          "hint": "접을 수 있는 섹션",
+          "label": "비녀장"
+        }
+      },
+      "noMatches": "일치하는 명령이 없습니다.",
+      "placeholder": "명령을 입력하세요"
+    },
+    "comments": {
+      "add": "코멘트",
+      "compose": "댓글 추가",
+      "documentComments": "문서 주석",
+      "empty": "아직 공개된 댓글이 없습니다.",
+      "openCount": "{{count}} 열려 있음",
+      "openTitle": "댓글 열기",
+      "placeholder": "댓글을 작성하세요. Cmd/Ctrl+Enter가 제출됩니다.",
+      "resolve": "해결",
+      "submit": "의견 제출"
+    },
+    "documents": {
+      "bodyPlaceholder": "메모, 계획, 링크 또는 회의 결과를 작성하세요...",
+      "empty": "아직 작업공간 문서가 표시되지 않습니다.",
+      "emptyBody": "이 커뮤니티 내에서 글쓰기를 시작하려면 문서를 만들거나 선택하세요.",
+      "emptyBodyTitle": "문서 선택 또는 만들기",
+      "emptyMine": "아직 문서가 없습니다.",
+      "emptyShared": "아직 공유된 문서가 없습니다.",
+      "emptyTitle": "선택한 문서가 없습니다.",
+      "emptyWorkspace": "아직 작업공간 문서가 없습니다.",
+      "newPlaceholder": "새 문서 제목",
+      "sidebarTitle": "커뮤니티 문서"
+    },
+    "editor": {
+      "addFirstBlock": "첫 번째 블록 추가",
+      "documentTitle": "문서 제목",
+      "tailEditable": "명령에 '/'를 입력하거나 새 블록에 대해 Enter 키를 누르세요.",
+      "tailReadonly": "이 문서에 대한 뷰어 액세스는 읽기 전용입니다."
+    },
+    "grants": {
+      "selectMember": "커뮤니티 회원 선택",
+      "title": "특정 회원 액세스"
+    },
+    "kicker": "커뮤니티 작업 공간",
+    "library": {
+      "mine": "내 문서",
+      "shared": "나와 공유됨",
+      "workspace": "작업공간 문서"
+    },
+    "nesting": {
+      "dragHint": "문서를 드래그하여 중첩하거나 재정렬하거나 최상위 수준으로 다시 이동하세요.",
+      "title": "문서 중첩",
+      "topLevel": "최상위 수준"
+    },
+    "pageBody": "문서를 관리하고, 커뮤니티와 협력하고, 아이디어를 영향력 있게 바꿔보세요.",
+    "pageTitle": "함께 행동을 구축하고 조정하세요.",
+    "roles": {
+      "editor": "편집자",
+      "owner": "소유자",
+      "viewer": "뷰어"
+    },
+    "search": {
+      "empty": "일치하는 페이지 콘텐츠가 없습니다.",
+      "loading": "문서 검색 중...",
+      "matches": "{{count}} 일치",
+      "matches_plural": "{{count}} 일치",
+      "placeholder": "페이지 콘텐츠 검색"
+    },
+    "selection": {
+      "bold": "용감한",
+      "boldSelected": "선택한 텍스트를 굵게 표시",
+      "clear": "선택 취소",
+      "colorHighlight": "{{color}} 하이라이트",
+      "colors": {
+        "blue": "파란색",
+        "green": "녹색",
+        "pink": "분홍색",
+        "purple": "보라",
+        "yellow": "노란색"
+      },
+      "commentSelected": "선택한 텍스트에 댓글 달기",
+      "copied": "선택한 블록을 Markdown으로 복사했습니다.",
+      "copyFallback": "클립보드 액세스에 실패했습니다. 아래 마크다운을 복사하세요.",
+      "copyMarkdown": "마크다운으로 복사",
+      "decreaseIndent": "들여쓰기 줄이기",
+      "done": "완료",
+      "formatBlockAs": "블록 형식을 {{label}}로 지정",
+      "formatSelected": "선택한 텍스트 서식 지정",
+      "highlight": "가장 밝은 부분",
+      "highlightColors": "강조 색상",
+      "highlightSelected": "선택한 텍스트 강조 표시",
+      "increaseIndent": "들여쓰기 늘리기",
+      "indent": "들여쓰기",
+      "italic": "이탤릭체",
+      "italicSelected": "기울임꼴로 선택한 텍스트",
+      "outdent": "내어쓰기",
+      "selectBlocks": "블록 선택",
+      "selected": "{{count}} 선택됨",
+      "selectedBlockActions": "선택된 차단 조치"
+    },
+    "share": {
+      "communityEditor": "편집자로 커뮤니티와 공유됨",
+      "communityViewer": "뷰어로서 커뮤니티와 공유됨",
+      "private": "비공개",
+      "title": "커뮤니티 공유"
+    },
+    "syncStatus": {
+      "compactError": "압축 오류",
+      "compacted": "꽉 찬",
+      "compacting": "압축",
+      "loaded": "짐을 실은",
+      "persisted": "지속됨",
+      "saveError": "저장 오류",
+      "saving": "절약",
+      "titleSaved": "제목이 저장되었습니다",
+      "unsavedChanges": "저장되지 않은 변경사항"
+    },
+    "tabs": {
+      "boards": "보드",
+      "calendar": "달력",
+      "documents": "문서"
+    },
+    "title": "지역 활동 계획, 문서화, 조정",
+    "viewerLockedBody": "문서, 보드 및 이벤트에는 비공개 또는 회원 공유 자료가 포함될 수 있으므로 지정된 커뮤니티 회원 및 관리자만 사용할 수 있습니다.",
+    "viewerLockedTitle": "워크스페이스 액세스는 회원 전용입니다."
+  }
+}

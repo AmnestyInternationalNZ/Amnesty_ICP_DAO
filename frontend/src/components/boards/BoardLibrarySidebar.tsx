@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronDown, ChevronRight, Plus, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { CommunityBoardSummary, CommunityMember } from '../../backend';
 import { WorkspaceRole } from '../../backend';
 import { compactPrincipal, readableDate, roleName } from '../../workspace/workspaceApi';
@@ -36,11 +37,16 @@ function BoardRow({
   onOpenBoard: (boardId: bigint) => void;
   selected: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <button className={selected ? 'kanban-sidebar-board selected' : 'kanban-sidebar-board'} onClick={() => onOpenBoard(board.id)} type="button">
       <strong>{board.title}</strong>
       <span>
-        {memberLabel(members, board.owner)} · {board.columnCount.toString()} columns · {board.cardCount.toString()} cards
+        {t('boards.sidebar.meta', {
+          cards: board.cardCount.toString(),
+          columns: board.columnCount.toString(),
+          owner: memberLabel(members, board.owner),
+        })}
       </span>
       <small>{readableDate(board.updatedAt)}</small>
     </button>
@@ -109,6 +115,7 @@ export default function BoardLibrarySidebar({
   onOpenBoard: (boardId: bigint) => void;
   selectedBoardId: bigint | null;
 }) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [collapsed, setCollapsed] = useState({ mine: false, workspace: false, shared: false });
   const filtered = useMemo(() => sortBoards(boards.filter((board) => boardMatchesSearch(board, search, members))), [boards, members, search]);
@@ -117,58 +124,58 @@ export default function BoardLibrarySidebar({
   const shared = filtered.filter((board) => !mine.some((item) => item.id === board.id) && !workspace.some((item) => item.id === board.id));
 
   return (
-    <aside aria-label="Boards" className="kanban-sidebar">
-      <h2>Boards</h2>
+    <aside aria-label={t('boards.sidebar.aria')} className="kanban-sidebar">
+      <h2>{t('boards.sidebar.title')}</h2>
       {canCreate ? (
         <div className="kanban-create-board">
           <input
-            aria-label="New board title"
+            aria-label={t('boards.sidebar.newBoardTitle')}
             onChange={(event) => onNewBoardTitleChange(event.currentTarget.value)}
             onKeyDown={(event) => {
               if (event.key === 'Enter') onCreateBoard();
             }}
-            placeholder="New board title"
+            placeholder={t('boards.sidebar.newBoardTitle')}
             value={newBoardTitle}
           />
           <button className="btn-primary rounded-full" disabled={!newBoardTitle.trim()} onClick={onCreateBoard} type="button">
             <Plus size={16} />
-            Create board
+            {t('boards.actions.createBoard')}
           </button>
         </div>
       ) : null}
       <label className="kanban-board-search">
         <Search size={16} />
-        <input aria-label="Search boards" onChange={(event) => setSearch(event.currentTarget.value)} placeholder="Search boards" value={search} />
+        <input aria-label={t('boards.sidebar.search')} onChange={(event) => setSearch(event.currentTarget.value)} placeholder={t('boards.sidebar.search')} value={search} />
       </label>
       <BoardSection
         boards={mine}
         collapsed={collapsed.mine}
-        empty="No boards yet."
+        empty={t('boards.sidebar.emptyMine')}
         members={members}
         onOpenBoard={onOpenBoard}
         onToggle={() => setCollapsed((value) => ({ ...value, mine: !value.mine }))}
         selectedBoardId={selectedBoardId}
-        title="My boards"
+        title={t('boards.sidebar.myBoards')}
       />
       <BoardSection
         boards={workspace}
         collapsed={collapsed.workspace}
-        empty="No workspace boards found."
+        empty={t('boards.sidebar.emptyWorkspace')}
         members={members}
         onOpenBoard={onOpenBoard}
         onToggle={() => setCollapsed((value) => ({ ...value, workspace: !value.workspace }))}
         selectedBoardId={selectedBoardId}
-        title="Workspace boards"
+        title={t('boards.sidebar.workspaceBoards')}
       />
       <BoardSection
         boards={shared}
         collapsed={collapsed.shared}
-        empty="No directly shared boards found."
+        empty={t('boards.sidebar.emptyShared')}
         members={members}
         onOpenBoard={onOpenBoard}
         onToggle={() => setCollapsed((value) => ({ ...value, shared: !value.shared }))}
         selectedBoardId={selectedBoardId}
-        title="Shared with me"
+        title={t('boards.sidebar.sharedWithMe')}
       />
     </aside>
   );

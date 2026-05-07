@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
 import { useGetCallerUserProfile } from './hooks/useQueries';
 import LoginButton from './components/LoginButton';
+import LanguageSwitcher from './components/LanguageSwitcher';
 import ProfileSetup from './components/ProfileSetup';
 import MainTabs from './components/MainTabs';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -77,7 +78,10 @@ export default function App() {
                 ))}
               </nav>
 
-              <LoginButton compact className="rounded-full px-7 py-3" />
+              <div className="flex flex-wrap items-center gap-3">
+                <LanguageSwitcher compact />
+                <LoginButton compact className="rounded-full px-7 py-3" />
+              </div>
             </div>
           </div>
         </header>

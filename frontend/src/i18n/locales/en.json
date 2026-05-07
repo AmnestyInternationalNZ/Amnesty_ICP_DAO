@@ -1,0 +1,960 @@
+{
+  "admin": {
+    "assignmentEffectTitle": "What this does",
+    "assignmentEffects": {
+      "communityAdmin": "Assign community admin privileges for the selected community.",
+      "member": "Assign member participation for the selected community.",
+      "platformAdmin": "Grant platform-wide admin privileges. This person will be able to create communities and manage membership across the platform.",
+      "removePlatformAdmin": "Remove platform-wide admin privileges while leaving community-scoped assignments untouched.",
+      "viewer": "Remove any assigned community role. The person will still be able to read the community as an authenticated viewer."
+    },
+    "assignmentKicker": "Assignment",
+    "assignmentLabel": "Assignment",
+    "assignmentTitle": "Update access for this scope",
+    "chooseScopeTitle": "Choose a working scope",
+    "currentInScope": "Current in scope: {{assignment}}",
+    "errors": {
+      "lookup": "Failed to lookup user profile:",
+      "save": "Failed to save role assignment:"
+    },
+    "focusBody": "Platform admins can manage any community. Community roles stay local to the selected community space.",
+    "focusKicker": "Current focus",
+    "heroBody": "Review who holds platform-wide access, inspect local rosters, and shift people between viewer, member, and community admin roles without leaving this space.",
+    "heroKicker": "Platform stewardship",
+    "heroTitle": "Assign platform admins and community roles from one place.",
+    "noPlatformAdmins": "No platform admins are currently assigned.",
+    "platformAdminsCount": "Platform admins",
+    "principalHelp": "Enter a valid principal to manage a user who does not yet appear in the saved profile list.",
+    "principalLabel": "User principal ID",
+    "principalPlaceholder": "Enter a principal ID",
+    "roles": {
+      "viewerOnly": "Viewer only"
+    },
+    "rosterKicker": "Community roster",
+    "rosterNobody": "Nobody has an assigned role in this community yet.",
+    "rosterPrompt": "Choose a community scope to inspect its current role assignments. Viewer access remains implicit and is never listed in the roster.",
+    "rosterShowing": "Showing {{visible}} of {{total}} assigned people in this community.",
+    "scopeLabel": "Working scope",
+    "selectedScopeFallback": "Community",
+    "selectedUserKicker": "Selected user",
+    "stewardsKicker": "Platform admins",
+    "stewardsTitle": "Current stewards",
+    "userSelectionKicker": "User selection",
+    "userSelectionTitle": "Choose who to update",
+    "whatChangesCommunity": "Community role changes affect only the selected community. Platform admin access, if any, remains unchanged.",
+    "whatChangesKicker": "What changes here",
+    "whatChangesPlatform": "Platform admin changes affect platform-wide stewardship only. Any community-specific roles remain intact.",
+    "workingScope": "Working scope"
+  },
+  "app": {
+    "footer": {
+      "actionBody": "Support campaigns, fund urgent work together, and keep community action grounded in accountability.",
+      "actionTitle": "Action",
+      "communityBody": "Browse community spaces, read the kaupapa behind each group, and see where you can take part.",
+      "communityTitle": "Community",
+      "governanceBody": "Debate proposals with visible voting windows, quorum settings, and clearly attributed decisions.",
+      "governanceTitle": "Governance",
+      "intro": "A local expression of Amnesty Community, shaped for proposals, campaigns, and people power across Aotearoa."
+    },
+    "landing": {
+      "accessBody": "Viewers can explore every community. Assigned members and community admins can propose, vote, and contribute together.",
+      "actionBody": "The live Amnesty site balances urgency with openness. This application now follows that same rhythm: more editorial space, clearer calls to action, and less of the boxed dashboard feel.",
+      "actionKicker": "Take action together",
+      "actionTitle": "Build local momentum across communities, proposals, and campaigns.",
+      "artBody": "Shape collective decisions, support urgent campaigns, and keep community action grounded in accountability.",
+      "artKicker": "People power",
+      "artTitle": "If you care enough to question, you care enough to act.",
+      "cards": {
+        "campaignsBody": "Support urgent work together with shared targets, visible progress, and community-led fundraising decisions.",
+        "campaignsTitle": "Practice generosity",
+        "communitiesBody": "Organise community spaces, invite participation deliberately, and keep human rights work rooted in people power.",
+        "communitiesTitle": "Build local momentum",
+        "proposalsBody": "Move ideas from discussion to decision with clear windows, visible voting results, and community accountability.",
+        "proposalsTitle": "Use community voice"
+      },
+      "heroBody": "Bring Amnesty communities together to organise local events, debate proposals, and fund urgent action with visible accountability.",
+      "heroKicker": "A human rights movement in Aotearoa",
+      "heroTitle": "People power for community governance",
+      "joinBody": "Communities create a shared place to organise around local action, clear participation, and practical solidarity.",
+      "joinKicker": "Join Amnesty Community",
+      "joinTitle": "Meet other human rights advocates",
+      "statement": "Community voice, visible accountability, and collective action belong in the same place.",
+      "visibilityBody": "Read community spaces, understand the local kaupapa, and see where you can help organise proposals, campaigns, and people power.",
+      "visibilityCallout": "View communities openly. Take part where you are trusted with a role.",
+      "visibilityTitle": "When community voice becomes visible, action can move faster."
+    },
+    "nav": {
+      "admin": "Admin",
+      "boards": "Boards",
+      "calendar": "Calendar",
+      "campaigns": "Campaigns",
+      "communities": "Communities",
+      "community": "Community",
+      "dashboard": "Dashboard",
+      "hub": "Hub",
+      "platform": "Platform",
+      "profile": "Profile",
+      "proposals": "Proposals",
+      "workspace": "Workspace"
+    }
+  },
+  "auth": {
+    "action": {
+      "loggingIn": "Logging in...",
+      "login": "Log in",
+      "logout": "Log out",
+      "signOut": "Sign out"
+    }
+  },
+  "boards": {
+    "actions": {
+      "addCard": "Add card",
+      "addColumn": "Add column",
+      "createBoard": "Create board",
+      "moveLeft": "Move left",
+      "moveRight": "Move right",
+      "pin": "Pin",
+      "pinned": "Pinned"
+    },
+    "board": {
+      "columns": "Board columns",
+      "newColumn": "New column",
+      "newColumnTitle": "New column title",
+      "searchCards": "Search cards",
+      "title": "Board title"
+    },
+    "card": {
+      "addDetails": "Add details",
+      "assignees": "Assignees",
+      "closeDetails": "Close card details",
+      "created": "Created",
+      "creator": "Creator",
+      "descriptionMode": "Description mode",
+      "detailTitle": "Card detail title",
+      "details": "Card details",
+      "dragCard": "Drag card",
+      "due": "Due {{date}}",
+      "dueDate": "Due date",
+      "editMarkdownSyntax": "Edit markdown syntax",
+      "linkedDocument": "Linked document",
+      "linkedDocumentNotVisible": "The linked document is no longer visible to you.",
+      "linkedEvent": "Linked event",
+      "linkedEventNotVisible": "The linked event is no longer visible to you.",
+      "markdownDescription": "Markdown description",
+      "markdownPlaceholder": "Write the card description in Markdown...",
+      "noDescription": "No description yet.",
+      "noDetailsYet": "No details yet",
+      "noLinkedDocument": "No linked document",
+      "noLinkedEvent": "No linked event",
+      "openDetails": "Open card details",
+      "openDocument": "Open document",
+      "openEvent": "Open event",
+      "preview": "Preview",
+      "saveCard": "Save card",
+      "title": "Card title",
+      "updated": "Updated"
+    },
+    "column": {
+      "addCardTo": "Add card to {{columnTitle}}",
+      "deleteColumn": "Delete column",
+      "deleteEmpty": "Delete empty column",
+      "dragColumn": "Drag column",
+      "moveCardsBeforeDelete": "Move cards before deleting this column",
+      "title": "Column title"
+    },
+    "empty": {
+      "chooseBoard": "Choose a board from the sidebar to start coordinating work.",
+      "createFirst": "Create a board for {{communityName}} to coordinate tasks, blockers, and next steps.",
+      "noSelectionTitle": "No board selected",
+      "unavailableBody": "This board may have been archived, deleted, or is not shared with you.",
+      "unavailableTitle": "Board unavailable"
+    },
+    "emptyBody": "Create a board to coordinate tasks for this community.",
+    "emptyTitle": "No board selected",
+    "hero": {
+      "boardStats": "Board stats",
+      "body": "Organise tasks, surface blockers, and move your community's work toward impact.",
+      "kicker": "Boards",
+      "manageAccessBody": "You can manage boards, columns, cards, and members.",
+      "shareAccessBody": "You can view or contribute based on the board sharing settings.",
+      "title": "Coordinate work and track progress together.",
+      "yourAccess": "Your access"
+    },
+    "labels": {
+      "activeCardsCount": "{{count}} active cards",
+      "boardsCount": "{{count}} boards",
+      "cards": "cards",
+      "cardsCountWithValue": "{{value}} cards",
+      "columnsCount": "{{count}} columns",
+      "filteredCardsCount": "{{count}} of {{total}} cards",
+      "workspaceCardsCount": "{{count}} workspace cards"
+    },
+    "messages": {
+      "archiveConfirm": "Archive this board? It will disappear from active board lists.",
+      "archived": "Board archived.",
+      "communityShareUpdated": "Community board sharing updated to {{role}}.",
+      "grantedAccess": "Granted {{role}} access.",
+      "pinned": "Pinned as your default board.",
+      "private": "Board is now private.",
+      "publicLinkCreated": "Public board link created and copied.",
+      "publicLinkDisabled": "Public board link disabled.",
+      "synced": "Board synced.",
+      "unpinned": "Removed as your default board."
+    },
+    "newCardPlaceholder": "New card title",
+    "newColumnPlaceholder": "New column title",
+    "newPlaceholder": "New board title",
+    "page": {
+      "body": "Turn plans into practical tasks with boards scoped to this community and its members.",
+      "title": "Coordinate community work on boards"
+    },
+    "public": {
+      "body": "This board is shared as a read-only public link. Sign in to collaborate inside your community workspace.",
+      "homeAria": "Open Amnesty DAO home",
+      "noSignIn": "No sign-in required for this read-only view.",
+      "readOnlyBoard": "Read-only board",
+      "sharedWorkspaceView": "Shared workspace view",
+      "title": "Public board view",
+      "unavailableBody": "This public board link may have been disabled or the board is no longer visible.",
+      "unavailableTitle": "Public board unavailable"
+    },
+    "share": {
+      "anyoneWithLink": "Anyone with the link",
+      "close": "Close board sharing",
+      "communityBoardRole": "Community board role",
+      "communityWorkspace": "Community workspace",
+      "copyLink": "Copy link",
+      "createPublicLink": "Create public link",
+      "description": "Grant direct access, share with community workspace members, or create a public read-only link.",
+      "directGrantRole": "Direct grant role",
+      "directMember": "Direct member",
+      "disable": "Disable",
+      "ownerOnlyPublicLink": "Only the board owner can manage public links.",
+      "principalPlaceholder": "aaaaa-aa or member principal",
+      "principalToGrant": "Principal to grant access",
+      "publicBoardUrl": "Public board URL",
+      "publicLinksBody": "Create a read-only public link for people outside the community.",
+      "title": "Share board",
+      "updateCommunityShare": "Update community share",
+      "workspaceVisibility": "Control whether this board appears for workspace members."
+    },
+    "sidebar": {
+      "aria": "Board library",
+      "emptyMine": "No boards owned by you yet.",
+      "emptyShared": "No directly shared boards found.",
+      "emptyWorkspace": "No workspace boards found.",
+      "meta": "{{role}} · {{columns}} columns · {{cards}} cards",
+      "myBoards": "My boards",
+      "newBoardTitle": "New board title",
+      "search": "Search boards",
+      "sharedWithMe": "Shared with me",
+      "title": "Boards",
+      "workspaceBoards": "Workspace boards"
+    }
+  },
+  "calendar": {
+    "actions": {
+      "create": "Create event",
+      "new": "New",
+      "saveEvent": "Save event",
+      "update": "Update event"
+    },
+    "createTitle": "Create community event",
+    "editTitle": "Edit community event",
+    "editor": {
+      "aria": "Event editor",
+      "planMeeting": "Plan a meeting"
+    },
+    "emptyBody": "Create the first event to make upcoming community work visible.",
+    "emptyTitle": "No events yet",
+    "errors": {
+      "loadFailed": "Could not load calendar events."
+    },
+    "fields": {
+      "allDay": "All day",
+      "description": "Description",
+      "end": "End",
+      "location": "Location",
+      "locationPlaceholder": "Room, call link, or place",
+      "meetingTitlePlaceholder": "Meeting title",
+      "notes": "Notes",
+      "notesPlaceholder": "Purpose, agenda, or preparation notes",
+      "shareToWorkspace": "Share to workspace",
+      "start": "Start",
+      "title": "Event title"
+    },
+    "hero": {
+      "body": "Schedule events, meetings, and actions so your community can take action together.",
+      "kicker": "Calendar",
+      "title": "Plan with purpose.",
+      "utcBacked": "UTC-backed calendar"
+    },
+    "legend": {
+      "dragToReschedule": "Drag to reschedule",
+      "myEvents": "My events",
+      "workspaceVisible": "Workspace visible"
+    },
+    "loadingEvents": "Loading events...",
+    "messages": {
+      "chooseParticipant": "Choose a participant to grant access.",
+      "copied": "{{label}} copied.",
+      "created": "Event created.",
+      "deleted": "Event deleted.",
+      "grantedAccess": "Granted {{role}} access.",
+      "publicLinkDisabled": "Public event link disabled.",
+      "releaseToSave": "Release to save the new time.",
+      "timeSaved": "Event time saved.",
+      "updated": "Event updated."
+    },
+    "meta": {
+      "owner": "Owner",
+      "ownerOnly": "Only the owner can manage public links.",
+      "participants": "Participants",
+      "privateShared": "Private/shared",
+      "role": "Role",
+      "start": "Start",
+      "visibility": "Visibility",
+      "workspace": "Workspace"
+    },
+    "page": {
+      "body": "Plan gatherings, actions, meetings, and deadlines in one community calendar.",
+      "title": "Keep community events visible"
+    },
+    "public": {
+      "calendar": "Public calendar",
+      "detailsAria": "Public event details",
+      "event": "Event",
+      "noEdits": "No edits from this view",
+      "notFoundBody": "This public event link may have been disabled or the event is no longer visible.",
+      "notFoundTitle": "Public event unavailable",
+      "openingBody": "Loading the shared event details.",
+      "openingTitle": "Opening public event...",
+      "readOnly": "Read-only",
+      "readOnlyRole": "Read-only viewer"
+    },
+    "share": {
+      "addParticipant": "Add participant",
+      "copyEventLink": "Copy event link",
+      "copyPublicLink": "Copy public link",
+      "createPublicLink": "Create public link",
+      "disablePublicLink": "Disable public link",
+      "eventLink": "Event link",
+      "eventRole": "Event role",
+      "grantAccess": "Grant access",
+      "principalPlaceholder": "aaaaa-aa or member principal",
+      "principalToGrant": "Principal to grant event access",
+      "publicEventLink": "Public event link",
+      "title": "Event sharing"
+    },
+    "visibleEvents": "{{count}} visible event"
+  },
+  "campaigns": {
+    "card": {
+      "allOrNothing": "All-or-nothing: Funds are only collected if the target is met by the deadline.",
+      "contributeLockedTitle": "Only assigned community members and admins can contribute to campaigns",
+      "daysLeft": "{{days}} days left",
+      "ended": "Ended",
+      "progress": "{{raised}} / {{goal}}",
+      "progressPercentage": "{{percentage}}%",
+      "yourCampaign": "Your campaign"
+    },
+    "create": {
+      "durationLabel": "Campaign duration (days) *",
+      "durationPlaceholder": "Enter number of days",
+      "error": "Failed to create campaign: {{message}}",
+      "fundingBody": "Your campaign will follow an all-or-nothing model. Funds are only collected if the target amount is met by the deadline. If the goal is not reached, no funds will be collected.",
+      "fundingTitle": "All-or-nothing funding",
+      "goalLabel": "Goal amount ($) *",
+      "goalPlaceholder": "Enter target amount",
+      "storyHelp": "Include narrative, who benefits, and budget outline",
+      "storyLabel": "Campaign story *",
+      "storyPlaceholder": "Describe your campaign, who it will help, and how the funds will be used...",
+      "title": "Create fundraising campaign",
+      "titleLabel": "Campaign title *",
+      "titlePlaceholder": "Enter campaign title",
+      "validationAllFields": "Please fill in all fields",
+      "validationDays": "Please enter a valid number of days",
+      "validationGoalAmount": "Please enter a valid goal amount"
+    },
+    "detail": {
+      "amountLabel": "Amount ($)",
+      "amountPlaceholder": "Enter amount",
+      "campaignEnded": "Campaign ended",
+      "contributeError": "Failed to contribute: {{message}}",
+      "contributeSuccess": "Contribution successful!",
+      "contributeTitle": "Contribute to this campaign",
+      "contributionValidation": "Please enter a valid contribution amount",
+      "contributionsTab": "Contributions ({{count}})",
+      "creatorActionsTitle": "Creator actions",
+      "creatorTooltip": {
+        "goalNotMet": "Campaign can only be finalized once the funding goal is reached",
+        "notActive": "Campaign has already been finalized",
+        "notCreator": "Only the campaign creator can finalize the campaign",
+        "ready": "Finalize campaign now that the funding goal has been reached"
+      },
+      "detailsTab": "Details",
+      "finalizeConfirm": "Are you sure you want to finalize this campaign? This will mark the campaign as successful and complete. This action cannot be undone.",
+      "finalizeError": "Failed to finalize campaign: {{message}}",
+      "finalizeStatusGoalMet": "Campaign goal has been met! You can finalize the campaign.",
+      "finalizeStatusPending": "Campaign can be finalized once the funding goal of {{goal}} is reached.",
+      "finalizeStatusReady": "Campaign can be finalized now that the funding goal has been reached.",
+      "finalizeSuccess": "Campaign finalized successfully!",
+      "fundingBody": "This campaign follows an all-or-nothing model. Funds are only collected if the target amount is met by the deadline or if the campaign creator finalizes it early once the goal is reached. If the goal is not reached, no funds will be collected.",
+      "fundingTitle": "All-or-nothing funding",
+      "goalReached": "Funding goal reached! Campaign can now be finalized.",
+      "goalReachedNote": "The funding goal has been reached. The campaign creator can now finalize this campaign.",
+      "noteLabel": "Note:",
+      "postUpdatePlaceholder": "Share progress, outcomes, or other updates with backers...",
+      "postUpdateTitle": "Post an update",
+      "progressSummary": "{{raised}} / {{goal}}",
+      "stateLabel": "State: {{state}}",
+      "storyTitle": "Campaign story",
+      "updateError": "Failed to post update: {{message}}",
+      "updateLabel": "Update #{{id}}",
+      "updateSuccess": "Update posted successfully!",
+      "updateValidation": "Please enter update content",
+      "updatesTab": "Updates ({{count}})"
+    }
+  },
+  "common": {
+    "actions": {
+      "back": "Back",
+      "cancel": "Cancel",
+      "close": "Close",
+      "continue": "Continue",
+      "contribute": "Contribute",
+      "create": "Create",
+      "createCampaign": "Create campaign",
+      "createCommunity": "Create community",
+      "createFirstCampaign": "Create first campaign",
+      "createFirstCommunity": "Create first community",
+      "createFirstProposal": "Create first proposal",
+      "createProposal": "Create proposal",
+      "delete": "Delete",
+      "edit": "Edit",
+      "enterPrincipal": "Enter principal",
+      "finalizeCampaign": "Finalize campaign",
+      "finalizeProposal": "Finalize proposal",
+      "leaveCommunity": "Leave community",
+      "logIn": "Log in",
+      "logOut": "Log out",
+      "lookUp": "Look up",
+      "openCommunity": "Open community",
+      "postUpdate": "Post update",
+      "save": "Save",
+      "saveAssignment": "Save assignment",
+      "selectFromList": "Select from list",
+      "share": "Share",
+      "viewDetails": "View details"
+    },
+    "buttons": {
+      "campaignAccessLocked": "Campaign access locked",
+      "proposalAccessLocked": "Proposal access locked"
+    },
+    "empty": {
+      "noCampaigns": "No campaigns yet",
+      "noCommunities": "No communities have been published yet.",
+      "noContributions": "No contributions yet.",
+      "noProposals": "No proposals yet",
+      "noUpdates": "No updates posted yet.",
+      "noUsers": "No saved user profiles yet."
+    },
+    "errors": {
+      "genericFinalizeProposal": "An error occurred while finalizing the proposal. Please try again.",
+      "genericVote": "An error occurred while processing your vote. Please try again."
+    },
+    "labels": {
+      "accessModel": "Access model",
+      "by": "By {{name}}",
+      "byPrefix": "By",
+      "campaign": "Campaign",
+      "campaignId": "Campaign ID: {{id}}",
+      "characters": "{{count}}/{{max}} characters",
+      "community": "Community",
+      "contribution": "Contribution",
+      "platformAccess": "Platform access",
+      "principal": "Principal",
+      "proposal": "Proposal",
+      "roleAccess": "Role access",
+      "scope": "Scope: {{scope}}",
+      "signedIn": "Signed in",
+      "totalVotes": "Total votes",
+      "unknown": "Unknown",
+      "updates": "Updates",
+      "viewerOnly": "Viewer only"
+    },
+    "loading": {
+      "checkingAccess": "Checking access",
+      "checkingRole": "Checking role",
+      "checkingStatus": "Checking finalization status...",
+      "contributing": "Contributing...",
+      "creating": "Creating...",
+      "finalizing": "Finalizing...",
+      "leaving": "Leaving...",
+      "loggingIn": "Logging in...",
+      "posting": "Posting...",
+      "saving": "Saving...",
+      "voting": "Voting..."
+    },
+    "roles": {
+      "communityAdmin": "Community admin",
+      "member": "Member",
+      "platformAdmin": "Platform admin",
+      "viewer": "Viewer"
+    },
+    "states": {
+      "campaign": {
+        "active": "Active",
+        "expired": "Expired",
+        "failed": "Failed",
+        "successful": "Successful"
+      },
+      "proposal": {
+        "active": "Active",
+        "failed": "Failed",
+        "passed": "Passed",
+        "pendingFinalization": "Pending finalization"
+      }
+    }
+  },
+  "communities": {
+    "body": "Community roles are explicit, but browsing stays open to every authenticated person so ideas, campaigns, and local context remain visible.",
+    "card": {
+      "accessLoading": "We are checking your community access.",
+      "accessParticipant": "You can help shape proposals and campaigns in this community.",
+      "accessViewer": "You have read-only viewer access here until a role is assigned.",
+      "assignedCount": "{{count}} assigned",
+      "kicker": "Community space"
+    },
+    "create": {
+      "error": "Failed to create community. Please check your permissions and try again.",
+      "nameLabel": "Community name *",
+      "namePlaceholder": "Enter community name",
+      "panelBody": "You will become the first community admin and be automatically assigned to the community. Platform admins can still oversee the community, but local membership management starts here.",
+      "panelTitle": "Community creation",
+      "policyLabel": "Community policy *",
+      "policyPlaceholder": "Describe the community's purpose, governance rules, and guidelines...",
+      "title": "Create new community"
+    },
+    "emptyAdmin": "Create the first community to start assigning roles, shaping proposals, and coordinating campaigns.",
+    "emptyViewer": "A platform admin needs to create the first community before members can be assigned.",
+    "kicker": "Communities",
+    "leave": {
+      "bulletBrowse": "Allow you to continue viewing the community as an authenticated viewer",
+      "bulletPreserve": "Preserve your historical proposals and votes (they will remain visible)",
+      "bulletProposal": "Revoke your ability to create new proposals in this community",
+      "bulletRemove": "Remove you from the community's member list",
+      "bulletViewer": "Return you to read-only viewer access in this community",
+      "bulletVote": "Revoke your ability to vote on proposals in this community",
+      "confirmHelp": "This confirmation helps prevent accidental community departure.",
+      "confirmLabel": "Type \"LEAVE\" to confirm *",
+      "confirmPlaceholder": "Type LEAVE to confirm",
+      "errorBody": "Make sure you are a member of this community and have the correct permissions to leave.",
+      "errorTitle": "Failed to leave community. Please check your permissions and try again.",
+      "leaving": "Leaving...",
+      "successBody": "You have been removed from the community member list and can now view it as a read-only viewer. Your historical contributions remain preserved.",
+      "successTitle": "Successfully left the community!",
+      "title": "Leave community",
+      "warningIntro": "You are about to leave \"{{communityName}}\". This action will:",
+      "warningOutro": "You will need admin assistance to rejoin as a member if you wish to participate again.",
+      "warningTitle": "Confirm community departure"
+    },
+    "membership": {
+      "body": "Role-based membership assignments for this community.",
+      "communityAdmins": "Community admins",
+      "emptyCommunityAdmins": "No community admins assigned.",
+      "emptyMembers": "No members assigned to this community.",
+      "kicker": "Role model",
+      "loadError": "Unable to load community membership information.",
+      "members": "Members",
+      "title": "Community membership",
+      "unnamedMember": "Unnamed member",
+      "viewerAccessBody": "Viewers are implicit and are not listed here. This roster shows only the principals with an assigned community role: community admins and members.",
+      "viewerAccessTitle": "Viewer access stays implicit"
+    },
+    "portal": {
+      "accessBanners": {
+        "communityAdminBody": "You can participate in governance and manage community role assignments inside this space.",
+        "communityAdminTitle": "Community stewardship",
+        "memberBody": "You can create proposals, vote, contribute to campaigns, and step back from this community if needed.",
+        "memberTitle": "Community participation",
+        "platformAdminBody": "You can participate here and manage community membership because you hold the platform admin role.",
+        "platformAdminTitle": "Platform-wide stewardship",
+        "viewerBody": "You can read community context, proposals, and campaigns. Participation opens once a role is assigned.",
+        "viewerTitle": "Viewer access"
+      },
+      "assignedParticipants": "Assigned participants",
+      "backToCommunities": "Back to communities",
+      "campaignsBodyEnabled": "Support campaigns or launch a new one for this community.",
+      "campaignsBodyViewer": "Follow campaign progress here. Contribution opens once a community role is assigned.",
+      "campaignsKicker": "Campaigns",
+      "campaignsTitle": "Fund local action",
+      "capabilities": "Your capabilities",
+      "capabilitiesEnabled": "Create proposals, vote, and help shape community action.",
+      "capabilitiesViewer": "Read the full community context while you remain in viewer mode.",
+      "createCampaignLockedTitle": "Only assigned community members and admins can create campaigns",
+      "createProposalLockedTitle": "Only assigned community members and admins can create proposals",
+      "emptyCampaignsAdmin": "Start the first fundraising campaign for this community when the moment calls for collective support.",
+      "emptyCampaignsViewer": "No campaigns have been created for this community yet.",
+      "emptyProposalsAdmin": "Be the first to bring a proposal into this community space.",
+      "emptyProposalsViewer": "No proposals have been created for this community yet.",
+      "kicker": "Community portal",
+      "loadErrorBody": "The requested community is missing or could not be loaded right now.",
+      "loadErrorTitle": "We could not load this community.",
+      "platformAccessTitle": "Platform access",
+      "proposalsBodyEnabled": "Create a proposal or vote on the direction this community should take next.",
+      "proposalsBodyViewer": "Read the current proposal slate and watch decision-making stay visible.",
+      "proposalsKicker": "Proposals",
+      "proposalsTitle": "Shape community decisions",
+      "roleAccessTitle": "Role access"
+    },
+    "setupKicker": "Community setup",
+    "title": "Read every community. Participate where you are trusted to act."
+  },
+  "i18n": {
+    "language": {
+      "helper": "Choose the language used across Amnesty DAO on this device.",
+      "label": "Language",
+      "machineTranslationNote": "Draft machine translations are provided to help reviewers start faster. Please review community-facing copy before publishing."
+    }
+  },
+  "mainTabs": {
+    "body": "Read communities as a viewer, step into decision-making wherever you hold a role, and keep platform participation grounded in people power.",
+    "claimAction": "Claim platform admin",
+    "kicker": "Amnesty Community",
+    "platformRoles": "Platform roles",
+    "platformRolesBody": "Platform admins manage platform-wide access and can support membership across every community.",
+    "roleModelBody": "Platform-wide access is reserved for the people stewarding community roles. Participation itself remains community-scoped, so members can focus on local organising and decision-making.",
+    "roleModelKicker": "Role model",
+    "setupBody": "No platform admin exists yet. Claim the first role explicitly before communities and member assignments can be managed.",
+    "setupKicker": "Platform setup",
+    "setupTitle": "Claim the first platform admin",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "platformAdmin": "Platform admin"
+    },
+    "title": "Take action together",
+    "yourAccess": "Your access",
+    "yourAccessBody": "Viewers can read across the platform. Community roles unlock proposals, voting, fundraising, and membership stewardship."
+  },
+  "profile": {
+    "body": "Add the name other advocates should see when proposals, campaigns, and decisions are attributed across the platform.",
+    "kicker": "Amnesty Community",
+    "nameLabel": "Your name",
+    "namePlaceholder": "How should the community know you?",
+    "page": {
+      "body": "Keep the name people see beside your proposals, campaigns, workspace edits, and community participation up to date.",
+      "identityKicker": "Internet Identity principal",
+      "kicker": "Profile",
+      "title": "Manage your community identity"
+    },
+    "saveError": "We could not save your profile yet.",
+    "title": "Welcome to the movement"
+  },
+  "proposals": {
+    "card": {
+      "alreadyVotedBody": "The system enforces one vote per person per proposal. Your vote has been recorded and counted.",
+      "alreadyVotedCreator": "As the proposal creator, you were able to vote on your own proposal.",
+      "alreadyVotedTitle": "You have already voted on this proposal",
+      "creatorUnknown": "Unknown member",
+      "daysCount": "{{count}} days",
+      "finalizeErrorTitle": "Failed to finalize proposal.",
+      "finalizeSuccessBody": "The proposal has been finalized and its final status has been determined based on the voting results.",
+      "finalizeSuccessTitle": "Proposal finalized successfully!",
+      "governanceSettings": "Governance settings",
+      "lessThanMinute": "Less than 1m remaining",
+      "no": "No: {{count}} ({{percentage}}%)",
+      "passThreshold": "Pass threshold",
+      "passThresholdValue": "{{count}}% yes votes",
+      "quorum": "Quorum",
+      "timeDaysHours": "{{days}}d {{hours}}h remaining",
+      "timeHoursMinutes": "{{hours}}h {{minutes}}m remaining",
+      "timeMinutes": "{{minutes}}m remaining",
+      "timeRemaining": "Time remaining: {{value}}",
+      "totalVotesRequired": "Total votes: {{total}} / {{required}} required",
+      "viewerAccess": "Viewer access",
+      "voteButtonTitles": {
+        "alreadyVoted": "You have already voted on this proposal",
+        "no": "Vote no on this proposal",
+        "viewer": "Only assigned community members and admins can vote",
+        "votingClosed": "The voting window has closed",
+        "votingNotStarted": "Voting has not started yet",
+        "yes": "Vote yes on this proposal"
+      },
+      "voteErrorTitle": "Failed to vote. Please try again.",
+      "voteNo": "Vote no",
+      "voteSuccessBody": "Your vote has been recorded. The system ensures one vote per person per proposal.",
+      "voteSuccessCreator": "As the proposal creator, you successfully voted on your own proposal.",
+      "voteSuccessTitle": "Vote cast successfully!",
+      "voteYes": "Vote yes",
+      "votedBadge": "You have voted",
+      "votesMinimum": "{{count}} votes minimum",
+      "votingClosed": "Voting closed",
+      "votingNotStarted": "Voting not started",
+      "votingResults": "Voting results",
+      "votingWindow": "Voting window",
+      "yes": "Yes: {{count}} ({{percentage}}%)",
+      "yourProposal": "Your proposal"
+    },
+    "create": {
+      "customizeGovernance": "Customize governance settings",
+      "defaultPassThreshold": "50% of votes must be yes",
+      "defaultQuorum": "1 vote minimum",
+      "defaultSettings": "Default settings",
+      "defaultVotingWindow": "3 days",
+      "descriptionLabel": "Proposal description *",
+      "descriptionPlaceholder": "Describe your proposal in detail. What are you proposing? Why should the community support it?",
+      "error": "Failed to create proposal. Please check your permissions and try again.",
+      "minimumVotesHelp": "Minimum total votes required for proposal to be valid",
+      "minimumVotesLabel": "Minimum votes (quorum)",
+      "passThreshold": "Pass threshold",
+      "passThresholdHelp": "Percentage of yes votes needed to pass (1-100%)",
+      "passThresholdLabel": "Pass threshold (%)",
+      "quorum": "Quorum",
+      "submissionBody": "Once submitted, community members will be able to vote yes or no on your proposal during the voting window. After the voting period ends, any member can finalize the proposal to determine if it passed or failed.",
+      "submissionTitle": "Proposal submission",
+      "title": "Create new proposal",
+      "titleLabel": "Proposal title *",
+      "titlePlaceholder": "Enter proposal title",
+      "votingWindow": "Voting window",
+      "votingWindowDaysLabel": "Voting window (days)",
+      "votingWindowHelp": "How long members can vote (1-30 days)"
+    }
+  },
+  "workspace": {
+    "actions": {
+      "archive": "Archive",
+      "compact": "Compact snapshot",
+      "copyLink": "Copy link",
+      "debugExport": "Download JSON",
+      "grant": "Grant access",
+      "importMarkdown": "Import Markdown",
+      "markdownExport": "Download Markdown",
+      "menu": "Actions",
+      "pin": "Pin default",
+      "redo": "Redo",
+      "sync": "Sync",
+      "undo": "Undo",
+      "unpin": "Unpin default",
+      "updateShare": "Update share"
+    },
+    "blockMenu": {
+      "autoListNumbering": "Automatic numbering",
+      "continuePreviousList": "Continue previous list",
+      "copyBlockLink": "Copy block link",
+      "disableHyperlink": "Disable hyperlink",
+      "duplicate": "Duplicate",
+      "enableHyperlink": "Enable hyperlink",
+      "formatBlock": "Format block",
+      "insertAbove": "Insert above",
+      "insertBelow": "Insert below",
+      "listNumbering": "List numbering",
+      "moveDown": "Move down",
+      "moveUp": "Move up",
+      "restartAtOne": "Restart at 1",
+      "turnInto": "Turn into"
+    },
+    "blockRenderer": {
+      "addCaption": "Add a caption",
+      "blockAria": "Block {{index}}: {{label}}",
+      "blockControls": "Block controls",
+      "blockMenu": "Block menu",
+      "collapseToggle": "Collapse toggle",
+      "dividerBlock": "Divider block",
+      "dragBlock": "Drag block",
+      "dragToReorder": "Drag to reorder",
+      "expandToggle": "Expand toggle",
+      "fileLabel": "File label",
+      "fileUrl": "File URL",
+      "imageCaption": "Image caption",
+      "imageUrl": "Image URL",
+      "markChecked": "Mark checked",
+      "markUnchecked": "Mark unchecked",
+      "pasteFileUrl": "Paste a file URL to link it.",
+      "pasteImageUrl": "Paste an image URL to embed it.",
+      "typeForCommands": "Type '/' for commands",
+      "workspaceImage": "Workspace image"
+    },
+    "body": "Keep working notes, practical task boards, and community events scoped to this community only.",
+    "commands": {
+      "aria": "Slash commands",
+      "groups": {
+        "Lists": "Lists",
+        "Media": "Media",
+        "Structure": "Structure",
+        "Text": "Text"
+      },
+      "items": {
+        "bullet": {
+          "hint": "Simple list item",
+          "label": "Bullet list"
+        },
+        "callout": {
+          "hint": "Light note box",
+          "label": "Callout"
+        },
+        "checklist": {
+          "hint": "Track a task",
+          "label": "Checklist"
+        },
+        "divider": {
+          "hint": "Horizontal rule",
+          "label": "Divider"
+        },
+        "fileLink": {
+          "hint": "External file URL",
+          "label": "File link"
+        },
+        "heading1": {
+          "hint": "Large section title",
+          "label": "Heading 1"
+        },
+        "heading2": {
+          "hint": "Medium section title",
+          "label": "Heading 2"
+        },
+        "heading3": {
+          "hint": "Small section title",
+          "label": "Heading 3"
+        },
+        "image": {
+          "hint": "External image URL",
+          "label": "Image"
+        },
+        "numbered": {
+          "hint": "Ordered list item",
+          "label": "Numbered list"
+        },
+        "paragraph": {
+          "hint": "Plain paragraph",
+          "label": "Text"
+        },
+        "quote": {
+          "hint": "Indented quote",
+          "label": "Quote"
+        },
+        "toggle": {
+          "hint": "Collapsible section",
+          "label": "Toggle"
+        }
+      },
+      "noMatches": "No matching commands",
+      "placeholder": "Type a command"
+    },
+    "comments": {
+      "add": "Comment",
+      "compose": "Add comment",
+      "documentComments": "Document comments",
+      "empty": "No open comments yet.",
+      "openCount": "{{count}} open",
+      "openTitle": "Open comments",
+      "placeholder": "Write a comment. Cmd/Ctrl+Enter submits.",
+      "resolve": "Resolve",
+      "submit": "Submit comment"
+    },
+    "documents": {
+      "bodyPlaceholder": "Write notes, plans, links, or meeting outcomes...",
+      "empty": "No workspace docs are visible to you yet.",
+      "emptyBody": "Create or select a document to start writing inside this community.",
+      "emptyBodyTitle": "Choose or create a document",
+      "emptyMine": "No documents yet.",
+      "emptyShared": "No documents shared with you yet.",
+      "emptyTitle": "No document selected",
+      "emptyWorkspace": "No workspace documents yet.",
+      "newPlaceholder": "New document title",
+      "sidebarTitle": "Community docs"
+    },
+    "editor": {
+      "addFirstBlock": "Add first block",
+      "documentTitle": "Document title",
+      "tailEditable": "Type '/' for commands or press Enter for a new block",
+      "tailReadonly": "Viewer access is read-only for this document."
+    },
+    "grants": {
+      "selectMember": "Select a community member",
+      "title": "Specific member access"
+    },
+    "kicker": "Community workspace",
+    "library": {
+      "mine": "My documents",
+      "shared": "Shared with me",
+      "workspace": "Workspace documents"
+    },
+    "nesting": {
+      "dragHint": "Drag documents to nest, reorder, or move them back to the top level.",
+      "title": "Document nesting",
+      "topLevel": "Top level"
+    },
+    "pageBody": "Manage documents, collaborate with your community, and turn ideas into impact.",
+    "pageTitle": "Build and coordinate action together.",
+    "roles": {
+      "editor": "Editor",
+      "owner": "Owner",
+      "viewer": "Viewer"
+    },
+    "search": {
+      "empty": "No page content matches.",
+      "loading": "Searching documents...",
+      "matches": "{{count}} match",
+      "matches_plural": "{{count}} matches",
+      "placeholder": "Search page content"
+    },
+    "selection": {
+      "bold": "Bold",
+      "boldSelected": "Bold selected text",
+      "clear": "Clear selection",
+      "colorHighlight": "{{color}} highlight",
+      "colors": {
+        "blue": "Blue",
+        "green": "Green",
+        "pink": "Pink",
+        "purple": "Purple",
+        "yellow": "Yellow"
+      },
+      "commentSelected": "Comment on selected text",
+      "copied": "Copied selected blocks as Markdown.",
+      "copyFallback": "Clipboard access failed. Copy the Markdown below.",
+      "copyMarkdown": "Copy as Markdown",
+      "decreaseIndent": "Decrease indent",
+      "done": "Done",
+      "formatBlockAs": "Format block as {{label}}",
+      "formatSelected": "Format selected text",
+      "highlight": "Highlight",
+      "highlightColors": "Highlight colors",
+      "highlightSelected": "Highlight selected text",
+      "increaseIndent": "Increase indent",
+      "indent": "Indent",
+      "italic": "Italic",
+      "italicSelected": "Italic selected text",
+      "outdent": "Outdent",
+      "selectBlocks": "Select blocks",
+      "selected": "{{count}} selected",
+      "selectedBlockActions": "Selected block actions"
+    },
+    "share": {
+      "communityEditor": "Shared with community as editor",
+      "communityViewer": "Shared with community as viewer",
+      "private": "Private",
+      "title": "Community sharing"
+    },
+    "syncStatus": {
+      "compactError": "Compact error",
+      "compacted": "Compacted",
+      "compacting": "Compacting",
+      "loaded": "Loaded",
+      "persisted": "Persisted",
+      "saveError": "Save error",
+      "saving": "Saving",
+      "titleSaved": "Title saved",
+      "unsavedChanges": "Unsaved changes"
+    },
+    "tabs": {
+      "boards": "Boards",
+      "calendar": "Calendar",
+      "documents": "Docs"
+    },
+    "title": "Plan, document, and coordinate local action",
+    "viewerLockedBody": "Docs, boards, and events can include private or member-shared material, so they are only available to assigned community members and admins.",
+    "viewerLockedTitle": "Workspace access is member-only"
+  }
+}

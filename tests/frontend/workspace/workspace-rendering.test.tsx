@@ -1,8 +1,11 @@
+import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it, vi } from 'vitest';
+import { I18nextProvider } from 'react-i18next';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { BlockRenderer, renderMarkedText } from '../../../frontend/src/components/workspace/BlockRenderer';
 import { isBlockHiddenByCollapsedToggle } from '../../../frontend/src/components/workspace/DocumentEditor';
 import { SelectionFormatMenu } from '../../../frontend/src/components/workspace/SelectionFormatMenu';
+import { i18n } from '../../../frontend/src/i18n';
 import type { WorkspaceBlock } from '../../../frontend/src/workspace/types';
 
 function block(overrides: Partial<WorkspaceBlock> = {}): WorkspaceBlock {
@@ -15,6 +18,10 @@ function block(overrides: Partial<WorkspaceBlock> = {}): WorkspaceBlock {
 }
 
 const noop = () => {};
+function renderWithI18n(node: React.ReactElement): string {
+  return renderToStaticMarkup(<I18nextProvider i18n={i18n}>{node}</I18nextProvider>);
+}
+
 const blockRendererProps = {
   canEdit: false,
   commentsCount: 0,
@@ -46,8 +53,12 @@ const blockRendererProps = {
 };
 
 describe('workspace rendering', () => {
+  beforeAll(async () => {
+    await i18n.changeLanguage('en');
+  });
+
   it('renders linked text in read-only linked mode', () => {
-    const html = renderToStaticMarkup(
+    const html = renderWithI18n(
       <BlockRenderer {...blockRendererProps} block={block({ text: 'Open https://example.com' })} />,
     );
 
@@ -73,18 +84,18 @@ describe('workspace rendering', () => {
   });
 
   it('renders editable contentEditable blocks and slash commands', () => {
-    const html = renderToStaticMarkup(
+    const html = renderWithI18n(
       <BlockRenderer {...blockRendererProps} block={block({ text: '/' })} canEdit isSlashOpen />,
     );
 
     expect(html).toContain('contenteditable="true"');
     expect(html).toContain('data-render-mode="editable"');
-    expect(html).toContain('/commands');
+    expect(html).toContain('/Type a command');
     expect(html).toContain('Heading 1');
   });
 
   it('renders selection formatting controls for DOMRange selections', () => {
-    const html = renderToStaticMarkup(
+    const html = renderWithI18n(
       <SelectionFormatMenu
         onClose={noop}
         onComment={noop}
@@ -96,7 +107,7 @@ describe('workspace rendering', () => {
       />,
     );
 
-    expect(html).toContain('Selected text formatting');
+    expect(html).toContain('Format selected text');
     expect(html).toContain('Bold');
     expect(html).toContain('Outdent');
     expect(html).toContain('Comment');
@@ -116,7 +127,7 @@ describe('workspace rendering', () => {
 
   it('shows block comment pills without replacing content rendering', () => {
     const onOpenComments = vi.fn();
-    const html = renderToStaticMarkup(
+    const html = renderWithI18n(
       <BlockRenderer {...blockRendererProps} block={block()} commentsCount={2} onOpenComments={onOpenComments} />,
     );
 

@@ -1,0 +1,960 @@
+{
+  "admin": {
+    "assignmentEffectTitle": "ይህ ምን ያደርጋል",
+    "assignmentEffects": {
+      "communityAdmin": "ለተመረጠው ማህበረሰብ የማህበረሰብ አስተዳዳሪ ልዩ መብቶችን መድብ።",
+      "member": "ለተመረጠው ማህበረሰብ የአባላትን ተሳትፎ መድብ።",
+      "platformAdmin": "መድረክ-ሰፊ የአስተዳዳሪ መብቶችን ይስጡ። ይህ ሰው ማህበረሰቦችን መፍጠር እና በመድረኩ ላይ አባልነትን ማስተዳደር ይችላል።",
+      "removePlatformAdmin": "በማህበረሰቡ የተቀመጡ ስራዎችን ሳይነኩ በመተው የመሣሪያ ስርዓት-ሰፊ የአስተዳዳሪ መብቶችን ያስወግዱ።",
+      "viewer": "ማንኛውንም የተመደበ የማህበረሰብ ሚና ያስወግዱ። ግለሰቡ አሁንም ማህበረሰቡን እንደ የተረጋገጠ ተመልካች ማንበብ ይችላል።"
+    },
+    "assignmentKicker": "ምደባ",
+    "assignmentLabel": "ምደባ",
+    "assignmentTitle": "ለዚህ ወሰን መዳረሻን አዘምን",
+    "chooseScopeTitle": "የስራ ወሰን ይምረጡ",
+    "currentInScope": "አሁን ያለው ስፋት፡{{assignment}}",
+    "errors": {
+      "lookup": "የተጠቃሚ መገለጫ መፈለግ አልተሳካም፦",
+      "save": "ሚና ምደባን ማስቀመጥ አልተሳካም፦"
+    },
+    "focusBody": "የመሣሪያ ስርዓት አስተዳዳሪዎች ማንኛውንም ማህበረሰብ ማስተዳደር ይችላሉ። የማህበረሰብ ሚናዎች ለተመረጠው የማህበረሰብ ቦታ ይቆያሉ።",
+    "focusKicker": "ወቅታዊ ትኩረት",
+    "heroBody": "የመሣሪያ ስርዓት-ሰፊ መዳረሻን ማን እንደሚይዝ ይገምግሙ፣ የአካባቢ ዝርዝሮችን ይመርምሩ እና ሰዎችን ከዚህ ቦታ ሳይለቁ በተመልካች፣ በአባል እና በማህበረሰብ አስተዳዳሪ ሚናዎች መካከል ይቀያይሩ።",
+    "heroKicker": "መድረክ መጋቢነት",
+    "heroTitle": "የመድረክ አስተዳዳሪዎችን እና የማህበረሰብ ሚናዎችን ከአንድ ቦታ ይመድቡ።",
+    "noPlatformAdmins": "በአሁኑ ጊዜ ምንም የመድረክ አስተዳዳሪዎች አልተመደቡም።",
+    "platformAdminsCount": "መድረክ አስተዳዳሪዎች",
+    "principalHelp": "በተቀመጠው የመገለጫ ዝርዝር ውስጥ ገና የማይታይ ተጠቃሚን ለማስተዳደር የሚሰራ ዋና መምህር ያስገቡ።",
+    "principalLabel": "የተጠቃሚ ዋና መታወቂያ",
+    "principalPlaceholder": "ዋና መታወቂያ አስገባ",
+    "roles": {
+      "viewerOnly": "ተመልካች ብቻ"
+    },
+    "rosterKicker": "የማህበረሰብ ዝርዝር",
+    "rosterNobody": "ማንም በዚህ ማህበረሰብ ውስጥ እስካሁን የተመደበ ሚና የለውም።",
+    "rosterPrompt": "አሁን ያለውን የሚና ድርሻ ለመፈተሽ የማህበረሰብ ወሰን ይምረጡ። የተመልካች መዳረሻ ስውር ሆኖ ይቆያል እና በስም ዝርዝር ውስጥ በጭራሽ አልተዘረዘረም።",
+    "rosterShowing": "በዚህ ማህበረሰብ ውስጥ {{visible}} ከ{{total}} የተመደቡ ሰዎችን በማሳየት ላይ።",
+    "scopeLabel": "የስራ ወሰን",
+    "selectedScopeFallback": "ማህበረሰብ",
+    "selectedUserKicker": "የተመረጠ ተጠቃሚ",
+    "stewardsKicker": "መድረክ አስተዳዳሪዎች",
+    "stewardsTitle": "የአሁን መጋቢዎች",
+    "userSelectionKicker": "የተጠቃሚ ምርጫ",
+    "userSelectionTitle": "ማን እንደሚያዘምን ይምረጡ",
+    "whatChangesCommunity": "የማህበረሰብ ሚና ለውጦች የተመረጠውን ማህበረሰብ ብቻ ነው የሚነኩት። የመሣሪያ ስርዓት አስተዳዳሪ መዳረሻ፣ ካለ፣ ሳይለወጥ ይቆያል።",
+    "whatChangesKicker": "እዚህ ምን ይለወጣል",
+    "whatChangesPlatform": "የፕላትፎርም አስተዳዳሪ ለውጦች መድረክ-አቀፍ መጋቢነትን ብቻ ነው የሚነኩት። ማንኛውም ማህበረሰብ-ተኮር ሚናዎች ሳይበላሹ ይቆያሉ።",
+    "workingScope": "የስራ ወሰን"
+  },
+  "app": {
+    "footer": {
+      "actionBody": "ዘመቻዎችን ይደግፉ፣ አስቸኳይ ስራዎችን በገንዘብ ይደግፉ እና የማህበረሰብ እርምጃ በተጠያቂነት ላይ የተመሰረተ እንዲሆን ያድርጉ።",
+      "actionTitle": "ድርጊት",
+      "communityBody": "የማህበረሰብ ቦታዎችን ያስሱ፣ ከእያንዳንዱ ቡድን በስተጀርባ ያለውን kaupapa ያንብቡ እና የት መሳተፍ እንደሚችሉ ይመልከቱ።",
+      "communityTitle": "ማህበረሰብ",
+      "governanceBody": "በሚታዩ የድምጽ መስጫ መስኮቶች፣ ምልአተ ጉባኤ ቅንጅቶች እና በግልጽ የተቀመጡ ውሳኔዎች ያላቸው የውይይት ሀሳቦች።",
+      "governanceTitle": "አስተዳደር",
+      "intro": "በAotearoa ዙሪያ ለፕሮፖዛል፣ ለዘመቻዎች እና ለሰዎች ኃይል የተቀረፀ የአምነስቲ ማህበረሰብ አካባቢያዊ መግለጫ።"
+    },
+    "landing": {
+      "accessBody": "ተመልካቾች እያንዳንዱን ማህበረሰብ ማሰስ ይችላሉ። የተመደቡ አባላት እና የማህበረሰብ አስተዳዳሪዎች ሃሳብ ማቅረብ፣ ድምጽ መስጠት እና አንድ ላይ ማበርከት ይችላሉ።",
+      "actionBody": "የቀጥታ የአምነስቲ ጣቢያ አጣዳፊነትን ከግልጽነት ጋር ያስተካክላል። ይህ መተግበሪያ አሁን ተመሳሳይ ሪትም ይከተላል፡ ተጨማሪ የአርትዖት ቦታ፣ ይበልጥ ግልጽ ወደ ተግባር የሚደረጉ ጥሪዎች እና በቦክስ የተሞላ ዳሽቦርድ ስሜት።",
+      "actionKicker": "አንድ ላይ እርምጃ ይውሰዱ",
+      "actionTitle": "በማህበረሰቦች፣ ፕሮፖዛሎች እና ዘመቻዎች ላይ የአካባቢ ተነሳሽነት ይገንቡ።",
+      "artBody": "የጋራ ውሳኔዎችን ይቅረጹ፣ አስቸኳይ ዘመቻዎችን ይደግፉ፣ እና የማህበረሰብ እርምጃ በተጠያቂነት ላይ የተመሰረተ እንዲሆን ያድርጉ።",
+      "artKicker": "የህዝብ ኃይል",
+      "artTitle": "ለመጠየቅ በቂ ፍላጎት ካሎት, በቂ እርምጃ ለመውሰድ ያስባሉ.",
+      "cards": {
+        "campaignsBody": "አስቸኳይ ስራን ከጋራ ኢላማዎች፣ ከሚታዩ ግስጋሴዎች እና ማህበረሰቡ የሚመራ የገንዘብ ማሰባሰብያ ውሳኔዎችን መደገፍ።",
+        "campaignsTitle": "ልግስና ተለማመድ",
+        "communitiesBody": "የማህበረሰብ ቦታዎችን ያደራጁ፣ ሆን ተብሎ ተሳትፎን ይጋብዙ እና የሰብአዊ መብት ስራ በሰዎች ሃይል ላይ የተመሰረተ እንዲሆን ያድርጉ።",
+        "communitiesTitle": "የአካባቢን ፍጥነት ይገንቡ",
+        "proposalsBody": "ግልጽ በሆኑ መስኮቶች፣ በሚታዩ የምርጫ ውጤቶች እና በማህበረሰብ ተጠያቂነት ሀሳቦችን ከውይይት ወደ ውሳኔ ያንቀሳቅሱ።",
+        "proposalsTitle": "የማህበረሰብ ድምጽ ተጠቀም"
+      },
+      "heroBody": "የአምነስቲ ማህበረሰቦችን አንድ ላይ በማሰባሰብ የአካባቢ ዝግጅቶችን ለማደራጀት፣ የመወያያ ሀሳቦችን ይከራከራሉ እና አፋጣኝ እርምጃ በሚታይ ተጠያቂነት ገንዘብ ይመድቡ።",
+      "heroKicker": "በAotearoa ውስጥ የሰብአዊ መብት እንቅስቃሴ",
+      "heroTitle": "የህዝብ ስልጣን ለማህበረሰብ አስተዳደር",
+      "joinBody": "ማህበረሰቦች በአካባቢያዊ ድርጊት፣ ግልጽ በሆነ ተሳትፎ እና በተግባራዊ ትብብር ዙሪያ የሚደራጁበት የጋራ ቦታ ይፈጥራሉ።",
+      "joinKicker": "የአምነስቲ ማህበረሰብን ይቀላቀሉ",
+      "joinTitle": "ከሌሎች የሰብአዊ መብት ተሟጋቾች ጋር ይገናኙ",
+      "statement": "የማህበረሰብ ድምጽ፣ የሚታይ ተጠያቂነት እና የጋራ እርምጃ በአንድ ቦታ ላይ ናቸው።",
+      "visibilityBody": "የማህበረሰብ ቦታዎችን ያንብቡ፣ የአካባቢውን kaupapa ይረዱ እና የት ፕሮፖዛሎችን፣ ዘመቻዎችን እና የሰዎችን ሃይል ለማደራጀት ማገዝ እንደሚችሉ ይመልከቱ።",
+      "visibilityCallout": "ማህበረሰቦችን በግልፅ ይመልከቱ። በሚታመኑበት ቦታ ይሳተፉ።",
+      "visibilityTitle": "የማህበረሰብ ድምጽ የሚታይ ሲሆን እርምጃ በፍጥነት ሊንቀሳቀስ ይችላል።"
+    },
+    "nav": {
+      "admin": "አስተዳዳሪ",
+      "boards": "ሰሌዳዎች",
+      "calendar": "የቀን መቁጠሪያ",
+      "campaigns": "ዘመቻዎች",
+      "communities": "ማህበረሰቦች",
+      "community": "ማህበረሰብ",
+      "dashboard": "ዳሽቦርድ",
+      "hub": "ሃብ",
+      "platform": "መድረክ",
+      "profile": "መገለጫ",
+      "proposals": "ፕሮፖዛል",
+      "workspace": "የስራ ቦታ"
+    }
+  },
+  "auth": {
+    "action": {
+      "loggingIn": "በመግባት ላይ...",
+      "login": "ግባ",
+      "logout": "ውጣ",
+      "signOut": "ዘግተህ ውጣ"
+    }
+  },
+  "boards": {
+    "actions": {
+      "addCard": "ካርድ ጨምር",
+      "addColumn": "አምድ ጨምር",
+      "createBoard": "ሰሌዳ ይፍጠሩ",
+      "moveLeft": "ወደ ግራ ውሰድ",
+      "moveRight": "ወደ ቀኝ አንቀሳቅስ",
+      "pin": "ፒን",
+      "pinned": "ተሰክቷል።"
+    },
+    "board": {
+      "columns": "የሰሌዳ አምዶች",
+      "newColumn": "አዲስ አምድ",
+      "newColumnTitle": "አዲስ የአምድ ርዕስ",
+      "searchCards": "ካርዶችን ፈልግ",
+      "title": "የቦርድ ርዕስ"
+    },
+    "card": {
+      "addDetails": "ዝርዝሮችን ያክሉ",
+      "assignees": "ተመዳቢዎች",
+      "closeDetails": "የካርድ ዝርዝሮችን ዝጋ",
+      "created": "ተፈጠረ",
+      "creator": "ፈጣሪ",
+      "descriptionMode": "የመግለጫ ሁነታ",
+      "detailTitle": "የካርድ ዝርዝር ርዕስ",
+      "details": "የካርድ ዝርዝሮች",
+      "dragCard": "ካርድ ይጎትቱ",
+      "due": "የሚከፈልበት {{date}}",
+      "dueDate": "የማለቂያ ቀን",
+      "editMarkdownSyntax": "ምልክት ማድረጊያ አገባብ አርትዕ",
+      "linkedDocument": "የተገናኘ ሰነድ",
+      "linkedDocumentNotVisible": "የተገናኘው ሰነድ ከእንግዲህ ለእርስዎ አይታይም።",
+      "linkedEvent": "የተገናኘ ክስተት",
+      "linkedEventNotVisible": "የተገናኘው ክስተት ከእንግዲህ ለእርስዎ አይታይም።",
+      "markdownDescription": "ምልክት ማድረጊያ መግለጫ",
+      "markdownPlaceholder": "የካርድ መግለጫውን በMarkdown ውስጥ ይፃፉ…",
+      "noDescription": "እስካሁን ምንም መግለጫ የለም።",
+      "noDetailsYet": "እስካሁን ምንም ዝርዝር የለም።",
+      "noLinkedDocument": "ምንም የተገናኘ ሰነድ የለም።",
+      "noLinkedEvent": "ምንም የተገናኘ ክስተት የለም።",
+      "openDetails": "የካርድ ዝርዝሮችን ክፈት",
+      "openDocument": "ሰነድ ክፈት",
+      "openEvent": "ክፈት ክስተት",
+      "preview": "ቅድመ እይታ",
+      "saveCard": "ካርድ ያስቀምጡ",
+      "title": "የካርድ ርዕስ",
+      "updated": "ተዘምኗል"
+    },
+    "column": {
+      "addCardTo": "ካርድ ወደ {{columnTitle}} አክል",
+      "deleteColumn": "አምድ ሰርዝ",
+      "deleteEmpty": "ባዶ አምድ ሰርዝ",
+      "dragColumn": "አምድ ይጎትቱ",
+      "moveCardsBeforeDelete": "ይህን አምድ ከመሰረዝዎ በፊት ካርዶችን ይውሰዱ",
+      "title": "የአምድ ርዕስ"
+    },
+    "empty": {
+      "chooseBoard": "የማስተባበር ሥራ ለመጀመር ከጎን አሞሌው ላይ ሰሌዳ ይምረጡ።",
+      "createFirst": "ተግባሮችን፣ አጋጆችን እና ቀጣይ እርምጃዎችን ለማስተባበር ለ{{communityName}} ሰሌዳ ይፍጠሩ።",
+      "noSelectionTitle": "ምንም ሰሌዳ አልተመረጠም።",
+      "unavailableBody": "ይህ ሰሌዳ በማህደር ተቀምጦ፣ ተሰርዞ ወይም ከእርስዎ ጋር ያልተጋራ ሊሆን ይችላል።",
+      "unavailableTitle": "ቦርድ አይገኝም"
+    },
+    "emptyBody": "ለዚህ ማህበረሰብ ስራዎችን የሚያስተባብር ሰሌዳ ይፍጠሩ።",
+    "emptyTitle": "ምንም ሰሌዳ አልተመረጠም።",
+    "hero": {
+      "boardStats": "የቦርድ ስታቲስቲክስ",
+      "body": "ተግባራትን ያደራጁ፣ የገጽታ መከላከያዎችን ያደራጁ እና የማህበረሰብዎን ስራ ወደ ተጽኖ ያንቀሳቅሱት።",
+      "kicker": "ሰሌዳዎች",
+      "manageAccessBody": "ሰሌዳዎችን፣ ዓምዶችን፣ ካርዶችን እና አባላትን ማስተዳደር ይችላሉ።",
+      "shareAccessBody": "በቦርድ መጋሪያ ቅንጅቶች ላይ በመመስረት ማየት ወይም ማበርከት ይችላሉ።",
+      "title": "ሥራን ያስተባብሩ እና እድገትን አብረው ይከታተሉ።",
+      "yourAccess": "የእርስዎ መዳረሻ"
+    },
+    "labels": {
+      "activeCardsCount": "{{count}} ገቢር ካርዶች",
+      "boardsCount": "{{count}} ሰሌዳዎች",
+      "cards": "ካርዶች",
+      "cardsCountWithValue": "{{value}} ካርዶች",
+      "columnsCount": "{{count}} አምዶች",
+      "filteredCardsCount": "{{count}} ከ{{total}} ካርዶች",
+      "workspaceCardsCount": "{{count}} የስራ ቦታ ካርዶች"
+    },
+    "messages": {
+      "archiveConfirm": "ይህ ሰሌዳ በማህደር ይቀመጥ? ከነቃ የቦርድ ዝርዝሮች ይጠፋል።",
+      "archived": "ቦርድ በማህደር ተቀምጧል።",
+      "communityShareUpdated": "የማህበረሰብ ቦርድ መጋራት ወደ {{role}} ዘምኗል።",
+      "grantedAccess": "የ{{role}} መዳረሻ ተሰጥቷል።",
+      "pinned": "እንደ ነባሪ ሰሌዳዎ ተሰክቷል።",
+      "private": "ቦርዱ አሁን የግል ነው።",
+      "publicLinkCreated": "የህዝብ ቦርድ ማገናኛ ተፈጥሯል እና ተቀድቷል።",
+      "publicLinkDisabled": "የህዝብ ቦርድ ማገናኛ ተሰናክሏል።",
+      "synced": "ሰሌዳ ተመሳስሏል።",
+      "unpinned": "እንደ ነባሪ ሰሌዳዎ ተወግዷል።"
+    },
+    "newCardPlaceholder": "አዲስ የካርድ ርዕስ",
+    "newColumnPlaceholder": "አዲስ የአምድ ርዕስ",
+    "newPlaceholder": "አዲስ የቦርድ ርዕስ",
+    "page": {
+      "body": "ዕቅዶችን ለዚህ ማህበረሰብ እና ለአባላቱ በተዘጋጁ ቦርዶች ወደ ተግባራዊ ተግባራት ይለውጡ።",
+      "title": "በቦርዶች ላይ የማህበረሰብ ስራን ያስተባብሩ"
+    },
+    "public": {
+      "body": "ይህ ሰሌዳ እንደ ተነባቢ-ብቻ የህዝብ ማገናኛ ተጋርቷል። በማህበረሰብዎ የስራ ቦታ ውስጥ ለመተባበር ይግቡ።",
+      "homeAria": "የአምነስቲ DAO ቤትን ይክፈቱ",
+      "noSignIn": "ለዚህ ተነባቢ-ብቻ እይታ ምንም መግባት አያስፈልግም።",
+      "readOnlyBoard": "ተነባቢ-ብቻ ሰሌዳ",
+      "sharedWorkspaceView": "የተጋራ የስራ ቦታ እይታ",
+      "title": "የህዝብ ቦርድ እይታ",
+      "unavailableBody": "ይህ የህዝብ ቦርድ ማገናኛ ተሰናክሏል ወይም ቦርዱ አሁን ላይታይ ይችላል።",
+      "unavailableTitle": "የህዝብ ቦርድ የለም።"
+    },
+    "share": {
+      "anyoneWithLink": "አገናኙ ያለው ማንኛውም ሰው",
+      "close": "የሰሌዳ ማጋራትን ዝጋ",
+      "communityBoardRole": "የማህበረሰብ ቦርድ ሚና",
+      "communityWorkspace": "የማህበረሰብ የስራ ቦታ",
+      "copyLink": "አገናኝ ቅዳ",
+      "createPublicLink": "ይፋዊ አገናኝ ፍጠር",
+      "description": "ቀጥተኛ መዳረሻ ይስጡ፣ ከማህበረሰብ የስራ ቦታ አባላት ጋር ይጋሩ፣ ወይም የህዝብ ተነባቢ-ብቻ አገናኝ ይፍጠሩ።",
+      "directGrantRole": "ቀጥተኛ የስጦታ ሚና",
+      "directMember": "ቀጥተኛ አባል",
+      "disable": "አሰናክል",
+      "ownerOnlyPublicLink": "የህዝብ አገናኞችን ማስተዳደር የሚችለው የቦርዱ ባለቤት ብቻ ነው።",
+      "principalPlaceholder": "aaaaa-aa ወይም አባል ርዕሰ መምህር",
+      "principalToGrant": "መዳረሻ ለመስጠት ዋና",
+      "publicBoardUrl": "ይፋዊ ቦርድ ዩአርኤል",
+      "publicLinksBody": "ከማህበረሰቡ ውጭ ላሉ ሰዎች ተነባቢ-ብቻ የህዝብ ግንኙነት ይፍጠሩ።",
+      "title": "ሰሌዳውን አጋራ",
+      "updateCommunityShare": "የማህበረሰብ ድርሻን አዘምን",
+      "workspaceVisibility": "ይህ ቦርድ ለስራ ቦታ አባላት ይታይ እንደሆነ ይቆጣጠሩ።"
+    },
+    "sidebar": {
+      "aria": "የቦርድ ቤተ-መጽሐፍት",
+      "emptyMine": "እስካሁን በእርስዎ ባለቤትነት የተያዙ ምንም ሰሌዳዎች የሉም።",
+      "emptyShared": "ምንም ቀጥታ የተጋሩ ሰሌዳዎች አልተገኙም።",
+      "emptyWorkspace": "ምንም የስራ ቦታ ሰሌዳዎች አልተገኙም።",
+      "meta": "{{role}} · {{columns}} አምዶች · {{cards}} ካርዶች",
+      "myBoards": "የእኔ ሰሌዳዎች",
+      "newBoardTitle": "አዲስ የቦርድ ርዕስ",
+      "search": "የፍለጋ ሰሌዳዎች",
+      "sharedWithMe": "ከእኔ ጋር ተጋርቷል።",
+      "title": "ሰሌዳዎች",
+      "workspaceBoards": "የስራ ቦታ ሰሌዳዎች"
+    }
+  },
+  "calendar": {
+    "actions": {
+      "create": "ክስተት ፍጠር",
+      "new": "አዲስ",
+      "saveEvent": "ክስተት አስቀምጥ",
+      "update": "ክስተት አዘምን"
+    },
+    "createTitle": "የማህበረሰብ ክስተት ፍጠር",
+    "editTitle": "የማህበረሰብ ክስተትን ያርትዑ",
+    "editor": {
+      "aria": "የክስተት አርታዒ",
+      "planMeeting": "ስብሰባ ያቅዱ"
+    },
+    "emptyBody": "መጪውን የማህበረሰብ ስራ የሚታይ ለማድረግ የመጀመሪያውን ክስተት ይፍጠሩ።",
+    "emptyTitle": "እስካሁን ምንም ክስተቶች የሉም",
+    "errors": {
+      "loadFailed": "የቀን መቁጠሪያ ክስተቶችን መጫን አልተቻለም።"
+    },
+    "fields": {
+      "allDay": "ቀኑን ሙሉ",
+      "description": "መግለጫ",
+      "end": "መጨረሻ",
+      "location": "አካባቢ",
+      "locationPlaceholder": "ክፍል፣ የጥሪ አገናኝ ወይም ቦታ",
+      "meetingTitlePlaceholder": "የስብሰባ ርዕስ",
+      "notes": "ማስታወሻዎች",
+      "notesPlaceholder": "ዓላማ፣ አጀንዳ ወይም የዝግጅት ማስታወሻዎች",
+      "shareToWorkspace": "ወደ የስራ ቦታ አጋራ",
+      "start": "ጀምር",
+      "title": "የክስተት ርዕስ"
+    },
+    "hero": {
+      "body": "ማህበረሰብዎ አንድ ላይ እርምጃ እንዲወስድ ዝግጅቶችን፣ ስብሰባዎችን እና ድርጊቶችን መርሐግብር ያስይዙ።",
+      "kicker": "የቀን መቁጠሪያ",
+      "title": "ከዓላማ ጋር ያቅዱ።",
+      "utcBacked": "በUTC የሚደገፍ የቀን መቁጠሪያ"
+    },
+    "legend": {
+      "dragToReschedule": "ለሌላ ጊዜ ለማስያዝ ይጎትቱ",
+      "myEvents": "የእኔ ክስተቶች",
+      "workspaceVisible": "የስራ ቦታ ይታያል"
+    },
+    "loadingEvents": "ክስተቶችን በመጫን ላይ...",
+    "messages": {
+      "chooseParticipant": "መዳረሻ ለመስጠት ተሳታፊ ይምረጡ።",
+      "copied": "{{label}} ተቀድቷል።",
+      "created": "ክስተት ተፈጥሯል።",
+      "deleted": "ክስተት ተሰርዟል።",
+      "grantedAccess": "የ{{role}} መዳረሻ ተሰጥቷል።",
+      "publicLinkDisabled": "ይፋዊ ክስተት ማገናኛ ተሰናክሏል።",
+      "releaseToSave": "አዲሱን ጊዜ ለመቆጠብ ይልቀቁ።",
+      "timeSaved": "የክስተት ጊዜ ተቀምጧል።",
+      "updated": "ክስተት ዘምኗል።"
+    },
+    "meta": {
+      "owner": "ባለቤት",
+      "ownerOnly": "የህዝብ አገናኞችን ማስተዳደር የሚችለው ባለቤቱ ብቻ ነው።",
+      "participants": "ተሳታፊዎች",
+      "privateShared": "የግል/የተጋራ",
+      "role": "ሚና",
+      "start": "ጀምር",
+      "visibility": "ታይነት",
+      "workspace": "የስራ ቦታ"
+    },
+    "page": {
+      "body": "በአንድ የማህበረሰብ የቀን መቁጠሪያ ውስጥ ስብሰባዎችን፣ ድርጊቶችን፣ ስብሰባዎችን እና የግዜ ገደቦችን ያቅዱ።",
+      "title": "የማህበረሰብ ክስተቶች እንዲታዩ ያድርጉ"
+    },
+    "public": {
+      "calendar": "የህዝብ የቀን መቁጠሪያ",
+      "detailsAria": "ይፋዊ ክስተት ዝርዝሮች",
+      "event": "ክስተት",
+      "noEdits": "ከዚህ እይታ ምንም አርትዖቶች የሉም",
+      "notFoundBody": "ይህ የወል ክስተት ማገናኛ ተሰናክሏል ወይም ክስተቱ አሁን ላይታይ ይችላል።",
+      "notFoundTitle": "ይፋዊ ክስተት የለም።",
+      "openingBody": "የጋራ ክስተት ዝርዝሮችን በመጫን ላይ።",
+      "openingTitle": "ይፋዊ ዝግጅትን በመክፈት ላይ...",
+      "readOnly": "ተነባቢ-ብቻ",
+      "readOnlyRole": "ተነባቢ-ብቻ ተመልካች"
+    },
+    "share": {
+      "addParticipant": "ተሳታፊ ጨምር",
+      "copyEventLink": "የክስተት ማገናኛን ቅዳ",
+      "copyPublicLink": "ይፋዊ አገናኝን ይቅዱ",
+      "createPublicLink": "ይፋዊ አገናኝ ፍጠር",
+      "disablePublicLink": "የህዝብ ግንኙነትን አሰናክል",
+      "eventLink": "የክስተት አገናኝ",
+      "eventRole": "የክስተት ሚና",
+      "grantAccess": "መዳረሻ ይስጡ",
+      "principalPlaceholder": "aaaaa-aa ወይም አባል ርዕሰ መምህር",
+      "principalToGrant": "የክስተት መዳረሻን ለመስጠት ርእሰመምህር",
+      "publicEventLink": "የህዝብ ክስተት አገናኝ",
+      "title": "ክስተት መጋራት"
+    },
+    "visibleEvents": "{{count}} የሚታይ ክስተት"
+  },
+  "campaigns": {
+    "card": {
+      "allOrNothing": "ሁሉም-ወይም-ምንም፡ ገንዘቦች የሚሰበሰቡት ዒላማው በመጨረሻው ቀን ከተሟላ ብቻ ነው።",
+      "contributeLockedTitle": "ለዘመቻዎች አስተዋፅኦ ማድረግ የሚችሉት የተመደቡ የማህበረሰብ አባላት እና አስተዳዳሪዎች ብቻ ናቸው።",
+      "daysLeft": "{{days}} ቀናት ቀርተዋል።",
+      "ended": "አበቃ",
+      "progress": "{{raised}} / {{goal}}",
+      "progressPercentage": "{{percentage}}%",
+      "yourCampaign": "የእርስዎ ዘመቻ"
+    },
+    "create": {
+      "durationLabel": "የዘመቻ ቆይታ (ቀናት) *",
+      "durationPlaceholder": "የቀኖችን ብዛት አስገባ",
+      "error": "ዘመቻ መፍጠር አልተሳካም፦ {{message}}",
+      "fundingBody": "ዘመቻዎ ሁሉን አቀፍ ወይም ምንም ሞዴል ይከተላል። ገንዘቦች የሚሰበሰቡት የታለመው መጠን በመጨረሻው ቀን ከተሟላ ብቻ ነው። ግቡ ካልተደረሰ, ምንም ገንዘብ አይሰበሰብም.",
+      "fundingTitle": "ሁሉም-ወይም-ምንም የገንዘብ ድጋፍ",
+      "goalLabel": "የግብ መጠን ($) *",
+      "goalPlaceholder": "የታለመውን መጠን ያስገቡ",
+      "storyHelp": "ትረካ፣ ማን እንደሚጠቅም እና የበጀት ዝርዝርን ያካትቱ",
+      "storyLabel": "የዘመቻ ታሪክ *",
+      "storyPlaceholder": "ዘመቻህን፣ ማንን እንደሚረዳ እና ገንዘቡ እንዴት ጥቅም ላይ እንደሚውል ግለጽ...",
+      "title": "የገንዘብ ማሰባሰብ ዘመቻ ፍጠር",
+      "titleLabel": "የዘመቻ ርዕስ *",
+      "titlePlaceholder": "የዘመቻ ርዕስ አስገባ",
+      "validationAllFields": "እባክዎ ሁሉንም መስኮች ይሙሉ",
+      "validationDays": "እባክህ የሚሰራ የቀኖች ቁጥር አስገባ",
+      "validationGoalAmount": "እባክዎ ትክክለኛ የግብ መጠን ያስገቡ"
+    },
+    "detail": {
+      "amountLabel": "መጠን ($)",
+      "amountPlaceholder": "መጠን ያስገቡ",
+      "campaignEnded": "ዘመቻው አልቋል",
+      "contributeError": "ማበርከት አልተሳካም፦ {{message}}",
+      "contributeSuccess": "አስተዋጽዎ ተሳክቷል!",
+      "contributeTitle": "ለዚህ ዘመቻ አስተዋፅዖ ያድርጉ",
+      "contributionValidation": "እባክዎ ትክክለኛ መዋጮ መጠን ያስገቡ",
+      "contributionsTab": "አስተዋጽዖዎች ({{count}})",
+      "creatorActionsTitle": "የፈጣሪ ተግባራት",
+      "creatorTooltip": {
+        "goalNotMet": "ዘመቻው ሊጠናቀቅ የሚችለው የገንዘብ ድጋፍ ግብ ላይ ከደረሰ በኋላ ብቻ ነው።",
+        "notActive": "ዘመቻው አስቀድሞ ተጠናቅቋል",
+        "notCreator": "ዘመቻውን ማጠናቀቅ የሚችለው የዘመቻ ፈጣሪው ብቻ ነው።",
+        "ready": "የገንዘብ ድጋፍ ግቡ ላይ ስለደረሰ ዘመቻውን አሁን ያጠናቅቁ"
+      },
+      "detailsTab": "ዝርዝሮች",
+      "finalizeConfirm": "እርግጠኛ ነዎት ይህን ዘመቻ ማጠናቀቅ ይፈልጋሉ? ይህ ዘመቻው የተሳካ እና የተሟላ እንዲሆን ያደርገዋል። ይህ እርምጃ ሊቀለበስ አይችልም።",
+      "finalizeError": "ዘመቻውን ማጠናቀቅ አልተሳካም፦ {{message}}",
+      "finalizeStatusGoalMet": "የዘመቻ ግብ ተሟልቷል! ዘመቻውን ማጠናቀቅ ይችላሉ።",
+      "finalizeStatusPending": "የ{{goal}} የገንዘብ ድጋፍ ግብ ከደረሰ በኋላ ዘመቻው ሊጠናቀቅ ይችላል።",
+      "finalizeStatusReady": "የገንዘብ ድጋፍ ግቡ ላይ ስለደረሰ ዘመቻው ሊጠናቀቅ ይችላል።",
+      "finalizeSuccess": "ዘመቻው በተሳካ ሁኔታ ተጠናቀቀ!",
+      "fundingBody": "ይህ ዘመቻ ሁሉንም-ወይም-ምንም ሞዴል ይከተላል። ገንዘቦች የሚሰበሰቡት የታለመው መጠን በመጨረሻው ቀን ከተሟላ ወይም የዘመቻ ፈጣሪው ግቡ ላይ እንደደረሰ ቀደም ብሎ ካጠናቀቀ ብቻ ነው። ግቡ ካልተደረሰ, ምንም ገንዘብ አይሰበሰብም.",
+      "fundingTitle": "ሁሉም-ወይም-ምንም የገንዘብ ድጋፍ",
+      "goalReached": "የገንዘብ ድጋፍ ግብ ላይ ደርሷል! ዘመቻው አሁን ሊጠናቀቅ ይችላል።",
+      "goalReachedNote": "የገንዘብ ድጋፍ ግብ ላይ ደርሷል. የዘመቻ ፈጣሪው አሁን ይህን ዘመቻ ማጠናቀቅ ይችላል።",
+      "noteLabel": "ማስታወሻ፡-",
+      "postUpdatePlaceholder": "እድገትን፣ ውጤቶችን ወይም ሌሎች ዝማኔዎችን ለደጋፊዎች አጋራ...",
+      "postUpdateTitle": "ዝማኔ ይለጥፉ",
+      "progressSummary": "{{raised}} / {{goal}}",
+      "stateLabel": "ግዛት፡ {{state}}",
+      "storyTitle": "የዘመቻ ታሪክ",
+      "updateError": "ዝማኔን መለጠፍ አልተሳካም፦ {{message}}",
+      "updateLabel": "አዘምን #{{id}}",
+      "updateSuccess": "ዝማኔ በተሳካ ሁኔታ ተለጠፈ!",
+      "updateValidation": "እባክዎ የዝማኔ ይዘት ያስገቡ",
+      "updatesTab": "ዝማኔዎች ({{count}})"
+    }
+  },
+  "common": {
+    "actions": {
+      "back": "ተመለስ",
+      "cancel": "ሰርዝ",
+      "close": "ዝጋ",
+      "continue": "ቀጥል",
+      "contribute": "አዋጡ",
+      "create": "ፍጠር",
+      "createCampaign": "ዘመቻ ፍጠር",
+      "createCommunity": "ማህበረሰብ መፍጠር",
+      "createFirstCampaign": "የመጀመሪያ ዘመቻ ፍጠር",
+      "createFirstCommunity": "የመጀመሪያውን ማህበረሰብ ይፍጠሩ",
+      "createFirstProposal": "የመጀመሪያ ፕሮፖዛል ይፍጠሩ",
+      "createProposal": "ፕሮፖዛል ፍጠር",
+      "delete": "ሰርዝ",
+      "edit": "አርትዕ",
+      "enterPrincipal": "ዋና አስገባ",
+      "finalizeCampaign": "ዘመቻውን ጨርስ",
+      "finalizeProposal": "ፕሮፖዛሉን ጨርስ",
+      "leaveCommunity": "ማህበረሰቡን ይልቀቁ",
+      "logIn": "ግባ",
+      "logOut": "ውጣ",
+      "lookUp": "ወደ ላይ ይመልከቱ",
+      "openCommunity": "ክፍት ማህበረሰብ",
+      "postUpdate": "ዝመና ይለጥፉ",
+      "save": "አስቀምጥ",
+      "saveAssignment": "ምደባ አስቀምጥ",
+      "selectFromList": "ከዝርዝር ውስጥ ይምረጡ",
+      "share": "አጋራ",
+      "viewDetails": "ዝርዝሮችን ይመልከቱ"
+    },
+    "buttons": {
+      "campaignAccessLocked": "የዘመቻ መዳረሻ ተቆልፏል",
+      "proposalAccessLocked": "የፕሮፖዛል መዳረሻ ተቆልፏል"
+    },
+    "empty": {
+      "noCampaigns": "እስካሁን ምንም ዘመቻዎች የሉም",
+      "noCommunities": "እስካሁን ምንም ማህበረሰቦች አልታተሙም።",
+      "noContributions": "እስካሁን ምንም አስተዋጽዖ የለም።",
+      "noProposals": "እስካሁን ምንም ሀሳብ የለም።",
+      "noUpdates": "እስካሁን ምንም ዝማኔዎች አልተለጠፈም።",
+      "noUsers": "እስካሁን ምንም የተቀመጡ የተጠቃሚ መገለጫዎች የሉም።"
+    },
+    "errors": {
+      "genericFinalizeProposal": "ሃሳቡን በማጠናቀቅ ላይ ሳለ ስህተት ተከስቷል። እባክህ እንደገና ሞክር።",
+      "genericVote": "ድምጽዎን በማስኬድ ላይ ስህተት አጋጥሟል። እባክህ እንደገና ሞክር።"
+    },
+    "labels": {
+      "accessModel": "የመዳረሻ ሞዴል",
+      "by": "በ{{name}}",
+      "byPrefix": "በ",
+      "campaign": "ዘመቻ",
+      "campaignId": "የዘመቻ መታወቂያ፡ {{id}}",
+      "characters": "{{count}}/{{max}} ቁምፊዎች",
+      "community": "ማህበረሰብ",
+      "contribution": "አስተዋጽዖ",
+      "platformAccess": "የመድረክ መዳረሻ",
+      "principal": "ርዕሰ መምህር",
+      "proposal": "ፕሮፖዛል",
+      "roleAccess": "የሚና መዳረሻ",
+      "scope": "ወሰን፡ {{scope}}",
+      "signedIn": "ገብቷል።",
+      "totalVotes": "ጠቅላላ ድምጾች",
+      "unknown": "ያልታወቀ",
+      "updates": "ዝማኔዎች",
+      "viewerOnly": "ተመልካች ብቻ"
+    },
+    "loading": {
+      "checkingAccess": "መዳረሻን በመፈተሽ ላይ",
+      "checkingRole": "ሚና በመፈተሽ ላይ",
+      "checkingStatus": "የማጠናቀቂያ ሁኔታን በመፈተሽ ላይ...",
+      "contributing": "በማበርከት ላይ...",
+      "creating": "በመፍጠር ላይ...",
+      "finalizing": "በማጠናቀቅ ላይ...",
+      "leaving": "በመውጣት ላይ...",
+      "loggingIn": "በመግባት ላይ...",
+      "posting": "በመለጠፍ ላይ...",
+      "saving": "በማስቀመጥ ላይ...",
+      "voting": "ድምጽ መስጠት..."
+    },
+    "roles": {
+      "communityAdmin": "የማህበረሰብ አስተዳዳሪ",
+      "member": "አባል",
+      "platformAdmin": "መድረክ አስተዳዳሪ",
+      "viewer": "ተመልካች"
+    },
+    "states": {
+      "campaign": {
+        "active": "ንቁ",
+        "expired": "ጊዜው አልፎበታል።",
+        "failed": "አልተሳካም።",
+        "successful": "ስኬታማ"
+      },
+      "proposal": {
+        "active": "ንቁ",
+        "failed": "አልተሳካም።",
+        "passed": "አለፈ",
+        "pendingFinalization": "ማጠናቀቅን በመጠባበቅ ላይ"
+      }
+    }
+  },
+  "communities": {
+    "body": "የማህበረሰቡ ሚናዎች ግልጽ ናቸው፣ ነገር ግን አሰሳ ለሁሉም የተረጋገጠ ሰው ክፍት ሆኖ ይቆያል፣ ስለዚህም ሀሳቦች፣ ዘመቻዎች እና የአካባቢ አውድ መታየት አለባቸው።",
+    "card": {
+      "accessLoading": "የእርስዎን የማህበረሰብ መዳረሻ እያጣራን ነው።",
+      "accessParticipant": "በዚህ ማህበረሰብ ውስጥ ሀሳቦችን እና ዘመቻዎችን ለመቅረጽ ማገዝ ይችላሉ።",
+      "accessViewer": "ሚና እስኪመደብ ድረስ የተመልካች መዳረሻ እዚህ አለህ።",
+      "assignedCount": "{{count}} ተመድቧል",
+      "kicker": "የማህበረሰብ ቦታ"
+    },
+    "create": {
+      "error": "ማህበረሰብ መፍጠር አልተሳካም። እባክህ ፈቃዶችህን ተመልከት እና እንደገና ሞክር።",
+      "nameLabel": "የማህበረሰብ ስም *",
+      "namePlaceholder": "የማህበረሰብ ስም አስገባ",
+      "panelBody": "የመጀመሪያው የማህበረሰብ አስተዳዳሪ ትሆናለህ እና በቀጥታ ወደ ማህበረሰቡ ትመደባለህ። የመሣሪያ ስርዓት አስተዳዳሪዎች አሁንም ማህበረሰቡን መቆጣጠር ይችላሉ፣ ነገር ግን የአካባቢ የአባልነት አስተዳደር እዚህ ይጀምራል።",
+      "panelTitle": "የማህበረሰብ መፍጠር",
+      "policyLabel": "የማህበረሰብ ፖሊሲ *",
+      "policyPlaceholder": "የማህበረሰቡን ዓላማ፣ የአስተዳደር ደንቦችን እና መመሪያዎችን ይግለጹ...",
+      "title": "አዲስ ማህበረሰብ ይፍጠሩ"
+    },
+    "emptyAdmin": "ሚናዎችን ለመመደብ፣ ሀሳቦችን ለመቅረጽ እና ዘመቻዎችን ለማስተባበር የመጀመሪያውን ማህበረሰብ ይፍጠሩ።",
+    "emptyViewer": "የመድረክ አስተዳዳሪ አባላት ከመመደባቸው በፊት የመጀመሪያውን ማህበረሰብ መፍጠር አለበት።",
+    "kicker": "ማህበረሰቦች",
+    "leave": {
+      "bulletBrowse": "ማህበረሰቡን እንደ የተረጋገጠ ተመልካች መመልከቱን እንዲቀጥሉ ይፍቀዱ",
+      "bulletPreserve": "ታሪካዊ ሃሳቦችህን እና ድምጾችህን አቆይ (እነሱ የሚታዩ ሆነው ይቆያሉ)",
+      "bulletProposal": "በዚህ ማህበረሰብ ውስጥ አዳዲስ ሀሳቦችን የመፍጠር ችሎታዎን ይሰርዙ",
+      "bulletRemove": "እርስዎን ከማህበረሰቡ አባል ዝርዝር ውስጥ ያስወግዱዎታል",
+      "bulletViewer": "በዚህ ማህበረሰብ ውስጥ ወደ ተነባቢ-ብቻ ተመልካች መዳረሻ ይመልስዎታል",
+      "bulletVote": "በዚህ ማህበረሰብ ውስጥ ባሉ ሀሳቦች ላይ ድምጽ የመስጠት ችሎታዎን ይሰርዙ",
+      "confirmHelp": "ይህ ማረጋገጫ በአጋጣሚ የማህበረሰብ ጉዞን ለመከላከል ይረዳል።",
+      "confirmLabel": "ለማረጋገጥ \"LEAVE\" ብለው ይተይቡ *",
+      "confirmPlaceholder": "ለማረጋገጥ LEAVE ብለው ይተይቡ",
+      "errorBody": "የዚህ ማህበረሰብ አባል መሆንዎን እና ለመልቀቅ ትክክለኛ ፈቃዶች እንዳለዎት ያረጋግጡ።",
+      "errorTitle": "ከማህበረሰቡ መውጣት አልተሳካም። እባክህ ፈቃዶችህን ተመልከት እና እንደገና ሞክር።",
+      "leaving": "በመውጣት ላይ...",
+      "successBody": "ከማህበረሰቡ አባል ዝርዝር ውስጥ ተወግደዋል እና አሁን እንደ ተነባቢ-ብቻ ተመልካች ሊያዩት ይችላሉ። የእርስዎ ታሪካዊ አስተዋጽዖ እንደተጠበቀ ይቆያል።",
+      "successTitle": "በተሳካ ሁኔታ ማህበረሰቡን ለቀው ወጡ!",
+      "title": "ማህበረሰቡን ይልቀቁ",
+      "warningIntro": "«{{communityName}}»ን ሊለቁ ነው። ይህ እርምጃ የሚከተሉትን ያደርጋል:",
+      "warningOutro": "እንደገና መሳተፍ ከፈለጉ እንደ አባልነት እንደገና ለመቀላቀል የአስተዳዳሪ እገዛ ያስፈልግዎታል።",
+      "warningTitle": "የማህበረሰብ መነሳት ያረጋግጡ"
+    },
+    "membership": {
+      "body": "ለዚህ ማህበረሰብ በሚና ላይ የተመሰረተ የአባልነት ስራዎች።",
+      "communityAdmins": "የማህበረሰብ አስተዳዳሪዎች",
+      "emptyCommunityAdmins": "ምንም የማህበረሰብ አስተዳዳሪዎች አልተመደቡም።",
+      "emptyMembers": "ለዚህ ማህበረሰብ ምንም አባላት አልተመደቡም።",
+      "kicker": "አርአያነት",
+      "loadError": "የማህበረሰብ አባልነት መረጃን መጫን አልተቻለም።",
+      "members": "አባላት",
+      "title": "የማህበረሰብ አባልነት",
+      "unnamedMember": "ያልተሰየመ አባል",
+      "viewerAccessBody": "ተመልካቾች ስውር ናቸው እና እዚህ አልተዘረዘሩም። ይህ የስም ዝርዝር የሚያሳየው የማህበረሰብ ሚና ያላቸውን ርእሰ መምህራን ብቻ ነው፡ የማህበረሰብ አስተዳዳሪዎች እና አባላት።",
+      "viewerAccessTitle": "የተመልካች መዳረሻ ስውር ሆኖ ይቆያል"
+    },
+    "portal": {
+      "accessBanners": {
+        "communityAdminBody": "በዚህ ቦታ ውስጥ በአስተዳደር ውስጥ መሳተፍ እና የማህበረሰብ ሚና ስራዎችን ማስተዳደር ይችላሉ።",
+        "communityAdminTitle": "የማህበረሰብ አስተዳደር",
+        "memberBody": "ሀሳቦችን መፍጠር፣ ድምጽ መስጠት፣ ለዘመቻዎች አስተዋጽዖ ማድረግ እና አስፈላጊ ከሆነ ከዚህ ማህበረሰብ መመለስ ይችላሉ።",
+        "memberTitle": "የማህበረሰብ ተሳትፎ",
+        "platformAdminBody": "የመድረክ አስተዳደር ሚናን ስለያዙ እዚህ መሳተፍ እና የማህበረሰብ አባልነትን ማስተዳደር ይችላሉ።",
+        "platformAdminTitle": "መድረክ-ሰፊ መጋቢነት",
+        "viewerBody": "የማህበረሰቡን አውድ፣ ፕሮፖዛል እና ዘመቻ ማንበብ ትችላለህ። ሚና ከተመደበ በኋላ ተሳትፎ ይከፈታል።",
+        "viewerTitle": "የተመልካች መዳረሻ"
+      },
+      "assignedParticipants": "የተመደቡ ተሳታፊዎች",
+      "backToCommunities": "ወደ ማህበረሰቦች ተመለስ",
+      "campaignsBodyEnabled": "ዘመቻዎችን ይደግፉ ወይም ለዚህ ማህበረሰብ አዲስ ያስጀምሩ።",
+      "campaignsBodyViewer": "የዘመቻውን ሂደት እዚህ ይከተሉ። የማህበረሰብ ሚና ከተመደበ በኋላ መዋጮ ይከፈታል።",
+      "campaignsKicker": "ዘመቻዎች",
+      "campaignsTitle": "አካባቢያዊ እርምጃን ፈንድ",
+      "capabilities": "ችሎታዎችዎ",
+      "capabilitiesEnabled": "ሀሳቦችን ይፍጠሩ፣ ድምጽ ይስጡ እና የማህበረሰብ እርምጃን ለመቅረጽ ያግዙ።",
+      "capabilitiesViewer": "በተመልካች ሁነታ ላይ በሚቆዩበት ጊዜ ሙሉውን የማህበረሰብ አውድ ያንብቡ።",
+      "createCampaignLockedTitle": "ዘመቻዎችን መፍጠር የሚችሉት የተመደቡ የማህበረሰብ አባላት እና አስተዳዳሪዎች ብቻ ናቸው።",
+      "createProposalLockedTitle": "የተመደቡ የማህበረሰብ አባላት እና አስተዳዳሪዎች ብቻ ሀሳቦችን መፍጠር ይችላሉ።",
+      "emptyCampaignsAdmin": "ቅጽበት የጋራ ድጋፍ በሚፈልግበት ጊዜ ለዚህ ማህበረሰብ የመጀመሪያውን የገንዘብ ማሰባሰብ ዘመቻ ይጀምሩ።",
+      "emptyCampaignsViewer": "ለዚህ ማህበረሰብ እስካሁን ምንም ዘመቻዎች አልተፈጠሩም።",
+      "emptyProposalsAdmin": "ወደዚህ የማህበረሰብ ቦታ ፕሮፖዛል ለማምጣት የመጀመሪያው ይሁኑ።",
+      "emptyProposalsViewer": "ለዚህ ማህበረሰብ እስካሁን ምንም ሀሳቦች አልተፈጠሩም።",
+      "kicker": "የማህበረሰብ መግቢያ",
+      "loadErrorBody": "የተጠየቀው ማህበረሰብ ጠፍቷል ወይም አሁን ሊጫን አልቻለም።",
+      "loadErrorTitle": "ይህን ማህበረሰብ መጫን አልቻልንም።",
+      "platformAccessTitle": "የመድረክ መዳረሻ",
+      "proposalsBodyEnabled": "ይህ ማህበረሰብ በቀጣይ ሊወስድ በሚችልበት አቅጣጫ ላይ ሀሳብ ይፍጠሩ ወይም ድምጽ ይስጡ።",
+      "proposalsBodyViewer": "Read the current proposal slate and watch decision-making stay visible.",
+      "proposalsKicker": "ፕሮፖዛል",
+      "proposalsTitle": "የማህበረሰብ ውሳኔዎችን ይቅረጹ",
+      "roleAccessTitle": "የሚና መዳረሻ"
+    },
+    "setupKicker": "የማህበረሰብ ማዋቀር",
+    "title": "እያንዳንዱን ማህበረሰብ ያንብቡ። እርስዎ እንዲሰሩ የታመኑበት ቦታ ይሳተፉ።"
+  },
+  "i18n": {
+    "language": {
+      "helper": "በዚህ መሣሪያ ላይ Amnesty DAO የሚጠቀመውን ቋንቋ ይምረጡ።",
+      "label": "ቋንቋ",
+      "machineTranslationNote": "ገምጋሚዎች በፍጥነት እንዲጀምሩ የማሽን ትርጉም ረቂቆች ተዘጋጅተዋል። ከማተምዎ በፊት ለማህበረሰብ የሚታዩ ጽሑፎችን ይገምግሙ።"
+    }
+  },
+  "mainTabs": {
+    "body": "ማህበረሰቦችን እንደ ተመልካች ያንብቡ፣ የትም ቦታ ይዘው ወደ ውሳኔ ሰጪነት ይግቡ፣ እና የመድረክ ተሳትፎ በሰዎች ሃይል ላይ የተመሰረተ እንዲሆን ያድርጉ።",
+    "claimAction": "የይገባኛል መድረክ አስተዳዳሪ",
+    "kicker": "አምነስቲ ማህበረሰብ",
+    "platformRoles": "የመድረክ ሚናዎች",
+    "platformRolesBody": "የመሣሪያ ስርዓት አስተዳዳሪዎች የመሣሪያ ስርዓት-ሰፊ መዳረሻን ያስተዳድራሉ እና በሁሉም ማህበረሰብ ውስጥ አባልነትን መደገፍ ይችላሉ።",
+    "roleModelBody": "የመድረክ-ሰፊ መዳረሻ የማህበረሰብ ሚናዎችን ለሚመሩ ሰዎች የተጠበቀ ነው። ተሳትፎው ራሱ ማህበረሰቡን ያማከለ ነው፣ ስለዚህ አባላት በአካባቢያዊ አደረጃጀት እና ውሳኔ አሰጣጥ ላይ ማተኮር ይችላሉ።",
+    "roleModelKicker": "አርአያነት",
+    "setupBody": "እስካሁን ምንም መድረክ አስተዳዳሪ የለም። ማህበረሰቦች እና የአባላት ምደባዎች መተዳደር ከመቻላቸው በፊት የመጀመሪያውን ሚና በግልፅ ይጠይቁ።",
+    "setupKicker": "መድረክ ማዋቀር",
+    "setupTitle": "የመጀመሪያውን የመድረክ አስተዳዳሪ ይገባኛል ይበሉ",
+    "tabs": {
+      "dashboard": "ዳሽቦርድ",
+      "platformAdmin": "መድረክ አስተዳዳሪ"
+    },
+    "title": "አንድ ላይ እርምጃ ይውሰዱ",
+    "yourAccess": "የእርስዎ መዳረሻ",
+    "yourAccessBody": "ተመልካቾች በመድረኩ ላይ ማንበብ ይችላሉ። የማህበረሰብ ሚናዎች ሀሳቦችን፣ ድምጽ መስጠትን፣ ገንዘብ ማሰባሰብን እና የአባልነት መጋቢነትን ይከፍታሉ።"
+  },
+  "profile": {
+    "body": "የውሳኔ ሃሳቦች፣ ዘመቻዎች እና ውሳኔዎች በመድረክ ላይ ሲገለጹ ሌሎች ተሟጋቾች ሊያዩት የሚገባውን ስም ያክሉ።",
+    "kicker": "አምነስቲ ማህበረሰብ",
+    "nameLabel": "ስምህ",
+    "namePlaceholder": "ማህበረሰቡ እንዴት ሊያውቅዎት ይገባል?",
+    "page": {
+      "body": "ሰዎች የሚያዩትን ስም ከእርስዎ ሃሳቦች፣ ዘመቻዎች፣ የስራ ቦታ አርትዖቶች እና የማህበረሰብ ተሳትፎ ጎን ያቆዩት።",
+      "identityKicker": "የበይነመረብ መታወቂያ ዋና",
+      "kicker": "መገለጫ",
+      "title": "የእርስዎን የማህበረሰብ ማንነት ያስተዳድሩ"
+    },
+    "saveError": "እስካሁን መገለጫህን ማስቀመጥ አልቻልንም።",
+    "title": "እንኳን ወደ እንቅስቃሴው በደህና መጡ"
+  },
+  "proposals": {
+    "card": {
+      "alreadyVotedBody": "ስርዓቱ በአንድ ሰው አንድ ድምጽ በአንድ ሀሳብ ያስፈጽማል። ድምጽህ ተመዝግቦ ተቆጥሯል።",
+      "alreadyVotedCreator": "የፕሮፖዛል ፈጣሪ እንደመሆንዎ መጠን በራስዎ ሀሳብ ላይ ድምጽ መስጠት ችለዋል።",
+      "alreadyVotedTitle": "በዚህ ሃሳብ ላይ አስቀድመው ድምጽ ሰጥተዋል",
+      "creatorUnknown": "ያልታወቀ አባል",
+      "daysCount": "{{count}} ቀናት",
+      "finalizeErrorTitle": "ፕሮፖዛሉን ማጠናቀቅ አልተሳካም።",
+      "finalizeSuccessBody": "ፕሮፖዛሉ ተጠናቅቋል እና የመጨረሻ ደረጃው በድምጽ አሰጣጥ ውጤቱ ላይ ተወስኗል.",
+      "finalizeSuccessTitle": "ፕሮፖዛል በተሳካ ሁኔታ ተጠናቋል!",
+      "governanceSettings": "የአስተዳደር ቅንጅቶች",
+      "lessThanMinute": "ከ 1 ሜትር ያነሰ ይቀራል",
+      "no": "ቁጥር፡ {{count}} ({{percentage}}%)",
+      "passThreshold": "ገደብ ማለፍ",
+      "passThresholdValue": "{{count}}% አዎ ድምጾች",
+      "quorum": "ምልአተ ጉባኤ",
+      "timeDaysHours": "{{days}}d {{hours}}ሰ ይቀራል",
+      "timeHoursMinutes": "{{hours}}ሰ {{minutes}}ደቂቃ ይቀራል",
+      "timeMinutes": "{{minutes}}ሜ ይቀራል",
+      "timeRemaining": "የቀረው ጊዜ፡ {{value}}",
+      "totalVotesRequired": "ጠቅላላ ድምጾች፡{{total}}/ {{required}} ያስፈልጋል",
+      "viewerAccess": "የተመልካች መዳረሻ",
+      "voteButtonTitles": {
+        "alreadyVoted": "በዚህ ሃሳብ ላይ አስቀድመው ድምጽ ሰጥተዋል",
+        "no": "በዚህ ሀሳብ ላይ አይ ድምጽ ይስጡ",
+        "viewer": "የተመደቡ የማህበረሰብ አባላት እና አስተዳዳሪዎች ብቻ መምረጥ ይችላሉ።",
+        "votingClosed": "የድምጽ መስጫ መስኮቱ ተዘግቷል።",
+        "votingNotStarted": "ድምጽ መስጠት ገና አልተጀመረም።",
+        "yes": "በዚህ ሀሳብ ላይ አዎ ድምጽ ይስጡ"
+      },
+      "voteErrorTitle": "ድምጽ መስጠት አልተሳካም። እባክህ እንደገና ሞክር።",
+      "voteNo": "አይምረጡ",
+      "voteSuccessBody": "ድምጽህ ተመዝግቧል። ስርዓቱ በአንድ ሰው አንድ ድምጽ በአንድ ሀሳብ ያረጋግጣል።",
+      "voteSuccessCreator": "የፕሮፖዛል ፈጣሪ እንደመሆንዎ መጠን በራስዎ ሀሳብ ላይ በተሳካ ሁኔታ ድምጽ ሰጥተዋል።",
+      "voteSuccessTitle": "ድምጽ በተሳካ ሁኔታ ተሰጥቷል!",
+      "voteYes": "አዎ ድምጽ ይስጡ",
+      "votedBadge": "ድምጽ ሰጥተዋል",
+      "votesMinimum": "{{count}} ዝቅተኛ ድምጽ",
+      "votingClosed": "ድምጽ መስጠት ተዘግቷል።",
+      "votingNotStarted": "ድምጽ መስጠት አልተጀመረም።",
+      "votingResults": "የድምጽ አሰጣጥ ውጤቶች",
+      "votingWindow": "የድምጽ መስጫ መስኮት",
+      "yes": "አዎ፡ {{count}} ({{percentage}}%)",
+      "yourProposal": "ያንተ ሀሳብ"
+    },
+    "create": {
+      "customizeGovernance": "የአስተዳደር ቅንብሮችን አብጅ",
+      "defaultPassThreshold": "50% ድምጽ አዎ መሆን አለበት።",
+      "defaultQuorum": "ቢያንስ 1 ድምጽ",
+      "defaultSettings": "ነባሪ ቅንብሮች",
+      "defaultVotingWindow": "3 ቀናት",
+      "descriptionLabel": "የውሳኔ ሃሳብ መግለጫ *",
+      "descriptionPlaceholder": "ሃሳብህን በዝርዝር ግለጽ። ምን እያቀረብክ ነው? ለምንድነው ማህበረሰቡ መደገፍ ያለበት?",
+      "error": "ፕሮፖዛል መፍጠር አልተሳካም። እባክህ ፈቃዶችህን ተመልከት እና እንደገና ሞክር።",
+      "minimumVotesHelp": "ፕሮፖዛሉ ትክክለኛ እንዲሆን ቢያንስ ጠቅላላ ድምጾች ያስፈልጋሉ።",
+      "minimumVotesLabel": "ዝቅተኛ ድምጾች (ኮረም)",
+      "passThreshold": "ገደብ ማለፍ",
+      "passThresholdHelp": "ለማለፍ የሚያስፈልገው አዎ ድምጽ መቶኛ (1-100%)",
+      "passThresholdLabel": "ማለፊያ ገደብ (%)",
+      "quorum": "ምልአተ ጉባኤ",
+      "submissionBody": "አንዴ ከገባ በኋላ፣ የማህበረሰብ አባላት በድምጽ መስጫ መስኮቱ ወቅት ባቀረቡት ሀሳብ ላይ አዎ ወይም አይ ድምጽ መስጠት ይችላሉ። የድምጽ መስጫ ጊዜው ካለቀ በኋላ ማንኛውም አባል ያለፈውን ወይም ያልተሳካለትን ለመወሰን ሃሳቡን ማጠናቀቅ ይችላል።",
+      "submissionTitle": "የፕሮፖዛል አቀራረብ",
+      "title": "አዲስ ፕሮፖዛል ፍጠር",
+      "titleLabel": "የውሳኔ ሃሳብ *",
+      "titlePlaceholder": "የፕሮፖዛል ርዕስ አስገባ",
+      "votingWindow": "የድምጽ መስጫ መስኮት",
+      "votingWindowDaysLabel": "የምርጫ መስኮት (ቀናት)",
+      "votingWindowHelp": "አባላት ለምን ያህል ጊዜ መምረጥ እንደሚችሉ (1-30 ቀናት)"
+    }
+  },
+  "workspace": {
+    "actions": {
+      "archive": "ማህደር",
+      "compact": "የታመቀ ቅጽበታዊ ገጽ እይታ",
+      "copyLink": "አገናኝ ቅዳ",
+      "debugExport": "JSON አውርድ",
+      "grant": "መዳረሻ ይስጡ",
+      "importMarkdown": "Markdown አስመጣ",
+      "markdownExport": "Markdown አውርድ",
+      "menu": "ድርጊቶች",
+      "pin": "የፒን ነባሪ",
+      "redo": "ድገም",
+      "sync": "አመሳስል",
+      "undo": "ቀልብስ",
+      "unpin": "ነባሪውን ንቀል",
+      "updateShare": "ማጋራትን አዘምን"
+    },
+    "blockMenu": {
+      "autoListNumbering": "ራስ-ሰር ቁጥር መስጠት",
+      "continuePreviousList": "የቀደመውን ዝርዝር ቀጥል",
+      "copyBlockLink": "የማገጃ አገናኝ ቅዳ",
+      "disableHyperlink": "hyperlink አሰናክል",
+      "duplicate": "ማባዛት።",
+      "enableHyperlink": "hyperlink አንቃ",
+      "formatBlock": "የቅርጸት እገዳ",
+      "insertAbove": "ከላይ አስገባ",
+      "insertBelow": "ከታች አስገባ",
+      "listNumbering": "ዝርዝር ቁጥር መስጠት",
+      "moveDown": "ወደ ታች ውሰድ",
+      "moveUp": "ወደ ላይ ተንቀሳቀስ",
+      "restartAtOne": "1 ላይ እንደገና ያስጀምሩ",
+      "turnInto": "ወደ ቀይር"
+    },
+    "blockRenderer": {
+      "addCaption": "መግለጫ ጽሑፍ ያክሉ",
+      "blockAria": "አግድ {{index}}: {{label}}",
+      "blockControls": "አግድ መቆጣጠሪያዎች",
+      "blockMenu": "ሜኑ አግድ",
+      "collapseToggle": "መቀያየር ሰብስብ",
+      "dividerBlock": "አከፋፋይ እገዳ",
+      "dragBlock": "እገዳን ይጎትቱ",
+      "dragToReorder": "እንደገና ለመደርደር ይጎትቱ",
+      "expandToggle": "መቀያየርን ዘርጋ",
+      "fileLabel": "የፋይል መለያ",
+      "fileUrl": "ፋይል URL",
+      "imageCaption": "የምስል መግለጫ",
+      "imageUrl": "የምስል URL",
+      "markChecked": "ምልክት የተደረገበት",
+      "markUnchecked": "ምልክት እንዳልተደረገበት ምልክት ያድርጉ",
+      "pasteFileUrl": "እሱን ለማገናኘት የፋይል URL ለጥፍ።",
+      "pasteImageUrl": "እሱን ለመክተት የምስል URL ለጥፍ።",
+      "typeForCommands": "ለትእዛዞች '/' ብለው ይተይቡ",
+      "workspaceImage": "የስራ ቦታ ምስል"
+    },
+    "body": "የስራ ማስታወሻዎችን፣ ተግባራዊ የተግባር ሰሌዳዎችን እና የማህበረሰብ ዝግጅቶችን ለዚህ ማህበረሰብ ብቻ ያቆዩ።",
+    "commands": {
+      "aria": "Slash ትዕዛዞች",
+      "groups": {
+        "Lists": "ዝርዝሮች",
+        "Media": "ሚዲያ",
+        "Structure": "መዋቅር",
+        "Text": "ጽሑፍ"
+      },
+      "items": {
+        "bullet": {
+          "hint": "ቀላል ዝርዝር ንጥል",
+          "label": "የጥይት ዝርዝር"
+        },
+        "callout": {
+          "hint": "የብርሃን ማስታወሻ ሣጥን",
+          "label": "ጥሪ"
+        },
+        "checklist": {
+          "hint": "አንድ ተግባር ይከታተሉ",
+          "label": "የማረጋገጫ ዝርዝር"
+        },
+        "divider": {
+          "hint": "አግድም ደንብ",
+          "label": "አከፋፋይ"
+        },
+        "fileLink": {
+          "hint": "ውጫዊ ፋይል URL",
+          "label": "የፋይል አገናኝ"
+        },
+        "heading1": {
+          "hint": "ትልቅ ክፍል ርዕስ",
+          "label": "ርዕስ 1"
+        },
+        "heading2": {
+          "hint": "መካከለኛ ክፍል ርዕስ",
+          "label": "ርዕስ 2"
+        },
+        "heading3": {
+          "hint": "ትንሽ ክፍል ርዕስ",
+          "label": "ርዕስ 3"
+        },
+        "image": {
+          "hint": "ውጫዊ ምስል URL",
+          "label": "ምስል"
+        },
+        "numbered": {
+          "hint": "የታዘዘ ዝርዝር ንጥል",
+          "label": "ቁጥር ያለው ዝርዝር"
+        },
+        "paragraph": {
+          "hint": "ግልጽ አንቀጽ",
+          "label": "ጽሑፍ"
+        },
+        "quote": {
+          "hint": "የተገባ ጥቅስ",
+          "label": "ጥቅስ"
+        },
+        "toggle": {
+          "hint": "ሊሰበሰብ የሚችል ክፍል",
+          "label": "ቀያይር"
+        }
+      },
+      "noMatches": "ምንም ተዛማጅ ትዕዛዞች የሉም",
+      "placeholder": "ትእዛዝ ይተይቡ"
+    },
+    "comments": {
+      "add": "አስተያየት",
+      "compose": "አስተያየት ጨምር",
+      "documentComments": "የሰነድ አስተያየቶች",
+      "empty": "እስካሁን ምንም ክፍት አስተያየቶች የሉም።",
+      "openCount": "{{count}} ክፍት ነው።",
+      "openTitle": "አስተያየቶችን ይክፈቱ",
+      "placeholder": "አስተያየት ጻፍ። Cmd/Ctrl+Enter ያስገባል።",
+      "resolve": "መፍታት",
+      "submit": "አስተያየት አስገባ"
+    },
+    "documents": {
+      "bodyPlaceholder": "ማስታወሻዎችን፣ ዕቅዶችን፣ አገናኞችን ወይም የስብሰባ ውጤቶችን ይጻፉ...",
+      "empty": "ምንም የስራ ቦታ ሰነዶች እስካሁን ለእርስዎ አይታዩም።",
+      "emptyBody": "በዚህ ማህበረሰብ ውስጥ መጻፍ ለመጀመር ሰነድ ይፍጠሩ ወይም ይምረጡ።",
+      "emptyBodyTitle": "ሰነድ ይምረጡ ወይም ይፍጠሩ",
+      "emptyMine": "እስካሁን ምንም ሰነዶች የሉም።",
+      "emptyShared": "እስካሁን ምንም ሰነዶች አልተጋሩም።",
+      "emptyTitle": "ምንም ሰነድ አልተመረጠም።",
+      "emptyWorkspace": "እስካሁን ምንም የስራ ቦታ ሰነዶች የሉም።",
+      "newPlaceholder": "አዲስ የሰነድ ርዕስ",
+      "sidebarTitle": "የማህበረሰብ ሰነዶች"
+    },
+    "editor": {
+      "addFirstBlock": "የመጀመሪያውን እገዳ ጨምር",
+      "documentTitle": "የሰነድ ርዕስ",
+      "tailEditable": "ለትእዛዞች '/' ብለው ይተይቡ ወይም ለአዲስ ብሎክ አስገባን ይጫኑ",
+      "tailReadonly": "የተመልካች መዳረሻ ለዚህ ሰነድ ተነባቢ-ብቻ ነው።"
+    },
+    "grants": {
+      "selectMember": "የማህበረሰብ አባል ይምረጡ",
+      "title": "የተወሰነ አባል መዳረሻ"
+    },
+    "kicker": "የማህበረሰብ የስራ ቦታ",
+    "library": {
+      "mine": "የእኔ ሰነዶች",
+      "shared": "ከእኔ ጋር ተጋርቷል።",
+      "workspace": "የስራ ቦታ ሰነዶች"
+    },
+    "nesting": {
+      "dragHint": "ሰነዶችን ወደ ጎጆው ይጎትቱ፣ እንደገና ለመደርደር ወይም ወደ ከፍተኛ ደረጃ ያንቀሳቅሷቸው።",
+      "title": "የሰነድ መክተቻ",
+      "topLevel": "ከፍተኛ ደረጃ"
+    },
+    "pageBody": "ሰነዶችን ያስተዳድሩ፣ ከማህበረሰብዎ ጋር ይተባበሩ እና ሃሳቦችን ወደ ተፅእኖ ይለውጡ።",
+    "pageTitle": "እርምጃን በጋራ ይገንቡ እና ያስተባብሩ።",
+    "roles": {
+      "editor": "አርታዒ",
+      "owner": "ባለቤት",
+      "viewer": "ተመልካች"
+    },
+    "search": {
+      "empty": "ምንም የገጽ ይዘት አይዛመድም።",
+      "loading": "ሰነዶችን በመፈለግ ላይ...",
+      "matches": "{{count}} ተዛማጅ",
+      "matches_plural": "{{count}} ተዛማጅ",
+      "placeholder": "የገጽ ይዘት ይፈልጉ"
+    },
+    "selection": {
+      "bold": "ደፋር",
+      "boldSelected": "ደማቅ የተመረጠ ጽሑፍ",
+      "clear": "ምርጫን አጽዳ",
+      "colorHighlight": "{{color}} ድምቀት",
+      "colors": {
+        "blue": "ሰማያዊ",
+        "green": "አረንጓዴ",
+        "pink": "ሮዝ",
+        "purple": "ሐምራዊ",
+        "yellow": "ቢጫ"
+      },
+      "commentSelected": "በተመረጠው ጽሑፍ ላይ አስተያየት ይስጡ",
+      "copied": "የተመረጡ ብሎኮች እንደ Markdown ተቀድተዋል።",
+      "copyFallback": "የቅንጥብ ሰሌዳ መዳረሻ አልተሳካም። ከታች ያለውን ማርክ ዳውን ይቅዱ።",
+      "copyMarkdown": "እንደ Markdown ቅዳ",
+      "decreaseIndent": "ገብ ቀንስ",
+      "done": "ተከናውኗል",
+      "formatBlockAs": "ማገድን እንደ {{label}} ቅረጽ",
+      "formatSelected": "የተመረጠውን ጽሑፍ ይቅረጹ",
+      "highlight": "አድምቅ",
+      "highlightColors": "ቀለሞችን አድምቅ",
+      "highlightSelected": "የተመረጠውን ጽሑፍ አድምቅ",
+      "increaseIndent": "ገብን ጨምር",
+      "indent": "ገብ",
+      "italic": "ኢታሊክ",
+      "italicSelected": "ሰያፍ የተመረጠ ጽሑፍ",
+      "outdent": "የወጣ",
+      "selectBlocks": "ብሎኮችን ይምረጡ",
+      "selected": "{{count}} ተመርጧል",
+      "selectedBlockActions": "የተመረጡ የማገጃ እርምጃዎች"
+    },
+    "share": {
+      "communityEditor": "እንደ አርታኢ ከማህበረሰብ ጋር ተጋርቷል።",
+      "communityViewer": "እንደ ተመልካች ከማህበረሰብ ጋር ተጋርቷል።",
+      "private": "የግል",
+      "title": "የማህበረሰብ መጋራት"
+    },
+    "syncStatus": {
+      "compactError": "የታመቀ ስህተት",
+      "compacted": "የታመቀ",
+      "compacting": "መጨናነቅ",
+      "loaded": "ተጭኗል",
+      "persisted": "ጸንቷል።",
+      "saveError": "ስህተት አስቀምጥ",
+      "saving": "በማስቀመጥ ላይ",
+      "titleSaved": "ርዕስ ተቀምጧል",
+      "unsavedChanges": "ያልተቀመጡ ለውጦች"
+    },
+    "tabs": {
+      "boards": "ሰሌዳዎች",
+      "calendar": "የቀን መቁጠሪያ",
+      "documents": "ሰነዶች"
+    },
+    "title": "የአካባቢያዊ እርምጃን ያቅዱ፣ ይመዝግቡ እና ያስተባብሩ",
+    "viewerLockedBody": "ሰነዶች፣ ሰሌዳዎች እና ዝግጅቶች የግል ወይም በአባላት የተጋሩ ነገሮችን ሊያካትቱ ስለሚችሉ ለተመደቡ የማህበረሰብ አባላት እና አስተዳዳሪዎች ብቻ ይገኛሉ።",
+    "viewerLockedTitle": "የWorkspace መዳረሻ የአባል-ብቻ ነው።"
+  }
+}

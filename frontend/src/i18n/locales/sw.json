@@ -1,0 +1,960 @@
+{
+  "admin": {
+    "assignmentEffectTitle": "Hii inafanya nini",
+    "assignmentEffects": {
+      "communityAdmin": "Weka mapendeleo ya wasimamizi wa jumuiya kwa jumuiya uliyochagua.",
+      "member": "Agiza ushiriki wa wanachama kwa jumuiya iliyochaguliwa.",
+      "platformAdmin": "Toa haki za msimamizi wa jukwaa zima. Mtu huyu ataweza kuunda jumuiya na kudhibiti uanachama kwenye jukwaa.",
+      "removePlatformAdmin": "Ondoa haki za msimamizi wa jukwaa zima huku ukiacha kazi zinazosimamiwa na jumuiya bila kuguswa.",
+      "viewer": "Ondoa jukumu lolote la jumuiya uliyokabidhiwa. Mtu huyo bado ataweza kusoma jumuiya kama mtazamaji aliyeidhinishwa."
+    },
+    "assignmentKicker": "Mgawo",
+    "assignmentLabel": "Mgawo",
+    "assignmentTitle": "Sasisha ufikiaji wa upeo huu",
+    "chooseScopeTitle": "Chagua wigo wa kufanya kazi",
+    "currentInScope": "Sasa katika upeo: {{assignment}}",
+    "errors": {
+      "lookup": "Imeshindwa kutafuta wasifu wa mtumiaji:",
+      "save": "Imeshindwa kuhifadhi jukumu la kazi:"
+    },
+    "focusBody": "Wasimamizi wa jukwaa wanaweza kudhibiti jumuiya yoyote. Majukumu ya jumuiya hukaa karibu na nafasi iliyochaguliwa ya jumuiya.",
+    "focusKicker": "Mtazamo wa sasa",
+    "heroBody": "Kagua ni nani anayeshikilia ufikiaji wa jukwaa zima, kagua orodha za karibu nawe, na uwahamisha watu kati ya majukumu ya watazamaji, wanachama na wasimamizi wa jumuiya bila kuacha nafasi hii.",
+    "heroKicker": "Uwakili wa jukwaa",
+    "heroTitle": "Wape wasimamizi wa majukwaa na majukumu ya jumuiya kutoka sehemu moja.",
+    "noPlatformAdmins": "Hakuna wasimamizi wa jukwaa waliokabidhiwa kwa sasa.",
+    "platformAdminsCount": "Wasimamizi wa jukwaa",
+    "principalHelp": "Weka mkuu halali ili kudhibiti mtumiaji ambaye bado haonekani kwenye orodha ya wasifu uliohifadhiwa.",
+    "principalLabel": "Kitambulisho kikuu cha mtumiaji",
+    "principalPlaceholder": "Weka kitambulisho kikuu",
+    "roles": {
+      "viewerOnly": "Mtazamaji pekee"
+    },
+    "rosterKicker": "Orodha ya jamii",
+    "rosterNobody": "Bado hakuna mtu aliyekabidhiwa jukumu katika jumuiya hii.",
+    "rosterPrompt": "Chagua upeo wa jumuiya ili kukagua majukumu yake ya sasa. Ufikiaji wa watazamaji unasalia kuwa wazi na haujaorodheshwa kamwe katika orodha.",
+    "rosterShowing": "Inaonyesha {{visible}} kati ya {{total}} watu waliowekwa kwenye jumuiya hii.",
+    "scopeLabel": "Upeo wa kufanya kazi",
+    "selectedScopeFallback": "Jumuiya",
+    "selectedUserKicker": "Mtumiaji aliyechaguliwa",
+    "stewardsKicker": "Wasimamizi wa jukwaa",
+    "stewardsTitle": "Wasimamizi wa sasa",
+    "userSelectionKicker": "Uchaguzi wa mtumiaji",
+    "userSelectionTitle": "Chagua nani wa kusasisha",
+    "whatChangesCommunity": "Mabadiliko ya jukumu la jumuiya huathiri tu jumuiya iliyochaguliwa. Ufikiaji wa msimamizi wa jukwaa, ikiwa wapo, haujabadilika.",
+    "whatChangesKicker": "Nini kinabadilika hapa",
+    "whatChangesPlatform": "Mabadiliko ya msimamizi wa jukwaa huathiri usimamizi wa jukwaa pekee. Majukumu yoyote mahususi ya jumuiya yanasalia kuwa sawa.",
+    "workingScope": "Upeo wa kufanya kazi"
+  },
+  "app": {
+    "footer": {
+      "actionBody": "Kusaidia kampeni, fadhili kazi ya dharura pamoja, na kuweka hatua za jumuiya katika msingi wa uwajibikaji.",
+      "actionTitle": "Kitendo",
+      "communityBody": "Vinjari nafasi za jumuiya, soma kaupapa nyuma ya kila kikundi, na uone ni wapi unaweza kushiriki.",
+      "communityTitle": "Jumuiya",
+      "governanceBody": "Mapendekezo ya mijadala yenye madirisha ya kupigia kura yanayoonekana, mipangilio ya akidi, na maamuzi yanayohusishwa waziwazi.",
+      "governanceTitle": "Utawala",
+      "intro": "Usemi wa ndani wa Jumuiya ya Amnesty, iliyoundwa kwa ajili ya mapendekezo, kampeni, na nguvu ya watu kote Aotearoa."
+    },
+    "landing": {
+      "accessBody": "Watazamaji wanaweza kuchunguza kila jumuiya. Wanachama waliokabidhiwa na wasimamizi wa jumuiya wanaweza kupendekeza, kupiga kura na kuchangia pamoja.",
+      "actionBody": "Tovuti ya Amnesty ya moja kwa moja inasawazisha uharaka na uwazi. Programu hii sasa inafuata mdundo huo: nafasi zaidi ya uhariri, wito wazi zaidi wa kuchukua hatua, na hisia kidogo ya dashibodi iliyo kwenye sanduku.",
+      "actionKicker": "Chukua hatua pamoja",
+      "actionTitle": "Jenga kasi ya ndani katika jumuiya, mapendekezo, na kampeni.",
+      "artBody": "Unda maamuzi ya pamoja, saidia kampeni za dharura, na uweke hatua za jumuiya katika msingi wa uwajibikaji.",
+      "artKicker": "Nguvu ya watu",
+      "artTitle": "Ikiwa unajali vya kutosha kuhoji, unajali vya kutosha kuchukua hatua.",
+      "cards": {
+        "campaignsBody": "Saidia kazi ya haraka pamoja na malengo ya pamoja, maendeleo yanayoonekana, na maamuzi ya uchangishaji fedha yanayoongozwa na jumuiya.",
+        "campaignsTitle": "Fanya mazoezi ya ukarimu",
+        "communitiesBody": "Panga nafasi za jumuiya, alika ushiriki kwa makusudi, na uweke kazi ya haki za binadamu katika mamlaka ya watu.",
+        "communitiesTitle": "Jenga kasi ya ndani",
+        "proposalsBody": "Hamisha mawazo kutoka kwa majadiliano hadi uamuzi kwa kutumia madirisha wazi, matokeo yanayoonekana ya upigaji kura, na uwajibikaji wa jumuiya.",
+        "proposalsTitle": "Tumia sauti ya jumuiya"
+      },
+      "heroBody": "Kuleta jumuiya za Amnesty pamoja ili kuandaa matukio ya ndani, mapendekezo ya mjadala, na kufadhili hatua za dharura na uwajibikaji unaoonekana.",
+      "heroKicker": "Harakati za haki za binadamu huko Aotearoa",
+      "heroTitle": "Nguvu ya watu kwa utawala wa jamii",
+      "joinBody": "Jumuiya huunda mahali pa pamoja ili kupanga kuhusu hatua za ndani, ushiriki wazi na mshikamano wa vitendo.",
+      "joinKicker": "Jiunge na Jumuiya ya Amnesty",
+      "joinTitle": "Kutana na watetezi wengine wa haki za binadamu",
+      "statement": "Sauti ya jumuiya, uwajibikaji unaoonekana, na hatua za pamoja ziko mahali pamoja.",
+      "visibilityBody": "Soma nafasi za jumuiya, elewa kaupapa ya karibu, na uone ni wapi unaweza kusaidia kupanga mapendekezo, kampeni na nguvu ya watu.",
+      "visibilityCallout": "Tazama jumuiya kwa uwazi. Shiriki ambapo unaaminika na jukumu.",
+      "visibilityTitle": "Sauti ya jumuiya inapoonekana, kitendo kinaweza kusonga kwa kasi zaidi."
+    },
+    "nav": {
+      "admin": "Msimamizi",
+      "boards": "Bodi",
+      "calendar": "Kalenda",
+      "campaigns": "Kampeni",
+      "communities": "Jumuiya",
+      "community": "Jumuiya",
+      "dashboard": "Dashibodi",
+      "hub": "Kitovu",
+      "platform": "Jukwaa",
+      "profile": "Wasifu",
+      "proposals": "Mapendekezo",
+      "workspace": "Nafasi ya kazi"
+    }
+  },
+  "auth": {
+    "action": {
+      "loggingIn": "Inaingia...",
+      "login": "Ingia",
+      "logout": "Toka nje",
+      "signOut": "Ondoka"
+    }
+  },
+  "boards": {
+    "actions": {
+      "addCard": "Ongeza kadi",
+      "addColumn": "Ongeza safu",
+      "createBoard": "Unda bodi",
+      "moveLeft": "Sogeza kushoto",
+      "moveRight": "Sogeza kulia",
+      "pin": "Bandika",
+      "pinned": "Imebandikwa"
+    },
+    "board": {
+      "columns": "Safu za bodi",
+      "newColumn": "Safu mpya",
+      "newColumnTitle": "Kichwa kipya cha safu wima",
+      "searchCards": "Tafuta kadi",
+      "title": "Jina la bodi"
+    },
+    "card": {
+      "addDetails": "Ongeza maelezo",
+      "assignees": "Waliokabidhiwa",
+      "closeDetails": "Funga maelezo ya kadi",
+      "created": "Imeundwa",
+      "creator": "Muumba",
+      "descriptionMode": "Njia ya maelezo",
+      "detailTitle": "Kichwa cha maelezo ya kadi",
+      "details": "Maelezo ya kadi",
+      "dragCard": "Buruta kadi",
+      "due": "Inatakiwa {{date}}",
+      "dueDate": "Tarehe ya mwisho",
+      "editMarkdownSyntax": "Hariri sintaksia ya kuashiria",
+      "linkedDocument": "Hati iliyounganishwa",
+      "linkedDocumentNotVisible": "Hati iliyounganishwa haionekani kwako tena.",
+      "linkedEvent": "Tukio lililounganishwa",
+      "linkedEventNotVisible": "Tukio lililounganishwa halionekani kwako tena.",
+      "markdownDescription": "Maelezo ya alama",
+      "markdownPlaceholder": "Andika maelezo ya kadi katika Markdown...",
+      "noDescription": "Bado hakuna maelezo.",
+      "noDetailsYet": "Bado hakuna maelezo",
+      "noLinkedDocument": "Hakuna hati iliyounganishwa",
+      "noLinkedEvent": "Hakuna tukio lililounganishwa",
+      "openDetails": "Fungua maelezo ya kadi",
+      "openDocument": "Fungua hati",
+      "openEvent": "Fungua tukio",
+      "preview": "Hakiki",
+      "saveCard": "Hifadhi kadi",
+      "title": "Jina la kadi",
+      "updated": "Imesasishwa"
+    },
+    "column": {
+      "addCardTo": "Ongeza kadi kwa {{columnTitle}}",
+      "deleteColumn": "Futa safu",
+      "deleteEmpty": "Futa safu tupu",
+      "dragColumn": "Buruta safu wima",
+      "moveCardsBeforeDelete": "Hamisha kadi kabla ya kufuta safu wima hii",
+      "title": "Kichwa cha safu wima"
+    },
+    "empty": {
+      "chooseBoard": "Chagua ubao kutoka kwa utepe ili kuanza kuratibu kazi.",
+      "createFirst": "Unda ubao wa {{communityName}} ili kuratibu kazi, vizuizi na hatua zinazofuata.",
+      "noSelectionTitle": "Hakuna ubao uliochaguliwa",
+      "unavailableBody": "Ubao huu unaweza kuwa umehifadhiwa kwenye kumbukumbu, umefutwa au haujashirikiwa nawe.",
+      "unavailableTitle": "Bodi haipatikani"
+    },
+    "emptyBody": "Unda bodi ili kuratibu kazi za jumuiya hii.",
+    "emptyTitle": "Hakuna ubao uliochaguliwa",
+    "hero": {
+      "boardStats": "Takwimu za bodi",
+      "body": "Panga kazi, vizuizi vya uso, na usogeze kazi ya jumuiya yako kuelekea athari.",
+      "kicker": "Bodi",
+      "manageAccessBody": "Unaweza kudhibiti bodi, safu wima, kadi na wanachama.",
+      "shareAccessBody": "Unaweza kutazama au kuchangia kulingana na mipangilio ya kushiriki ubao.",
+      "title": "Kuratibu kazi na kufuatilia maendeleo pamoja.",
+      "yourAccess": "Ufikiaji wako"
+    },
+    "labels": {
+      "activeCardsCount": "{{count}} kadi zinazotumika",
+      "boardsCount": "{{count}} mbao",
+      "cards": "kadi",
+      "cardsCountWithValue": "{{value}} kadi",
+      "columnsCount": "{{count}} safu wima",
+      "filteredCardsCount": "{{count}} kati ya {{total}} kadi",
+      "workspaceCardsCount": "{{count}} kadi za nafasi ya kazi"
+    },
+    "messages": {
+      "archiveConfirm": "Ungependa kuhifadhi ubao huu kwenye kumbukumbu? Itatoweka kutoka kwa orodha zinazotumika za bodi.",
+      "archived": "Bodi imehifadhiwa kwenye kumbukumbu.",
+      "communityShareUpdated": "Ushiriki wa bodi ya jumuiya umesasishwa hadi {{role}}.",
+      "grantedAccess": "Imeruhusu {{role}} ufikiaji.",
+      "pinned": "Imebandikwa kama ubao wako chaguomsingi.",
+      "private": "Bodi sasa ni ya kibinafsi.",
+      "publicLinkCreated": "Kiungo cha bodi ya umma kimeundwa na kunakiliwa.",
+      "publicLinkDisabled": "Kiungo cha bodi ya umma kimezimwa.",
+      "synced": "Bodi imesawazishwa.",
+      "unpinned": "Imeondolewa kama ubao wako chaguomsingi."
+    },
+    "newCardPlaceholder": "Jina la kadi mpya",
+    "newColumnPlaceholder": "Kichwa kipya cha safu wima",
+    "newPlaceholder": "Kichwa kipya cha bodi",
+    "page": {
+      "body": "Geuza mipango kuwa kazi za vitendo na bodi zinazoelekezwa kwa jumuiya hii na wanachama wake.",
+      "title": "Kuratibu kazi za jamii kwenye bodi"
+    },
+    "public": {
+      "body": "Ubao huu unashirikiwa kama kiungo cha umma cha kusoma pekee. Ingia katika akaunti ili ushirikiane ndani ya nafasi yako ya kazi ya jumuiya.",
+      "homeAria": "Fungua nyumba ya Amnesty DAO",
+      "noSignIn": "Huhitaji kuingia kwa mwonekano huu wa kusoma pekee.",
+      "readOnlyBoard": "Ubao wa kusoma pekee",
+      "sharedWorkspaceView": "Mwonekano wa nafasi ya kazi iliyoshirikiwa",
+      "title": "Mtazamo wa bodi ya umma",
+      "unavailableBody": "Kiungo hiki cha bodi ya umma kinaweza kuwa kimezimwa au bodi haionekani tena.",
+      "unavailableTitle": "Bodi ya umma haipatikani"
+    },
+    "share": {
+      "anyoneWithLink": "Yeyote aliye na kiungo",
+      "close": "Funga kushiriki ubao",
+      "communityBoardRole": "Jukumu la bodi ya jamii",
+      "communityWorkspace": "Nafasi ya kazi ya jumuiya",
+      "copyLink": "Nakili kiungo",
+      "createPublicLink": "Unda kiungo cha umma",
+      "description": "Toa ufikiaji wa moja kwa moja, shiriki na wanachama wa nafasi ya kazi ya jumuiya, au uunde kiungo cha kusoma pekee cha umma.",
+      "directGrantRole": "Jukumu la ruzuku ya moja kwa moja",
+      "directMember": "Mwanachama wa moja kwa moja",
+      "disable": "Zima",
+      "ownerOnlyPublicLink": "Ni mmiliki wa bodi pekee ndiye anayeweza kudhibiti viungo vya umma.",
+      "principalPlaceholder": "aaaaa-aa au mjumbe mkuu",
+      "principalToGrant": "Mkuu kutoa ufikiaji",
+      "publicBoardUrl": "URL ya bodi ya umma",
+      "publicLinksBody": "Unda kiungo cha umma cha kusoma pekee kwa watu walio nje ya jumuiya.",
+      "title": "Shiriki ubao",
+      "updateCommunityShare": "Sasisha ushiriki wa jumuiya",
+      "workspaceVisibility": "Dhibiti ikiwa bodi hii inaonekana kwa wanachama wa nafasi ya kazi."
+    },
+    "sidebar": {
+      "aria": "Maktaba ya bodi",
+      "emptyMine": "Bado hakuna bodi unazomiliki.",
+      "emptyShared": "Hakuna bodi zilizoshirikiwa moja kwa moja zilizopatikana.",
+      "emptyWorkspace": "Hakuna mbao za nafasi ya kazi zilizopatikana.",
+      "meta": "{{role}} · {{columns}} safu wima · {{cards}} kadi",
+      "myBoards": "Mbao zangu",
+      "newBoardTitle": "Kichwa kipya cha bodi",
+      "search": "Vibao vya utafutaji",
+      "sharedWithMe": "Imeshirikiwa nami",
+      "title": "Bodi",
+      "workspaceBoards": "Bodi za nafasi ya kazi"
+    }
+  },
+  "calendar": {
+    "actions": {
+      "create": "Unda tukio",
+      "new": "Mpya",
+      "saveEvent": "Hifadhi tukio",
+      "update": "Sasisha tukio"
+    },
+    "createTitle": "Unda tukio la jumuiya",
+    "editTitle": "Hariri tukio la jumuiya",
+    "editor": {
+      "aria": "Mhariri wa tukio",
+      "planMeeting": "Panga mkutano"
+    },
+    "emptyBody": "Unda tukio la kwanza ili kufanya kazi inayokuja ya jumuiya ionekane.",
+    "emptyTitle": "Hakuna matukio bado",
+    "errors": {
+      "loadFailed": "Haikuweza kupakia matukio ya kalenda."
+    },
+    "fields": {
+      "allDay": "Siku nzima",
+      "description": "Maelezo",
+      "end": "Mwisho",
+      "location": "Mahali",
+      "locationPlaceholder": "Chumba, kiungo cha simu, au mahali",
+      "meetingTitlePlaceholder": "Kichwa cha mkutano",
+      "notes": "Vidokezo",
+      "notesPlaceholder": "Kusudi, ajenda, au maelezo ya maandalizi",
+      "shareToWorkspace": "Shiriki kwenye nafasi ya kazi",
+      "start": "Anza",
+      "title": "Kichwa cha tukio"
+    },
+    "hero": {
+      "body": "Ratibu matukio, mikutano na vitendo ili jumuiya yako iweze kuchukua hatua pamoja.",
+      "kicker": "Kalenda",
+      "title": "Panga kwa kusudi.",
+      "utcBacked": "Kalenda inayoungwa mkono na UTC"
+    },
+    "legend": {
+      "dragToReschedule": "Buruta ili kupanga upya",
+      "myEvents": "Matukio yangu",
+      "workspaceVisible": "Nafasi ya kazi inaonekana"
+    },
+    "loadingEvents": "Inapakia matukio...",
+    "messages": {
+      "chooseParticipant": "Chagua mshiriki ili kutoa ufikiaji.",
+      "copied": "{{label}} imenakiliwa.",
+      "created": "Tukio limeundwa.",
+      "deleted": "Tukio limefutwa.",
+      "grantedAccess": "Imeruhusu {{role}} ufikiaji.",
+      "publicLinkDisabled": "Kiungo cha tukio la umma kimezimwa.",
+      "releaseToSave": "Toa ili kuokoa wakati mpya.",
+      "timeSaved": "Muda wa tukio umehifadhiwa.",
+      "updated": "Tukio limesasishwa."
+    },
+    "meta": {
+      "owner": "Mmiliki",
+      "ownerOnly": "Mmiliki pekee ndiye anayeweza kudhibiti viungo vya umma.",
+      "participants": "Washiriki",
+      "privateShared": "Binafsi/imeshirikiwa",
+      "role": "Jukumu",
+      "start": "Anza",
+      "visibility": "Mwonekano",
+      "workspace": "Nafasi ya kazi"
+    },
+    "page": {
+      "body": "Panga mikusanyiko, vitendo, mikutano, na tarehe za mwisho katika kalenda moja ya jumuiya.",
+      "title": "Weka matukio ya jumuiya yaonekane"
+    },
+    "public": {
+      "calendar": "Kalenda ya umma",
+      "detailsAria": "Maelezo ya tukio la umma",
+      "event": "Tukio",
+      "noEdits": "Hakuna mabadiliko kutoka kwa mtazamo huu",
+      "notFoundBody": "Kiungo hiki cha tukio la umma kinaweza kuwa kimezimwa au tukio halionekani tena.",
+      "notFoundTitle": "Tukio la umma halipatikani",
+      "openingBody": "Inapakia maelezo ya tukio lililoshirikiwa.",
+      "openingTitle": "Inafungua tukio la umma...",
+      "readOnly": "Kusoma pekee",
+      "readOnlyRole": "Mtazamaji wa kusoma pekee"
+    },
+    "share": {
+      "addParticipant": "Ongeza mshiriki",
+      "copyEventLink": "Nakili kiungo cha tukio",
+      "copyPublicLink": "Nakili kiungo cha umma",
+      "createPublicLink": "Unda kiungo cha umma",
+      "disablePublicLink": "Zima kiungo cha umma",
+      "eventLink": "Kiungo cha tukio",
+      "eventRole": "Jukumu la tukio",
+      "grantAccess": "Ruhusu ufikiaji",
+      "principalPlaceholder": "aaaaa-aa au mjumbe mkuu",
+      "principalToGrant": "Mkuu atoe idhini ya kufikia tukio",
+      "publicEventLink": "Kiungo cha tukio la umma",
+      "title": "Kushiriki tukio"
+    },
+    "visibleEvents": "{{count}} tukio linaloonekana"
+  },
+  "campaigns": {
+    "card": {
+      "allOrNothing": "Yote au hakuna: Pesa hukusanywa tu ikiwa lengo limefikiwa na tarehe ya mwisho.",
+      "contributeLockedTitle": "Wanajumuiya na wasimamizi waliotumwa pekee ndio wanaoweza kuchangia kampeni",
+      "daysLeft": "Siku {{days}} zimesalia",
+      "ended": "Imeisha",
+      "progress": "{{raised}} / {{goal}}",
+      "progressPercentage": "{{percentage}}%",
+      "yourCampaign": "Kampeni yako"
+    },
+    "create": {
+      "durationLabel": "Muda wa kampeni (siku) *",
+      "durationPlaceholder": "Weka idadi ya siku",
+      "error": "Imeshindwa kuunda kampeni: {{message}}",
+      "fundingBody": "Kampeni yako itafuata mtindo wa yote au hakuna. Fedha hukusanywa tu ikiwa kiasi kinacholengwa kinafikiwa na tarehe ya mwisho. Ikiwa lengo halijafikiwa, hakuna pesa zitakusanywa.",
+      "fundingTitle": "Ufadhili wa yote au hakuna",
+      "goalLabel": "Kiasi cha lengo ($) *",
+      "goalPlaceholder": "Weka kiasi kinacholengwa",
+      "storyHelp": "Jumuisha simulizi, nani anafaidika, na muhtasari wa bajeti",
+      "storyLabel": "Hadithi ya kampeni *",
+      "storyPlaceholder": "Eleza kampeni yako, itamsaidia nani, na jinsi fedha hizo zitatumika...",
+      "title": "Unda kampeni ya kukusanya pesa",
+      "titleLabel": "Jina la kampeni *",
+      "titlePlaceholder": "Weka jina la kampeni",
+      "validationAllFields": "Tafadhali jaza sehemu zote",
+      "validationDays": "Tafadhali weka idadi halali ya siku",
+      "validationGoalAmount": "Tafadhali weka kiasi halali cha lengo"
+    },
+    "detail": {
+      "amountLabel": "Kiasi ($)",
+      "amountPlaceholder": "Weka kiasi",
+      "campaignEnded": "Kampeni ilimalizika",
+      "contributeError": "Imeshindwa kuchangia: {{message}}",
+      "contributeSuccess": "Mchango umefaulu!",
+      "contributeTitle": "Changia katika kampeni hii",
+      "contributionValidation": "Tafadhali weka kiasi halali cha mchango",
+      "contributionsTab": "Michango ({{count}})",
+      "creatorActionsTitle": "Vitendo vya Muumba",
+      "creatorTooltip": {
+        "goalNotMet": "Kampeni inaweza kukamilika mara tu lengo la ufadhili kufikiwa",
+        "notActive": "Kampeni tayari imekamilika",
+        "notCreator": "Ni mtayarishaji wa kampeni pekee ndiye anayeweza kukamilisha kampeni",
+        "ready": "Maliza kampeni sasa kwa kuwa lengo la ufadhili limefikiwa"
+      },
+      "detailsTab": "Maelezo",
+      "finalizeConfirm": "Je, una uhakika unataka kukamilisha kampeni hii? Hii itaashiria kampeni kuwa ya mafanikio na kamilifu. Kitendo hiki hakiwezi kutenduliwa.",
+      "finalizeError": "Imeshindwa kukamilisha kampeni: {{message}}",
+      "finalizeStatusGoalMet": "Lengo la kampeni limefikiwa! Unaweza kukamilisha kampeni.",
+      "finalizeStatusPending": "Kampeni inaweza kukamilika mara tu lengo la ufadhili la {{goal}} litakapofikiwa.",
+      "finalizeStatusReady": "Kampeni inaweza kukamilika kwa kuwa lengo la ufadhili limefikiwa.",
+      "finalizeSuccess": "Kampeni imekamilika!",
+      "fundingBody": "Kampeni hii inafuata mtindo wa yote au hakuna. Pesa hukusanywa tu ikiwa kiasi kinacholengwa kinafikiwa na tarehe ya mwisho au ikiwa mtayarishaji wa kampeni atakamilisha mapema mara tu lengo litakapofikiwa. Ikiwa lengo halijafikiwa, hakuna pesa zitakusanywa.",
+      "fundingTitle": "Ufadhili wa yote au hakuna",
+      "goalReached": "Lengo la ufadhili limefikiwa! Kampeni sasa inaweza kukamilika.",
+      "goalReachedNote": "Lengo la ufadhili limefikiwa. Mtayarishi wa kampeni sasa anaweza kukamilisha kampeni hii.",
+      "noteLabel": "Kumbuka:",
+      "postUpdatePlaceholder": "Shiriki maendeleo, matokeo, au masasisho mengine na wasaidizi...",
+      "postUpdateTitle": "Chapisha sasisho",
+      "progressSummary": "{{raised}} / {{goal}}",
+      "stateLabel": "Jimbo: {{state}}",
+      "storyTitle": "Hadithi ya kampeni",
+      "updateError": "Imeshindwa kuchapisha sasisho: {{message}}",
+      "updateLabel": "Sasisha #{{id}}",
+      "updateSuccess": "Sasisho limechapishwa!",
+      "updateValidation": "Tafadhali ingiza maudhui ya sasisho",
+      "updatesTab": "Masasisho ({{count}})"
+    }
+  },
+  "common": {
+    "actions": {
+      "back": "Nyuma",
+      "cancel": "Ghairi",
+      "close": "Funga",
+      "continue": "Endelea",
+      "contribute": "Changia",
+      "create": "Unda",
+      "createCampaign": "Unda kampeni",
+      "createCommunity": "Unda jumuiya",
+      "createFirstCampaign": "Unda kampeni ya kwanza",
+      "createFirstCommunity": "Unda jumuiya ya kwanza",
+      "createFirstProposal": "Unda pendekezo la kwanza",
+      "createProposal": "Tengeneza pendekezo",
+      "delete": "Futa",
+      "edit": "Hariri",
+      "enterPrincipal": "Ingiza mkuu",
+      "finalizeCampaign": "Maliza kampeni",
+      "finalizeProposal": "Maliza pendekezo",
+      "leaveCommunity": "Ondoka kwenye jumuiya",
+      "logIn": "Ingia",
+      "logOut": "Toka nje",
+      "lookUp": "Angalia juu",
+      "openCommunity": "Jumuiya ya wazi",
+      "postUpdate": "Chapisha sasisho",
+      "save": "Hifadhi",
+      "saveAssignment": "Hifadhi kazi",
+      "selectFromList": "Chagua kutoka kwenye orodha",
+      "share": "Shiriki",
+      "viewDetails": "Tazama maelezo"
+    },
+    "buttons": {
+      "campaignAccessLocked": "Ufikiaji wa kampeni umefungwa",
+      "proposalAccessLocked": "Ufikiaji wa pendekezo umefungwa"
+    },
+    "empty": {
+      "noCampaigns": "Bado hakuna kampeni",
+      "noCommunities": "Bado hakuna jumuiya ambazo zimechapishwa.",
+      "noContributions": "Bado hakuna michango.",
+      "noProposals": "Bado hakuna mapendekezo",
+      "noUpdates": "Bado hakuna masasisho yaliyochapishwa.",
+      "noUsers": "Bado hakuna wasifu uliohifadhiwa wa mtumiaji."
+    },
+    "errors": {
+      "genericFinalizeProposal": "Hitilafu ilitokea wakati wa kukamilisha pendekezo. Tafadhali jaribu tena.",
+      "genericVote": "Hitilafu imetokea wakati wa kuchakata kura yako. Tafadhali jaribu tena."
+    },
+    "labels": {
+      "accessModel": "Muundo wa ufikiaji",
+      "by": "Na {{name}}",
+      "byPrefix": "Na",
+      "campaign": "Kampeni",
+      "campaignId": "Kitambulisho cha Kampeni: {{id}}",
+      "characters": "Herufi {{count}}/{{max}}",
+      "community": "Jumuiya",
+      "contribution": "Mchango",
+      "platformAccess": "Ufikiaji wa jukwaa",
+      "principal": "Mkuu wa shule",
+      "proposal": "Pendekezo",
+      "roleAccess": "Ufikiaji wa jukumu",
+      "scope": "Upeo: {{scope}}",
+      "signedIn": "Umeingia",
+      "totalVotes": "Jumla ya kura",
+      "unknown": "Haijulikani",
+      "updates": "Sasisho",
+      "viewerOnly": "Mtazamaji pekee"
+    },
+    "loading": {
+      "checkingAccess": "Inakagua ufikiaji",
+      "checkingRole": "Jukumu la kuangalia",
+      "checkingStatus": "Inakagua hali ya ukamilishaji...",
+      "contributing": "Inachangia...",
+      "creating": "Inaunda...",
+      "finalizing": "Inakamilisha...",
+      "leaving": "Inaondoka...",
+      "loggingIn": "Inaingia...",
+      "posting": "Inachapisha...",
+      "saving": "Inahifadhi...",
+      "voting": "Upigaji kura..."
+    },
+    "roles": {
+      "communityAdmin": "Msimamizi wa jumuiya",
+      "member": "Mwanachama",
+      "platformAdmin": "Msimamizi wa jukwaa",
+      "viewer": "Mtazamaji"
+    },
+    "states": {
+      "campaign": {
+        "active": "Inayotumika",
+        "expired": "Muda wake umeisha",
+        "failed": "Imeshindwa",
+        "successful": "Imefanikiwa"
+      },
+      "proposal": {
+        "active": "Inayotumika",
+        "failed": "Imeshindwa",
+        "passed": "Imepitishwa",
+        "pendingFinalization": "Inasubiri kukamilika"
+      }
+    }
+  },
+  "communities": {
+    "body": "Majukumu ya jumuiya yako wazi, lakini kuvinjari hubaki wazi kwa kila mtu aliyeidhinishwa ili mawazo, kampeni na muktadha wa karibu nawe uendelee kuonekana.",
+    "card": {
+      "accessLoading": "Tunakagua ufikiaji wako wa jumuiya.",
+      "accessParticipant": "Unaweza kusaidia kuunda mapendekezo na kampeni katika jumuiya hii.",
+      "accessViewer": "Una ufikiaji wa mtazamaji wa kusoma pekee hapa hadi jukumu likabidhiwe.",
+      "assignedCount": "{{count}} imekabidhiwa",
+      "kicker": "Nafasi ya jumuiya"
+    },
+    "create": {
+      "error": "Imeshindwa kuunda jumuiya. Tafadhali angalia ruhusa zako na ujaribu tena.",
+      "nameLabel": "Jina la jumuiya *",
+      "namePlaceholder": "Weka jina la jumuiya",
+      "panelBody": "Utakuwa msimamizi wa kwanza wa jumuiya na utakabidhiwa kwa jumuiya kiotomatiki. Wasimamizi wa jukwaa bado wanaweza kusimamia jumuiya, lakini usimamizi wa wanachama wa ndani huanzia hapa.",
+      "panelTitle": "Uundaji wa jumuiya",
+      "policyLabel": "Sera ya Jumuiya *",
+      "policyPlaceholder": "Eleza madhumuni ya jumuiya, sheria za utawala na miongozo...",
+      "title": "Unda jumuiya mpya"
+    },
+    "emptyAdmin": "Unda jumuiya ya kwanza ili kuanza kugawa majukumu, kuunda mapendekezo, na kuratibu kampeni.",
+    "emptyViewer": "Msimamizi wa jukwaa anahitaji kuunda jumuiya ya kwanza kabla ya wanachama kukabidhiwa.",
+    "kicker": "Jumuiya",
+    "leave": {
+      "bulletBrowse": "Kukuruhusu kuendelea kutazama jumuiya kama mtazamaji aliyeidhinishwa",
+      "bulletPreserve": "Hifadhi mapendekezo na kura zako za kihistoria (zitaendelea kuonekana)",
+      "bulletProposal": "Batilisha uwezo wako wa kuunda mapendekezo mapya katika jumuiya hii",
+      "bulletRemove": "Kukuondoa kwenye orodha ya wanachama wa jumuiya",
+      "bulletViewer": "Inakurejesha kwa ufikiaji wa mtazamaji wa kusoma pekee katika jumuiya hii",
+      "bulletVote": "Batilisha uwezo wako wa kupigia kura mapendekezo katika jumuiya hii",
+      "confirmHelp": "Uthibitishaji huu husaidia kuzuia kuondoka kwa jumuiya kwa bahati mbaya.",
+      "confirmLabel": "Andika \"ONDOKA\" ili kuthibitisha *",
+      "confirmPlaceholder": "Andika LEAVE ili kuthibitisha",
+      "errorBody": "Hakikisha kuwa wewe ni mwanachama wa jumuiya hii na una vibali sahihi vya kuondoka.",
+      "errorTitle": "Imeshindwa kuondoka kwenye jumuiya. Tafadhali angalia ruhusa zako na ujaribu tena.",
+      "leaving": "Inaondoka...",
+      "successBody": "Umeondolewa kwenye orodha ya wanajamii na sasa unaweza kuiona kama mtazamaji wa kusoma pekee. Michango yako ya kihistoria imesalia kuhifadhiwa.",
+      "successTitle": "Imefaulu kuondoka kwenye jumuiya!",
+      "title": "Ondoka kwenye jumuiya",
+      "warningIntro": "Unakaribia kuondoka \"{{communityName}}\". Hatua hii itakuwa:",
+      "warningOutro": "Utahitaji usaidizi wa msimamizi ili kujiunga tena kama mwanachama ikiwa ungependa kushiriki tena.",
+      "warningTitle": "Thibitisha kuondoka kwa jumuiya"
+    },
+    "membership": {
+      "body": "Majukumu ya uanachama ya jumuiya hii.",
+      "communityAdmins": "Wasimamizi wa jumuiya",
+      "emptyCommunityAdmins": "Hakuna wasimamizi wa jumuiya waliokabidhiwa.",
+      "emptyMembers": "Hakuna wanachama waliowekwa kwenye jumuiya hii.",
+      "kicker": "Mfano wa kuigwa",
+      "loadError": "Imeshindwa kupakia maelezo ya uanachama wa jumuiya.",
+      "members": "Wanachama",
+      "title": "Uanachama wa jumuiya",
+      "unnamedMember": "Mwanachama asiye na jina",
+      "viewerAccessBody": "Watazamaji ni wazi na hawajaorodheshwa hapa. Orodha hii inaonyesha wakuu pekee walio na jukumu la jumuiya walilokabidhiwa: wasimamizi na wanachama wa jumuiya.",
+      "viewerAccessTitle": "Ufikiaji wa watazamaji unabaki bila uwazi"
+    },
+    "portal": {
+      "accessBanners": {
+        "communityAdminBody": "Unaweza kushiriki katika utawala na kudhibiti majukumu ya jumuiya ndani ya nafasi hii.",
+        "communityAdminTitle": "Uongozi wa jamii",
+        "memberBody": "Unaweza kuunda mapendekezo, kupiga kura, kuchangia kampeni na kurudi nyuma kutoka kwa jumuiya hii ikihitajika.",
+        "memberTitle": "Ushiriki wa jamii",
+        "platformAdminBody": "Unaweza kushiriki hapa na kudhibiti uanachama wa jumuiya kwa sababu unashikilia jukumu la msimamizi wa mfumo.",
+        "platformAdminTitle": "Uwakili wa jukwaa zima",
+        "viewerBody": "Unaweza kusoma muktadha wa jumuiya, mapendekezo, na kampeni. Ushiriki hufunguliwa mara jukumu linapotolewa.",
+        "viewerTitle": "Ufikiaji wa watazamaji"
+      },
+      "assignedParticipants": "Washiriki waliokabidhiwa",
+      "backToCommunities": "Rudi kwa jamii",
+      "campaignsBodyEnabled": "Kusaidia kampeni au kuzindua mpya kwa jumuiya hii.",
+      "campaignsBodyViewer": "Fuata maendeleo ya kampeni hapa. Mchango hufunguliwa mara tu jukumu la jumuiya limekabidhiwa.",
+      "campaignsKicker": "Kampeni",
+      "campaignsTitle": "Kufadhili hatua za ndani",
+      "capabilities": "Uwezo wako",
+      "capabilitiesEnabled": "Unda mapendekezo, piga kura na usaidie kuunda hatua za jumuiya.",
+      "capabilitiesViewer": "Soma muktadha kamili wa jumuiya huku ukisalia katika hali ya mtazamaji.",
+      "createCampaignLockedTitle": "Wanajumuiya na wasimamizi waliotumwa pekee ndio wanaoweza kuunda kampeni",
+      "createProposalLockedTitle": "Wanajumuiya na wasimamizi waliokabidhiwa pekee ndio wanaweza kuunda mapendekezo",
+      "emptyCampaignsAdmin": "Anzisha kampeni ya kwanza ya kuchangisha pesa kwa jumuiya hii wakati ambapo unahitaji usaidizi wa pamoja.",
+      "emptyCampaignsViewer": "Bado hakuna kampeni ambazo zimeundwa kwa ajili ya jumuiya hii.",
+      "emptyProposalsAdmin": "Kuwa wa kwanza kuleta pendekezo katika nafasi hii ya jumuiya.",
+      "emptyProposalsViewer": "Bado hakuna mapendekezo ya jumuiya hii ambayo yameundwa.",
+      "kicker": "Lango la jumuiya",
+      "loadErrorBody": "Jumuiya iliyoombwa haipo au haikuweza kupakiwa kwa sasa.",
+      "loadErrorTitle": "Hatukuweza kupakia jumuiya hii.",
+      "platformAccessTitle": "Ufikiaji wa jukwaa",
+      "proposalsBodyEnabled": "Unda pendekezo au upigie kura mwelekeo ambao jumuiya hii inapaswa kufuata.",
+      "proposalsBodyViewer": "Soma pendekezo la sasa na utazame ufanyaji maamuzi uendelee kuonekana.",
+      "proposalsKicker": "Mapendekezo",
+      "proposalsTitle": "Sura maamuzi ya jamii",
+      "roleAccessTitle": "Ufikiaji wa jukumu"
+    },
+    "setupKicker": "Mpangilio wa jumuiya",
+    "title": "Soma kila jumuiya. Shiriki pale unapoaminika kutenda."
+  },
+  "i18n": {
+    "language": {
+      "helper": "Chagua lugha itakayotumika katika Amnesty DAO kwenye kifaa hiki.",
+      "label": "Lugha",
+      "machineTranslationNote": "Tafsiri za awali za mashine zimetolewa ili wahakiki waanze haraka. Tafadhali kagua maandishi yanayoonekana kwa jamii kabla ya kuchapisha."
+    }
+  },
+  "mainTabs": {
+    "body": "Soma jumuiya kama mtazamaji, ingia katika kufanya maamuzi popote unaposhikilia jukumu, na weka ushiriki wa jukwaa katika msingi wa mamlaka ya watu.",
+    "claimAction": "Dai msimamizi wa jukwaa",
+    "kicker": "Jumuiya ya Msamaha",
+    "platformRoles": "Jukumu la jukwaa",
+    "platformRolesBody": "Wasimamizi wa jukwaa hudhibiti ufikiaji wa jukwaa zima na wanaweza kusaidia uanachama katika kila jumuiya.",
+    "roleModelBody": "Ufikiaji wa jukwaa pana umetengwa kwa ajili ya watu wanaosimamia majukumu ya jumuiya. Ushiriki wenyewe unabaki kuwa wa jumuiya, ili wanachama waweze kuzingatia upangaji wa ndani na kufanya maamuzi.",
+    "roleModelKicker": "Mfano wa kuigwa",
+    "setupBody": "Bado hakuna msimamizi wa jukwaa. Dai jukumu la kwanza kwa uwazi kabla ya jumuiya na kazi za wanachama kudhibitiwa.",
+    "setupKicker": "Mpangilio wa jukwaa",
+    "setupTitle": "Dai msimamizi wa jukwaa la kwanza",
+    "tabs": {
+      "dashboard": "Dashibodi",
+      "platformAdmin": "Msimamizi wa jukwaa"
+    },
+    "title": "Chukua hatua pamoja",
+    "yourAccess": "Ufikiaji wako",
+    "yourAccessBody": "Watazamaji wanaweza kusoma kwenye jukwaa. Majukumu ya jumuiya hufungua mapendekezo, upigaji kura, uchangishaji fedha, na usimamizi wa wanachama."
+  },
+  "profile": {
+    "body": "Ongeza jina ambalo watetezi wengine wanapaswa kuona wakati mapendekezo, kampeni na maamuzi yanahusishwa kwenye jukwaa.",
+    "kicker": "Jumuiya ya Msamaha",
+    "nameLabel": "Jina lako",
+    "namePlaceholder": "Je, jamii inapaswa kukufahamu vipi?",
+    "page": {
+      "body": "Sasisha jina ambalo watu wanaona kando na mapendekezo yako, kampeni, mabadiliko ya nafasi ya kazi na ushiriki wa jumuiya.",
+      "identityKicker": "Mkuu wa Utambulisho wa Mtandao",
+      "kicker": "Wasifu",
+      "title": "Dhibiti utambulisho wa jumuiya yako"
+    },
+    "saveError": "Bado hatukuweza kuhifadhi wasifu wako.",
+    "title": "Karibu kwa harakati"
+  },
+  "proposals": {
+    "card": {
+      "alreadyVotedBody": "Mfumo huo unalazimisha kura moja kwa kila mtu kwa pendekezo. Kura yako imerekodiwa na kuhesabiwa.",
+      "alreadyVotedCreator": "Kama mtayarishi wa pendekezo, uliweza kupigia kura pendekezo lako mwenyewe.",
+      "alreadyVotedTitle": "Tayari umepigia kura pendekezo hili",
+      "creatorUnknown": "Mwanachama asiyejulikana",
+      "daysCount": "Siku {{count}}",
+      "finalizeErrorTitle": "Imeshindwa kukamilisha pendekezo.",
+      "finalizeSuccessBody": "Pendekezo hilo limekamilishwa na hali yake ya mwisho imebainishwa kulingana na matokeo ya upigaji kura.",
+      "finalizeSuccessTitle": "Pendekezo limekamilika!",
+      "governanceSettings": "Mipangilio ya utawala",
+      "lessThanMinute": "Imesalia chini ya m 1",
+      "no": "Hapana: {{count}} ({{percentage}}%)",
+      "passThreshold": "Kupita kizingiti",
+      "passThresholdValue": "{{count}}% kura za ndiyo",
+      "quorum": "Akidi",
+      "timeDaysHours": "{{days}}d {{hours}}saa zimesalia",
+      "timeHoursMinutes": "{{hours}}saa {{minutes}}zimesalia",
+      "timeMinutes": "{{minutes}}m zimesalia",
+      "timeRemaining": "Muda uliosalia: {{value}}",
+      "totalVotesRequired": "Jumla ya kura: {{total}} / {{required}} inahitajika",
+      "viewerAccess": "Ufikiaji wa watazamaji",
+      "voteButtonTitles": {
+        "alreadyVoted": "Tayari umepigia kura pendekezo hili",
+        "no": "Piga kura ya hapana kwa pendekezo hili",
+        "viewer": "Wanajumuiya na wasimamizi waliokabidhiwa pekee ndio wanaoweza kupiga kura",
+        "votingClosed": "Dirisha la kupiga kura limefungwa",
+        "votingNotStarted": "Upigaji kura bado haujaanza",
+        "yes": "Piga kura ya ndiyo kwenye pendekezo hili"
+      },
+      "voteErrorTitle": "Imeshindwa kupiga kura. Tafadhali jaribu tena.",
+      "voteNo": "Piga kura nambari",
+      "voteSuccessBody": "Kura yako imerekodiwa. Mfumo huo unahakikisha kura moja kwa kila mtu kwa pendekezo.",
+      "voteSuccessCreator": "Kama mtayarishi wa pendekezo, ulipiga kura kwa ufanisi kuhusu pendekezo lako mwenyewe.",
+      "voteSuccessTitle": "Piga kura!",
+      "voteYes": "Piga kura ya ndiyo",
+      "votedBadge": "Umepiga kura",
+      "votesMinimum": "{{count}} kiwango cha chini cha kura",
+      "votingClosed": "Upigaji kura umefungwa",
+      "votingNotStarted": "Upigaji kura haujaanza",
+      "votingResults": "Matokeo ya kupiga kura",
+      "votingWindow": "Dirisha la kupiga kura",
+      "yes": "Ndiyo: {{count}} ({{percentage}}%)",
+      "yourProposal": "Pendekezo lako"
+    },
+    "create": {
+      "customizeGovernance": "Weka mapendeleo kwenye mipangilio ya utawala",
+      "defaultPassThreshold": "50% ya kura lazima iwe ndiyo",
+      "defaultQuorum": "Kiwango cha chini cha kura 1",
+      "defaultSettings": "Mipangilio chaguomsingi",
+      "defaultVotingWindow": "siku 3",
+      "descriptionLabel": "Maelezo ya pendekezo *",
+      "descriptionPlaceholder": "Eleza pendekezo lako kwa undani. Unapendekeza nini? Kwa nini jamii iunge mkono?",
+      "error": "Imeshindwa kuunda pendekezo. Tafadhali angalia ruhusa zako na ujaribu tena.",
+      "minimumVotesHelp": "Kiwango cha chini cha jumla cha kura zinazohitajika ili pendekezo liwe halali",
+      "minimumVotesLabel": "Kiwango cha chini cha kura (idadi)",
+      "passThreshold": "Kupita kizingiti",
+      "passThresholdHelp": "Asilimia ya kura za ndiyo zinazohitajika kupitishwa (1-100%)",
+      "passThresholdLabel": "Kiwango cha kupita (%)",
+      "quorum": "Akidi",
+      "submissionBody": "Baada ya kuwasilishwa, wanajamii wataweza kupiga kura ya ndiyo au hapana kwenye pendekezo lako wakati wa dirisha la kupiga kura. Baada ya muda wa kupiga kura kuisha, mwanachama yeyote anaweza kukamilisha pendekezo ili kubaini kama lilipita au halikufaulu.",
+      "submissionTitle": "Uwasilishaji wa pendekezo",
+      "title": "Unda pendekezo jipya",
+      "titleLabel": "Jina la pendekezo *",
+      "titlePlaceholder": "Weka kichwa cha pendekezo",
+      "votingWindow": "Dirisha la kupiga kura",
+      "votingWindowDaysLabel": "Dirisha la kupiga kura (siku)",
+      "votingWindowHelp": "Muda ambao wanachama wanaweza kupiga kura (siku 1-30)"
+    }
+  },
+  "workspace": {
+    "actions": {
+      "archive": "Hifadhi",
+      "compact": "Picha ndogo",
+      "copyLink": "Nakili kiungo",
+      "debugExport": "Pakua JSON",
+      "grant": "Ruhusu ufikiaji",
+      "importMarkdown": "Ingiza Alama",
+      "markdownExport": "Pakua Markdown",
+      "menu": "Vitendo",
+      "pin": "Bandika chaguomsingi",
+      "redo": "Rudia",
+      "sync": "Sawazisha",
+      "undo": "Tendua",
+      "unpin": "Bandua chaguomsingi",
+      "updateShare": "Sasisha kushiriki"
+    },
+    "blockMenu": {
+      "autoListNumbering": "Kuweka nambari kiotomatiki",
+      "continuePreviousList": "Endelea orodha iliyopita",
+      "copyBlockLink": "Nakili kiungo cha kuzuia",
+      "disableHyperlink": "Zima kiungo",
+      "duplicate": "Nakala",
+      "enableHyperlink": "Washa kiungo",
+      "formatBlock": "Kizuizi cha umbizo",
+      "insertAbove": "Weka juu",
+      "insertBelow": "Ingiza hapa chini",
+      "listNumbering": "Kuweka nambari kwenye orodha",
+      "moveDown": "Sogeza chini",
+      "moveUp": "Sogeza juu",
+      "restartAtOne": "Anzisha tena saa 1",
+      "turnInto": "Geuka kuwa"
+    },
+    "blockRenderer": {
+      "addCaption": "Ongeza maelezo mafupi",
+      "blockAria": "Zuia {{index}}: {{label}}",
+      "blockControls": "Vidhibiti vya kuzuia",
+      "blockMenu": "Menyu ya kuzuia",
+      "collapseToggle": "Kunja kigeuza",
+      "dividerBlock": "Kizuizi cha mgawanyiko",
+      "dragBlock": "Buruta kizuizi",
+      "dragToReorder": "Buruta ili kupanga upya",
+      "expandToggle": "Panua kigeuza",
+      "fileLabel": "Lebo ya faili",
+      "fileUrl": "URL ya faili",
+      "imageCaption": "Maelezo ya picha",
+      "imageUrl": "URL ya picha",
+      "markChecked": "Alama imechaguliwa",
+      "markUnchecked": "Weka alama kuwa haijachaguliwa",
+      "pasteFileUrl": "Bandika URL ya faili ili kuiunganisha.",
+      "pasteImageUrl": "Bandika URL ya picha ili kuipachika.",
+      "typeForCommands": "Andika '/' kwa amri",
+      "workspaceImage": "Picha ya nafasi ya kazi"
+    },
+    "body": "Weka madokezo ya kazi, vibao vya kazi vya vitendo, na matukio ya jumuiya yanayolenga jumuiya hii pekee.",
+    "commands": {
+      "aria": "Amri za kufyeka",
+      "groups": {
+        "Lists": "Orodha",
+        "Media": "Vyombo vya habari",
+        "Structure": "Muundo",
+        "Text": "Maandishi"
+      },
+      "items": {
+        "bullet": {
+          "hint": "Kipengee rahisi cha orodha",
+          "label": "Orodha ya risasi"
+        },
+        "callout": {
+          "hint": "Sanduku la noti nyepesi",
+          "label": "Wito"
+        },
+        "checklist": {
+          "hint": "Fuatilia jukumu",
+          "label": "Orodha ya ukaguzi"
+        },
+        "divider": {
+          "hint": "Utawala wa usawa",
+          "label": "Kigawanyaji"
+        },
+        "fileLink": {
+          "hint": "URL ya faili ya nje",
+          "label": "Kiungo cha faili"
+        },
+        "heading1": {
+          "hint": "Kichwa cha sehemu kubwa",
+          "label": "Kichwa 1"
+        },
+        "heading2": {
+          "hint": "Kichwa cha sehemu ya wastani",
+          "label": "Kichwa cha 2"
+        },
+        "heading3": {
+          "hint": "Kichwa cha sehemu ndogo",
+          "label": "Kichwa cha 3"
+        },
+        "image": {
+          "hint": "URL ya picha ya nje",
+          "label": "Picha"
+        },
+        "numbered": {
+          "hint": "Kipengee cha orodha kilichoagizwa",
+          "label": "Orodha ya nambari"
+        },
+        "paragraph": {
+          "hint": "Kifungu wazi",
+          "label": "Maandishi"
+        },
+        "quote": {
+          "hint": "Nukuu iliyoinuliwa",
+          "label": "Nukuu"
+        },
+        "toggle": {
+          "hint": "Sehemu inayoweza kukunjwa",
+          "label": "Geuza"
+        }
+      },
+      "noMatches": "Hakuna amri zinazolingana",
+      "placeholder": "Andika amri"
+    },
+    "comments": {
+      "add": "Maoni",
+      "compose": "Ongeza maoni",
+      "documentComments": "Maoni ya hati",
+      "empty": "Hakuna maoni wazi bado.",
+      "openCount": "{{count}} fungua",
+      "openTitle": "Fungua maoni",
+      "placeholder": "Andika maoni. Cmd/Ctrl+Enter inawasilisha.",
+      "resolve": "Suluhisha",
+      "submit": "Wasilisha maoni"
+    },
+    "documents": {
+      "bodyPlaceholder": "Andika madokezo, mipango, viungo, au matokeo ya mkutano...",
+      "empty": "Bado hakuna hati za nafasi ya kazi zinazoonekana kwako.",
+      "emptyBody": "Unda au chagua hati ili kuanza kuandika ndani ya jumuiya hii.",
+      "emptyBodyTitle": "Chagua au unda hati",
+      "emptyMine": "Bado hakuna hati.",
+      "emptyShared": "Bado hakuna hati zilizoshirikiwa nawe.",
+      "emptyTitle": "Hakuna hati iliyochaguliwa",
+      "emptyWorkspace": "Bado hakuna hati za nafasi ya kazi.",
+      "newPlaceholder": "Kichwa kipya cha hati",
+      "sidebarTitle": "Hati za jumuiya"
+    },
+    "editor": {
+      "addFirstBlock": "Ongeza kizuizi cha kwanza",
+      "documentTitle": "Kichwa cha hati",
+      "tailEditable": "Andika '/' kwa amri au bonyeza Enter kwa kizuizi kipya",
+      "tailReadonly": "Ufikiaji wa mtazamaji ni wa kusoma pekee kwa hati hii."
+    },
+    "grants": {
+      "selectMember": "Chagua mwanajumuiya",
+      "title": "Ufikiaji maalum wa mwanachama"
+    },
+    "kicker": "Nafasi ya kazi ya jumuiya",
+    "library": {
+      "mine": "Nyaraka zangu",
+      "shared": "Imeshirikiwa nami",
+      "workspace": "Nyaraka za nafasi ya kazi"
+    },
+    "nesting": {
+      "dragHint": "Buruta hati ili kuweka kiota, kupanga upya, au kuzirudisha kwenye kiwango cha juu.",
+      "title": "Uwekaji wa hati",
+      "topLevel": "Kiwango cha juu"
+    },
+    "pageBody": "Dhibiti hati, shirikiana na jumuiya yako, na ugeuze mawazo kuwa athari.",
+    "pageTitle": "Jenga na ratibu vitendo pamoja.",
+    "roles": {
+      "editor": "Mhariri",
+      "owner": "Mmiliki",
+      "viewer": "Mtazamaji"
+    },
+    "search": {
+      "empty": "Hakuna maudhui ya ukurasa yanayolingana.",
+      "loading": "Inatafuta hati...",
+      "matches": "{{count}} mechi",
+      "matches_plural": "{{count}} zinazolingana",
+      "placeholder": "Tafuta yaliyomo kwenye ukurasa"
+    },
+    "selection": {
+      "bold": "Ujasiri",
+      "boldSelected": "Maandishi yaliyochaguliwa kwa herufi nzito",
+      "clear": "Futa uteuzi",
+      "colorHighlight": "{{color}} kivutio",
+      "colors": {
+        "blue": "Bluu",
+        "green": "Kijani",
+        "pink": "Pink",
+        "purple": "Zambarau",
+        "yellow": "Njano"
+      },
+      "commentSelected": "Maoni juu ya maandishi yaliyochaguliwa",
+      "copied": "Imenakili vizuizi vilivyochaguliwa kama Markdown.",
+      "copyFallback": "Imeshindwa kufikia ubao wa kunakili. Nakili Alama hapa chini.",
+      "copyMarkdown": "Nakili kama Markdown",
+      "decreaseIndent": "Punguza ujongezaji ndani",
+      "done": "Imekamilika",
+      "formatBlockAs": "Fomati kizuizi kama {{label}}",
+      "formatSelected": "Fomati maandishi yaliyochaguliwa",
+      "highlight": "Angazia",
+      "highlightColors": "Angazia rangi",
+      "highlightSelected": "Angazia maandishi uliyochagua",
+      "increaseIndent": "Ongeza ujongezaji ndani",
+      "indent": "Pendekeza ndani",
+      "italic": "Italiki",
+      "italicSelected": "Maandishi yaliyochaguliwa kwa italiki",
+      "outdent": "Nje",
+      "selectBlocks": "Chagua vitalu",
+      "selected": "{{count}} imechaguliwa",
+      "selectedBlockActions": "Vitendo vya kuzuia vilivyochaguliwa"
+    },
+    "share": {
+      "communityEditor": "Imeshirikiwa na jumuiya kama mhariri",
+      "communityViewer": "Imeshirikiwa na jumuiya kama mtazamaji",
+      "private": "Privat",
+      "title": "Kushiriki kwa jumuiya"
+    },
+    "syncStatus": {
+      "compactError": "Kosa kamili",
+      "compacted": "Imeunganishwa",
+      "compacting": "Kubana",
+      "loaded": "Imepakiwa",
+      "persisted": "Iliendelea",
+      "saveError": "Hitilafu ya kuokoa",
+      "saving": "Kuhifadhi",
+      "titleSaved": "Kichwa kimehifadhiwa",
+      "unsavedChanges": "Mabadiliko ambayo hayajahifadhiwa"
+    },
+    "tabs": {
+      "boards": "Bodi",
+      "calendar": "Kalenda",
+      "documents": "Hati"
+    },
+    "title": "Panga, weka kumbukumbu na uratibu hatua za ndani",
+    "viewerLockedBody": "Hati, bodi na matukio yanaweza kujumuisha nyenzo za kibinafsi au zilizoshirikiwa na wanachama, kwa hivyo zinapatikana tu kwa wanajamii na wasimamizi waliopewa.",
+    "viewerLockedTitle": "Ufikiaji wa nafasi ya kazi ni wa wanachama pekee"
+  }
+}

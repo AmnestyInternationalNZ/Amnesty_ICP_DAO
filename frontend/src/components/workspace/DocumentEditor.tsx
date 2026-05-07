@@ -37,6 +37,7 @@ import type { CommunityDocumentPayload, CommunityDocumentSummary, CommunityMembe
 import { WorkspaceRole } from '../../backend';
 import { blocksToMarkdown } from '../../workspace/markdownExport';
 import { nextBlockTypeAfterEnter, isTextEditableBlock, type MarkdownShortcutResult } from '../../workspace/editorCommands';
+import { blockTypeLabel, syncStatusLabel } from '../../workspace/localizedEditorCommands';
 import { computeNumberedListMarkers } from '../../workspace/numberedLists';
 import type {
   WorkspaceBlock,
@@ -634,7 +635,7 @@ export function DocumentEditor({
       >
         <header className="document-title-area">
           <h1
-            aria-label="Document title"
+            aria-label={t('workspace.editor.documentTitle')}
             contentEditable={canEdit}
             onBlur={(event) => {
               const nextTitle = event.currentTarget.innerText.replace(/\n/g, ' ').trim() || 'Untitled';
@@ -667,14 +668,14 @@ export function DocumentEditor({
             <span>{'\u00b7'}</span>
             <span>{readableDate(selectedDocument.updatedAt, locale)}</span>
             <span>{'\u00b7'}</span>
-            <span>{syncStatus}</span>
+            <span>{syncStatusLabel(syncStatus, t)}</span>
             <span>{'\u00b7'}</span>
             <span>{selectedShareLabel(selectedDocument.communityShare, t)}</span>
           </p>
         </header>
 
         {selectionMode ? (
-          <div className="multi-block-toolbar" role="toolbar" aria-label="Selected block actions">
+          <div className="multi-block-toolbar" role="toolbar" aria-label={t('workspace.selection.selectedBlockActions')}>
             <strong>{t('workspace.selection.selected', { count: selectedBlockIds.size })}</strong>
             <button disabled={selectedBlockIds.size === 0} onClick={() => void copySelectedMarkdown()} type="button">
               <Copy size={14} />
@@ -691,7 +692,7 @@ export function DocumentEditor({
               {t('workspace.selection.indent')}
             </button>
             <span className="multi-block-divider" />
-            <span className="multi-block-label">Turn into</span>
+            <span className="multi-block-label">{t('workspace.blockMenu.turnInto')}</span>
             <div className="multi-block-transform">
               {textBlockTypes.map((type) => (
                 <button
@@ -701,7 +702,7 @@ export function DocumentEditor({
                   onClick={() => selectedBlocks.forEach((block) => onBlockType(block.id, type))}
                   type="button"
                 >
-                  {type}
+                  {blockTypeLabel(type, t)}
                 </button>
               ))}
             </div>
@@ -855,11 +856,11 @@ export function DocumentEditor({
       ) : null}
 
       {(commentsOpen || commentBlockId) ? (
-        <aside className="comment-panel" aria-label="Document comments">
+        <aside className="comment-panel" aria-label={t('workspace.comments.documentComments')}>
           <div className="comment-panel-head">
             <div>
               <strong>{t('workspace.comments.openTitle')}</strong>
-              <p>{openComments.length} open</p>
+              <p>{t('workspace.comments.openCount', { count: openComments.length })}</p>
             </div>
             <button className="icon-button" onClick={() => { setCommentsOpen(false); setCommentBlockId(null); }} type="button">
               <X size={16} />

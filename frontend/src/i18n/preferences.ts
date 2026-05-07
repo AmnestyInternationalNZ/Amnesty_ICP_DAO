@@ -1,17 +1,8 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES, type SupportedLocale } from './types';
+import { DEFAULT_LOCALE, LOCALE_DEFINITIONS, SUPPORTED_LOCALES, normalizeLocale, type SupportedLocale } from './types';
 
 const LOCALE_STORAGE_KEY = 'amnesty.locale';
-
-function normalizeLocale(locale: string | null | undefined): SupportedLocale | null {
-    if (!locale) {
-        return null;
-    }
-
-    const normalized = locale.toLowerCase();
-    return SUPPORTED_LOCALES.find((supported) => normalized === supported || normalized.startsWith(`${supported}-`)) ?? null;
-}
 
 export function getSavedLocalePreference(): SupportedLocale | null {
     if (typeof window === 'undefined') {
@@ -81,6 +72,9 @@ export function useLocalePreference() {
     return {
         locale,
         setLocale,
+        localeDefinitions: LOCALE_DEFINITIONS,
         supportedLocales: SUPPORTED_LOCALES
     };
 }
+
+export { normalizeLocale };

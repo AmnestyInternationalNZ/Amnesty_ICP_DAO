@@ -1,5 +1,7 @@
 import type { WorkspaceBlockType } from '../../workspace/types';
 import type { BlockCommand } from '../../workspace/editorCommands';
+import { useTranslation } from 'react-i18next';
+import { blockCommandGroup, blockCommandHint, blockCommandLabel } from '../../workspace/localizedEditorCommands';
 
 export function SlashCommandMenu({
   commands,
@@ -16,16 +18,18 @@ export function SlashCommandMenu({
   query: string;
   selectedIndex: number;
 }) {
+  const { t } = useTranslation();
   const groupedCommands = commands.reduce<Record<string, BlockCommand[]>>((groups, command) => {
-    groups[command.group] = [...(groups[command.group] ?? []), command];
+    const group = blockCommandGroup(command, t);
+    groups[group] = [...(groups[group] ?? []), command];
     return groups;
   }, {});
   let globalIndex = -1;
 
   return (
-    <div className="slash-menu" role="menu" aria-label="Block commands">
-      <div className="slash-menu-search">/{query || 'commands'}</div>
-      {commands.length === 0 ? <div className="slash-menu-empty">No matching commands</div> : null}
+    <div className="slash-menu" role="menu" aria-label={t('workspace.commands.aria')}>
+      <div className="slash-menu-search">/{query || t('workspace.commands.placeholder')}</div>
+      {commands.length === 0 ? <div className="slash-menu-empty">{t('workspace.commands.noMatches')}</div> : null}
       {Object.entries(groupedCommands).map(([group, groupCommands]) => (
         <div className="slash-menu-group" key={group}>
           <div className="slash-menu-head">{group}</div>
@@ -44,8 +48,8 @@ export function SlashCommandMenu({
                 role="menuitem"
                 type="button"
               >
-                <span>{command.label}</span>
-                <small>{command.markdown ?? command.hint}</small>
+                <span>{blockCommandLabel(command, t)}</span>
+                <small>{command.markdown ?? blockCommandHint(command, t)}</small>
               </button>
             );
           })}

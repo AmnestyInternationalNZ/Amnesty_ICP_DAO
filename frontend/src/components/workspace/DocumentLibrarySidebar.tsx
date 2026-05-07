@@ -329,6 +329,7 @@ function SidebarSectionList({
   title: string;
   tree?: DocNode[];
 }) {
+  const { t } = useTranslation();
   const nodes = tree ?? docs.map((doc) => ({ ...doc, children: [] }));
   return (
     <section className="sidebar-section">
@@ -343,7 +344,7 @@ function SidebarSectionList({
 
       {!collapsed && canReparent && (
         <>
-          <p className="sidebar-drag-hint">Drag pages onto each other to nest.</p>
+          <p className="sidebar-drag-hint">{t('workspace.nesting.dragHint')}</p>
           <RootDropTarget active={!!isRootDropTarget} />
         </>
       )}
@@ -374,10 +375,11 @@ function SidebarSectionList({
 }
 
 function RootDropTarget({ active }: { active: boolean }) {
+  const { t } = useTranslation();
   const { setNodeRef } = useDroppable({ id: ROOT_DROP_ID });
   return (
     <div ref={setNodeRef} className="sidebar-root-drop-zone" data-root-drop-target={active ? 'true' : undefined}>
-      Top level
+      {t('workspace.nesting.topLevel')}
     </div>
   );
 }

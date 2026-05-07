@@ -13,6 +13,9 @@
     "dev": "vite --config frontend/vite.config.ts",
     "build": "vite build --config frontend/vite.config.ts",
     "preview": "vite preview --config frontend/vite.config.ts",
+    "extract:locale-spreadsheet": "node scripts/export-locale-spreadsheet.mjs",
+    "import:locale-spreadsheet": "node scripts/import-locale-spreadsheet.mjs",
+    "check:locales": "node scripts/check-locales.mjs",
     "test:backend": "pnpm exec icp build backend && vitest run --config vitest.config.ts",
     "test:frontend": "vitest run --config vitest.frontend.config.ts"
   },

@@ -15,6 +15,7 @@ import CommunityPortal from './CommunityPortal';
 import CommunityProposalsPage from './CommunityProposalsPage';
 import CommunityWorkspacePage from './CommunityWorkspacePage';
 import Dashboard from './Dashboard';
+import LanguageSwitcher from './LanguageSwitcher';
 import LoadingSpinner from './LoadingSpinner';
 import ProfilePage from './ProfilePage';
 import SiteFooter from './SiteFooter';
@@ -188,17 +189,20 @@ export default function MainTabs() {
               })}
             </nav>
 
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="inline-flex w-fit items-center justify-center gap-3 rounded-[0.9rem] bg-amnesty-yellow px-6 py-3 text-base text-amnesty-ink transition hover:brightness-95 amnesty-heading"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8.25 15.75 12 12 15.75M15.75 12H3" />
-              </svg>
-              {t('auth.action.signOut')}
-            </button>
+            <div className="flex flex-wrap items-center gap-3">
+              <LanguageSwitcher compact />
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="inline-flex w-fit items-center justify-center gap-3 rounded-[0.9rem] bg-amnesty-yellow px-6 py-3 text-base text-amnesty-ink transition hover:brightness-95 amnesty-heading"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8.25 15.75 12 12 15.75M15.75 12H3" />
+                </svg>
+                {t('auth.action.signOut')}
+              </button>
+            </div>
           </div>
         </div>
       </header>

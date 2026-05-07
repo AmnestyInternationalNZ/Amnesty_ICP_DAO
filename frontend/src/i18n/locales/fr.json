@@ -1,0 +1,960 @@
+{
+  "admin": {
+    "assignmentEffectTitle": "Qu'est-ce que cela fait",
+    "assignmentEffects": {
+      "communityAdmin": "Attribuez des privilèges d’administrateur de communauté à la communauté sélectionnée.",
+      "member": "Attribuez la participation des membres à la communauté sélectionnée.",
+      "platformAdmin": "Accordez des privilèges d’administrateur à l’échelle de la plateforme. Cette personne sera capable de créer des communautés et de gérer les adhésions sur la plateforme.",
+      "removePlatformAdmin": "Supprimez les privilèges d’administrateur à l’échelle de la plateforme tout en laissant intactes les affectations à l’échelle de la communauté.",
+      "viewer": "Supprimez tout rôle de communauté attribué. La personne pourra toujours lire la communauté en tant que spectateur authentifié."
+    },
+    "assignmentKicker": "Affectation",
+    "assignmentLabel": "Affectation",
+    "assignmentTitle": "Mettre à jour l'accès pour cette étendue",
+    "chooseScopeTitle": "Choisissez une portée de travail",
+    "currentInScope": "Portée actuelle : {{assignment}}",
+    "errors": {
+      "lookup": "Échec de la recherche du profil utilisateur :",
+      "save": "Échec de l'enregistrement de l'attribution de rôle :"
+    },
+    "focusBody": "Les administrateurs de plateforme peuvent gérer n’importe quelle communauté. Les rôles communautaires restent locaux dans l’espace communautaire sélectionné.",
+    "focusKicker": "Objectif actuel",
+    "heroBody": "Vérifiez qui détient l'accès à l'ensemble de la plateforme, inspectez les listes locales et déplacez les personnes entre les rôles de spectateur, de membre et d'administrateur de communauté sans quitter cet espace.",
+    "heroKicker": "Gestion de la plateforme",
+    "heroTitle": "Attribuez des administrateurs de plateforme et des rôles de communauté à partir d’un seul endroit.",
+    "noPlatformAdmins": "Aucun administrateur de plateforme n'est actuellement affecté.",
+    "platformAdminsCount": "Administrateurs de plateforme",
+    "principalHelp": "Entrez un principal valide pour gérer un utilisateur qui n'apparaît pas encore dans la liste de profils enregistrée.",
+    "principalLabel": "ID d'utilisateur principal",
+    "principalPlaceholder": "Entrez un identifiant principal",
+    "roles": {
+      "viewerOnly": "Visionneuse uniquement"
+    },
+    "rosterKicker": "Liste de la communauté",
+    "rosterNobody": "Personne n'a encore de rôle assigné dans cette communauté.",
+    "rosterPrompt": "Choisissez une étendue de communauté pour inspecter ses attributions de rôles actuelles. L'accès des téléspectateurs reste implicite et n'est jamais répertorié dans la liste.",
+    "rosterShowing": "Affichage de {{visible}} sur {{total}} personnes assignées dans cette communauté.",
+    "scopeLabel": "Portée de travail",
+    "selectedScopeFallback": "Communauté",
+    "selectedUserKicker": "Utilisateur sélectionné",
+    "stewardsKicker": "Administrateurs de plateforme",
+    "stewardsTitle": "Commissaires actuels",
+    "userSelectionKicker": "Sélection de l'utilisateur",
+    "userSelectionTitle": "Choisissez qui mettre à jour",
+    "whatChangesCommunity": "Les changements de rôle dans la communauté affectent uniquement la communauté sélectionnée. L'accès administrateur de la plateforme, le cas échéant, reste inchangé.",
+    "whatChangesKicker": "Ce qui change ici",
+    "whatChangesPlatform": "Les modifications apportées à l’administrateur de la plateforme affectent uniquement la gestion à l’échelle de la plateforme. Tous les rôles spécifiques à la communauté restent intacts.",
+    "workingScope": "Portée de travail"
+  },
+  "app": {
+    "footer": {
+      "actionBody": "Soutenez les campagnes, financez ensemble les travaux urgents et maintenez l’action communautaire fondée sur la responsabilité.",
+      "actionTitle": "Action",
+      "communityBody": "Parcourez les espaces communautaires, lisez le kaupapa derrière chaque groupe et voyez où vous pouvez participer.",
+      "communityTitle": "Communauté",
+      "governanceBody": "Débattez des propositions avec des fenêtres de vote visibles, des paramètres de quorum et des décisions clairement attribuées.",
+      "governanceTitle": "Gouvernance",
+      "intro": "Une expression locale de la communauté d'Amnesty, façonnée par des propositions, des campagnes et le pouvoir populaire à travers Aotearoa."
+    },
+    "landing": {
+      "accessBody": "Les téléspectateurs peuvent explorer chaque communauté. Les membres assignés et les administrateurs de communauté peuvent proposer, voter et contribuer ensemble.",
+      "actionBody": "Le site d’Amnesty en direct équilibre l’urgence et l’ouverture. Cette application suit désormais le même rythme : plus d'espace éditorial, des appels à l'action plus clairs et moins l'impression de tableau de bord encadré.",
+      "actionKicker": "Agir ensemble",
+      "actionTitle": "Créez une dynamique locale à travers les communautés, les propositions et les campagnes.",
+      "artBody": "Façonnez les décisions collectives, soutenez les campagnes urgentes et maintenez l’action communautaire fondée sur la responsabilité.",
+      "artKicker": "Le pouvoir du peuple",
+      "artTitle": "Si vous vous souciez suffisamment de poser des questions, vous vous souciez suffisamment d’agir.",
+      "cards": {
+        "campaignsBody": "Soutenez le travail urgent en commun avec des objectifs partagés, des progrès visibles et des décisions de collecte de fonds menées par la communauté.",
+        "campaignsTitle": "Pratiquer la générosité",
+        "communitiesBody": "Organisez des espaces communautaires, invitez délibérément à la participation et maintenez le travail en faveur des droits humains ancré dans le pouvoir du peuple.",
+        "communitiesTitle": "Créer une dynamique locale",
+        "proposalsBody": "Faites passer les idées de la discussion à la décision avec des fenêtres claires, des résultats de vote visibles et une responsabilité communautaire.",
+        "proposalsTitle": "Utiliser la voix de la communauté"
+      },
+      "heroBody": "Rassemblez les communautés d’Amnesty pour organiser des événements locaux, débattre de propositions et financer des actions urgentes avec une responsabilité visible.",
+      "heroKicker": "Un mouvement de défense des droits humains à Aotearoa",
+      "heroTitle": "Le pouvoir du peuple pour la gouvernance communautaire",
+      "joinBody": "Les communautés créent un espace commun pour s'organiser autour d'une action locale, d'une participation claire et d'une solidarité pratique.",
+      "joinKicker": "Rejoignez la communauté Amnesty",
+      "joinTitle": "Rencontrez d’autres défenseurs des droits de l’homme",
+      "statement": "La voix de la communauté, la responsabilité visible et l’action collective appartiennent au même endroit.",
+      "visibilityBody": "Lisez les espaces communautaires, comprenez le kaupapa local et voyez où vous pouvez aider à organiser des propositions, des campagnes et le pouvoir populaire.",
+      "visibilityCallout": "Visualisez ouvertement les communautés. Participez là où on vous confie un rôle.",
+      "visibilityTitle": "Lorsque la voix de la communauté devient visible, l’action peut aller plus vite."
+    },
+    "nav": {
+      "admin": "Administrateur",
+      "boards": "Planches",
+      "calendar": "Calendrier",
+      "campaigns": "Campagnes",
+      "communities": "Communautés",
+      "community": "Communauté",
+      "dashboard": "Tableau de bord",
+      "hub": "Centre",
+      "platform": "Plateforme",
+      "profile": "Profil",
+      "proposals": "Propositions",
+      "workspace": "Espace de travail"
+    }
+  },
+  "auth": {
+    "action": {
+      "loggingIn": "Connexion...",
+      "login": "Connectez-vous",
+      "logout": "Se déconnecter",
+      "signOut": "Se déconnecter"
+    }
+  },
+  "boards": {
+    "actions": {
+      "addCard": "Ajouter une carte",
+      "addColumn": "Ajouter une colonne",
+      "createBoard": "Créer un tableau",
+      "moveLeft": "Déplacer vers la gauche",
+      "moveRight": "Déplacer à droite",
+      "pin": "Épingle",
+      "pinned": "Épinglé"
+    },
+    "board": {
+      "columns": "Colonnes du tableau",
+      "newColumn": "Nouvelle colonne",
+      "newColumnTitle": "Nouveau titre de colonne",
+      "searchCards": "Rechercher des cartes",
+      "title": "Titre du conseil d'administration"
+    },
+    "card": {
+      "addDetails": "Ajouter des détails",
+      "assignees": "Destinataires",
+      "closeDetails": "Fermer les détails de la carte",
+      "created": "Créé",
+      "creator": "Créateur",
+      "descriptionMode": "Mode descriptif",
+      "detailTitle": "Titre détaillé de la carte",
+      "details": "Détails de la carte",
+      "dragCard": "Faites glisser la carte",
+      "due": "À payer {{date}}",
+      "dueDate": "Date d'échéance",
+      "editMarkdownSyntax": "Modifier la syntaxe de démarque",
+      "linkedDocument": "Document lié",
+      "linkedDocumentNotVisible": "Le document lié ne vous est plus visible.",
+      "linkedEvent": "Événement lié",
+      "linkedEventNotVisible": "L'événement lié ne vous est plus visible.",
+      "markdownDescription": "Description de la démarque",
+      "markdownPlaceholder": "Écrivez la description de la carte dans Markdown...",
+      "noDescription": "Aucune description pour l'instant.",
+      "noDetailsYet": "Pas de détails pour l'instant",
+      "noLinkedDocument": "Aucun document lié",
+      "noLinkedEvent": "Aucun événement lié",
+      "openDetails": "Ouvrir les détails de la carte",
+      "openDocument": "Ouvrir le document",
+      "openEvent": "Événement ouvert",
+      "preview": "Aperçu",
+      "saveCard": "Enregistrer la carte",
+      "title": "Titre de la carte",
+      "updated": "Mis à jour"
+    },
+    "column": {
+      "addCardTo": "Ajouter une carte à {{columnTitle}}",
+      "deleteColumn": "Supprimer la colonne",
+      "deleteEmpty": "Supprimer la colonne vide",
+      "dragColumn": "Faites glisser la colonne",
+      "moveCardsBeforeDelete": "Déplacez les cartes avant de supprimer cette colonne",
+      "title": "Titre de la colonne"
+    },
+    "empty": {
+      "chooseBoard": "Choisissez un tableau dans la barre latérale pour commencer à coordonner le travail.",
+      "createFirst": "Créez un tableau pour {{communityName}} afin de coordonner les tâches, les bloqueurs et les prochaines étapes.",
+      "noSelectionTitle": "Aucun tableau sélectionné",
+      "unavailableBody": "Ce tableau a peut-être été archivé, supprimé ou n'est pas partagé avec vous.",
+      "unavailableTitle": "Tableau indisponible"
+    },
+    "emptyBody": "Créez un tableau pour coordonner les tâches de cette communauté.",
+    "emptyTitle": "Aucun tableau sélectionné",
+    "hero": {
+      "boardStats": "Statistiques du tableau",
+      "body": "Organisez les tâches, faites apparaître les bloqueurs et faites évoluer le travail de votre communauté vers un impact.",
+      "kicker": "Planches",
+      "manageAccessBody": "Vous pouvez gérer des tableaux, des colonnes, des cartes et des membres.",
+      "shareAccessBody": "Vous pouvez afficher ou contribuer en fonction des paramètres de partage du tableau.",
+      "title": "Coordonner le travail et suivre les progrès ensemble.",
+      "yourAccess": "Votre accès"
+    },
+    "labels": {
+      "activeCardsCount": "{{count}} cartes actives",
+      "boardsCount": "{{count}} planches",
+      "cards": "cartes",
+      "cardsCountWithValue": "{{value}} cartes",
+      "columnsCount": "{{count}} colonnes",
+      "filteredCardsCount": "{{count}} cartes sur {{total}}",
+      "workspaceCardsCount": "{{count}} cartes d'espace de travail"
+    },
+    "messages": {
+      "archiveConfirm": "Archiver ce tableau ? Il disparaîtra des listes actives du forum.",
+      "archived": "Tableau archivé.",
+      "communityShareUpdated": "Partage du tableau communautaire mis à jour vers {{role}}.",
+      "grantedAccess": "Accès accordé à {{role}}.",
+      "pinned": "Épinglé comme tableau par défaut.",
+      "private": "Le conseil est désormais privé.",
+      "publicLinkCreated": "Lien du tableau public créé et copié.",
+      "publicLinkDisabled": "Lien vers le tableau public désactivé.",
+      "synced": "Tableau synchronisé.",
+      "unpinned": "Supprimé en tant que tableau par défaut."
+    },
+    "newCardPlaceholder": "Nouveau titre de carte",
+    "newColumnPlaceholder": "Nouveau titre de colonne",
+    "newPlaceholder": "Nouveau titre du conseil d'administration",
+    "page": {
+      "body": "Transformez vos projets en tâches pratiques avec des tableaux adaptés à cette communauté et à ses membres.",
+      "title": "Coordonner le travail communautaire au sein des conseils d’administration"
+    },
+    "public": {
+      "body": "Ce forum est partagé sous forme de lien public en lecture seule. Connectez-vous pour collaborer dans votre espace de travail communautaire.",
+      "homeAria": "Ouvrir la maison Amnesty DAO",
+      "noSignIn": "Aucune connexion requise pour cette vue en lecture seule.",
+      "readOnlyBoard": "Tableau en lecture seule",
+      "sharedWorkspaceView": "Vue de l'espace de travail partagé",
+      "title": "Vue du tableau public",
+      "unavailableBody": "Ce lien vers un tableau public a peut-être été désactivé ou le tableau n'est plus visible.",
+      "unavailableTitle": "Tableau public indisponible"
+    },
+    "share": {
+      "anyoneWithLink": "Quelqu'un ayant le lien",
+      "close": "Fermer le partage du tableau",
+      "communityBoardRole": "Rôle du conseil communautaire",
+      "communityWorkspace": "Espace de travail communautaire",
+      "copyLink": "Copier le lien",
+      "createPublicLink": "Créer un lien public",
+      "description": "Accordez un accès direct, partagez avec les membres de l'espace de travail de la communauté ou créez un lien public en lecture seule.",
+      "directGrantRole": "Rôle de subvention directe",
+      "directMember": "Membre direct",
+      "disable": "Désactiver",
+      "ownerOnlyPublicLink": "Seul le propriétaire du forum peut gérer les liens publics.",
+      "principalPlaceholder": "aaaaa-aa ou membre principal",
+      "principalToGrant": "Principal pour accorder l'accès",
+      "publicBoardUrl": "URL du forum public",
+      "publicLinksBody": "Créez un lien public en lecture seule pour les personnes extérieures à la communauté.",
+      "title": "Partager le tableau",
+      "updateCommunityShare": "Mettre à jour le partage communautaire",
+      "workspaceVisibility": "Contrôlez si ce tableau apparaît pour les membres de l'espace de travail."
+    },
+    "sidebar": {
+      "aria": "Bibliothèque du conseil d'administration",
+      "emptyMine": "Aucune planche ne vous appartient pour l'instant.",
+      "emptyShared": "Aucun tableau directement partagé trouvé.",
+      "emptyWorkspace": "Aucun tableau d'espace de travail trouvé.",
+      "meta": "{{role}} · {{columns}} colonnes · {{cards}} cartes",
+      "myBoards": "Mes planches",
+      "newBoardTitle": "Nouveau titre du conseil d'administration",
+      "search": "Tableaux de recherche",
+      "sharedWithMe": "Partagé avec moi",
+      "title": "Planches",
+      "workspaceBoards": "Tableaux d'espace de travail"
+    }
+  },
+  "calendar": {
+    "actions": {
+      "create": "Créer un événement",
+      "new": "Nouveau",
+      "saveEvent": "Enregistrer l'événement",
+      "update": "Événement de mise à jour"
+    },
+    "createTitle": "Créer un événement communautaire",
+    "editTitle": "Modifier un événement communautaire",
+    "editor": {
+      "aria": "Editeur d'événements",
+      "planMeeting": "Planifier une réunion"
+    },
+    "emptyBody": "Créez le premier événement pour rendre visible le travail communautaire à venir.",
+    "emptyTitle": "Aucun événement pour l'instant",
+    "errors": {
+      "loadFailed": "Impossible de charger les événements du calendrier."
+    },
+    "fields": {
+      "allDay": "Toute la journée",
+      "description": "Descriptif",
+      "end": "Fin",
+      "location": "Emplacement",
+      "locationPlaceholder": "Salle, lien d'appel ou lieu",
+      "meetingTitlePlaceholder": "Titre de la réunion",
+      "notes": "Remarques",
+      "notesPlaceholder": "Objectif, ordre du jour ou notes de préparation",
+      "shareToWorkspace": "Partager sur l'espace de travail",
+      "start": "Commencer",
+      "title": "Titre de l'événement"
+    },
+    "hero": {
+      "body": "Planifiez des événements, des réunions et des actions pour que votre communauté puisse agir ensemble.",
+      "kicker": "Calendrier",
+      "title": "Planifiez avec un but.",
+      "utcBacked": "Calendrier basé sur UTC"
+    },
+    "legend": {
+      "dragToReschedule": "Faites glisser pour reprogrammer",
+      "myEvents": "Mes événements",
+      "workspaceVisible": "Espace de travail visible"
+    },
+    "loadingEvents": "Chargement des événements...",
+    "messages": {
+      "chooseParticipant": "Choisissez un participant pour accorder l’accès.",
+      "copied": "{{label}} copié.",
+      "created": "Événement créé.",
+      "deleted": "Événement supprimé.",
+      "grantedAccess": "Accès accordé à {{role}}.",
+      "publicLinkDisabled": "Lien vers l'événement public désactivé.",
+      "releaseToSave": "Relâchez pour enregistrer la nouvelle heure.",
+      "timeSaved": "Heure de l'événement enregistrée.",
+      "updated": "Événement mis à jour."
+    },
+    "meta": {
+      "owner": "Propriétaire",
+      "ownerOnly": "Seul le propriétaire peut gérer les liens publics.",
+      "participants": "Participants",
+      "privateShared": "Privé/partagé",
+      "role": "Rôle",
+      "start": "Commencer",
+      "visibility": "Visibilité",
+      "workspace": "Espace de travail"
+    },
+    "page": {
+      "body": "Planifiez les rassemblements, les actions, les réunions et les délais dans un seul calendrier communautaire.",
+      "title": "Gardez les événements communautaires visibles"
+    },
+    "public": {
+      "calendar": "Calendrier public",
+      "detailsAria": "Détails de l'événement public",
+      "event": "Événement",
+      "noEdits": "Aucune modification de cette vue",
+      "notFoundBody": "Ce lien d'événement public a peut-être été désactivé ou l'événement n'est plus visible.",
+      "notFoundTitle": "Événement public indisponible",
+      "openingBody": "Chargement des détails de l'événement partagé.",
+      "openingTitle": "Événement public d'ouverture...",
+      "readOnly": "Lecture seule",
+      "readOnlyRole": "Visionneuse en lecture seule"
+    },
+    "share": {
+      "addParticipant": "Ajouter un participant",
+      "copyEventLink": "Copier le lien de l'événement",
+      "copyPublicLink": "Copier le lien public",
+      "createPublicLink": "Créer un lien public",
+      "disablePublicLink": "Désactiver le lien public",
+      "eventLink": "Lien de l'événement",
+      "eventRole": "Rôle événementiel",
+      "grantAccess": "Accorder l'accès",
+      "principalPlaceholder": "aaaaa-aa ou membre principal",
+      "principalToGrant": "Principal pour accorder l'accès à l'événement",
+      "publicEventLink": "Lien de l'événement public",
+      "title": "Partage d'événements"
+    },
+    "visibleEvents": "{{count}} événement visible"
+  },
+  "campaigns": {
+    "card": {
+      "allOrNothing": "Tout ou rien : les fonds ne sont collectés que si l'objectif est atteint dans les délais.",
+      "contributeLockedTitle": "Only assigned community members and admins can contribute to campaigns",
+      "daysLeft": "{{days}} jours restants",
+      "ended": "Terminé",
+      "progress": "{{raised}} / {{goal}}",
+      "progressPercentage": "{{percentage}}%",
+      "yourCampaign": "Votre campagne"
+    },
+    "create": {
+      "durationLabel": "Durée de la campagne (jours) *",
+      "durationPlaceholder": "Entrez le nombre de jours",
+      "error": "Échec de la création de la campagne : {{message}}",
+      "fundingBody": "Votre campagne suivra un modèle tout ou rien. Les fonds ne sont collectés que si le montant cible est atteint dans les délais. Si l’objectif n’est pas atteint, aucun fonds ne sera collecté.",
+      "fundingTitle": "Financement tout ou rien",
+      "goalLabel": "Montant de l'objectif ($) *",
+      "goalPlaceholder": "Entrez le montant cible",
+      "storyHelp": "Inclure un récit, qui en profite et un aperçu du budget",
+      "storyLabel": "Histoire de la campagne *",
+      "storyPlaceholder": "Décrivez votre campagne, qui elle aidera et comment les fonds seront utilisés...",
+      "title": "Créer une campagne de collecte de fonds",
+      "titleLabel": "Titre de la campagne *",
+      "titlePlaceholder": "Entrez le titre de la campagne",
+      "validationAllFields": "Veuillez remplir tous les champs",
+      "validationDays": "Veuillez entrer un nombre de jours valide",
+      "validationGoalAmount": "Veuillez saisir un montant d'objectif valide"
+    },
+    "detail": {
+      "amountLabel": "Montant ($)",
+      "amountPlaceholder": "Entrez le montant",
+      "campaignEnded": "Campagne terminée",
+      "contributeError": "Échec de la contribution : {{message}}",
+      "contributeSuccess": "Contribution réussie !",
+      "contributeTitle": "Contribuez à cette campagne",
+      "contributionValidation": "Veuillez saisir un montant de contribution valide",
+      "contributionsTab": "Cotisations ({{count}})",
+      "creatorActionsTitle": "Actions du créateur",
+      "creatorTooltip": {
+        "goalNotMet": "La campagne ne peut être finalisée qu'une fois l'objectif de financement atteint",
+        "notActive": "La campagne est déjà finalisée",
+        "notCreator": "Seul le créateur de la campagne peut finaliser la campagne",
+        "ready": "Finaliser la campagne maintenant que l'objectif de financement a été atteint"
+      },
+      "detailsTab": "Détails",
+      "finalizeConfirm": "Êtes-vous sûr de vouloir finaliser cette campagne ? Cela marquera la campagne comme réussie et complète. Cette action ne peut pas être annulée.",
+      "finalizeError": "Échec de la finalisation de la campagne : {{message}}",
+      "finalizeStatusGoalMet": "L'objectif de la campagne a été atteint ! Vous pouvez finaliser la campagne.",
+      "finalizeStatusPending": "La campagne pourra être finalisée une fois l’objectif de financement de {{goal}} atteint.",
+      "finalizeStatusReady": "La campagne peut être finalisée maintenant que l'objectif de financement a été atteint.",
+      "finalizeSuccess": "Campagne finalisée avec succès !",
+      "fundingBody": "Cette campagne suit un modèle du tout ou rien. Les fonds ne sont collectés que si le montant cible est atteint dans les délais ou si le créateur de la campagne le finalise tôt une fois l'objectif atteint. Si l’objectif n’est pas atteint, aucun fonds ne sera collecté.",
+      "fundingTitle": "Financement tout ou rien",
+      "goalReached": "Objectif de financement atteint ! La campagne peut maintenant être finalisée.",
+      "goalReachedNote": "L'objectif de financement a été atteint. Le créateur de la campagne peut désormais finaliser cette campagne.",
+      "noteLabel": "Remarque :",
+      "postUpdatePlaceholder": "Partagez les progrès, les résultats ou d'autres mises à jour avec les bailleurs de fonds...",
+      "postUpdateTitle": "Publier une mise à jour",
+      "progressSummary": "{{raised}} / {{goal}}",
+      "stateLabel": "État : {{state}}",
+      "storyTitle": "Histoire de la campagne",
+      "updateError": "Échec de la publication de la mise à jour : {{message}}",
+      "updateLabel": "Mise à jour #{{id}}",
+      "updateSuccess": "Mise à jour publiée avec succès !",
+      "updateValidation": "Veuillez saisir le contenu de la mise à jour",
+      "updatesTab": "Mises à jour ({{count}})"
+    }
+  },
+  "common": {
+    "actions": {
+      "back": "Retour",
+      "cancel": "Annuler",
+      "close": "Fermer",
+      "continue": "Continuer",
+      "contribute": "Contribuer",
+      "create": "Créer",
+      "createCampaign": "Créer une campagne",
+      "createCommunity": "Créer une communauté",
+      "createFirstCampaign": "Créer la première campagne",
+      "createFirstCommunity": "Créer la première communauté",
+      "createFirstProposal": "Créer la première proposition",
+      "createProposal": "Créer une proposition",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "enterPrincipal": "Entrez le principal",
+      "finalizeCampaign": "Finaliser la campagne",
+      "finalizeProposal": "Finaliser la proposition",
+      "leaveCommunity": "Quitter la communauté",
+      "logIn": "Connectez-vous",
+      "logOut": "Se déconnecter",
+      "lookUp": "Rechercher",
+      "openCommunity": "Communauté ouverte",
+      "postUpdate": "Publier la mise à jour",
+      "save": "Enregistrer",
+      "saveAssignment": "Enregistrer le devoir",
+      "selectFromList": "Sélectionner dans la liste",
+      "share": "Partager",
+      "viewDetails": "Afficher les détails"
+    },
+    "buttons": {
+      "campaignAccessLocked": "Accès à la campagne verrouillé",
+      "proposalAccessLocked": "Accès à la proposition verrouillé"
+    },
+    "empty": {
+      "noCampaigns": "Aucune campagne pour l'instant",
+      "noCommunities": "Aucune communauté n'a encore été publiée.",
+      "noContributions": "Aucune contribution pour l'instant.",
+      "noProposals": "Aucune proposition pour l'instant",
+      "noUpdates": "Aucune mise à jour publiée pour l'instant.",
+      "noUsers": "Aucun profil utilisateur enregistré pour l'instant."
+    },
+    "errors": {
+      "genericFinalizeProposal": "Une erreur s'est produite lors de la finalisation de la proposition. Veuillez réessayer.",
+      "genericVote": "Une erreur s'est produite lors du traitement de votre vote. Veuillez réessayer."
+    },
+    "labels": {
+      "accessModel": "Modèle d'accès",
+      "by": "Par {{name}}",
+      "byPrefix": "Par",
+      "campaign": "Campagne",
+      "campaignId": "ID de campagne : {{id}}",
+      "characters": "{{count}}/{{max}} caractères",
+      "community": "Communauté",
+      "contribution": "Cotisation",
+      "platformAccess": "Accès à la plateforme",
+      "principal": "Directeur",
+      "proposal": "Proposition",
+      "roleAccess": "Accès aux rôles",
+      "scope": "Portée : {{scope}}",
+      "signedIn": "Connecté",
+      "totalVotes": "Total des voix",
+      "unknown": "Inconnu",
+      "updates": "Mises à jour",
+      "viewerOnly": "Visionneuse uniquement"
+    },
+    "loading": {
+      "checkingAccess": "Vérification de l'accès",
+      "checkingRole": "Rôle de vérification",
+      "checkingStatus": "Vérification de l'état de finalisation...",
+      "contributing": "Contribuer...",
+      "creating": "Création...",
+      "finalizing": "Finalisation...",
+      "leaving": "Partir...",
+      "loggingIn": "Connexion...",
+      "posting": "Publication...",
+      "saving": "Sauvegarde...",
+      "voting": "Voter..."
+    },
+    "roles": {
+      "communityAdmin": "Administrateur de la communauté",
+      "member": "Membre",
+      "platformAdmin": "Administrateur de la plateforme",
+      "viewer": "Visionneuse"
+    },
+    "states": {
+      "campaign": {
+        "active": "Actif",
+        "expired": "Expiré",
+        "failed": "Échec",
+        "successful": "Réussi"
+      },
+      "proposal": {
+        "active": "Actif",
+        "failed": "Échec",
+        "passed": "Réussi",
+        "pendingFinalization": "En attente de finalisation"
+      }
+    }
+  },
+  "communities": {
+    "body": "Les rôles de la communauté sont explicites, mais la navigation reste ouverte à toute personne authentifiée afin que les idées, les campagnes et le contexte local restent visibles.",
+    "card": {
+      "accessLoading": "Nous vérifions votre accès à la communauté.",
+      "accessParticipant": "Vous pouvez contribuer à façonner les propositions et les campagnes dans cette communauté.",
+      "accessViewer": "Vous disposez ici d'un accès en lecture seule jusqu'à ce qu'un rôle soit attribué.",
+      "assignedCount": "{{count}} attribué",
+      "kicker": "Espace communautaire"
+    },
+    "create": {
+      "error": "Échec de la création d'une communauté. Veuillez vérifier vos autorisations et réessayer.",
+      "nameLabel": "Nom de la communauté *",
+      "namePlaceholder": "Entrez le nom de la communauté",
+      "panelBody": "Vous deviendrez le premier administrateur de la communauté et serez automatiquement affecté à la communauté. Les administrateurs de la plateforme peuvent toujours superviser la communauté, mais la gestion des membres locaux commence ici.",
+      "panelTitle": "Création de communauté",
+      "policyLabel": "Politique communautaire *",
+      "policyPlaceholder": "Décrire l'objectif de la communauté, les règles de gouvernance et les lignes directrices...",
+      "title": "Créer une nouvelle communauté"
+    },
+    "emptyAdmin": "Créez la première communauté pour commencer à attribuer des rôles, à élaborer des propositions et à coordonner des campagnes.",
+    "emptyViewer": "Un administrateur de plateforme doit créer la première communauté avant de pouvoir attribuer des membres.",
+    "kicker": "Communautés",
+    "leave": {
+      "bulletBrowse": "Vous permettre de continuer à visualiser la communauté en tant que spectateur authentifié",
+      "bulletPreserve": "Conservez vos propositions et votes historiques (ils resteront visibles)",
+      "bulletProposal": "Révoquez votre capacité à créer de nouvelles propositions dans cette communauté",
+      "bulletRemove": "Vous retirer de la liste des membres de la communauté",
+      "bulletViewer": "Vous rediriger vers l'accès en lecture seule dans cette communauté",
+      "bulletVote": "Révoquez votre capacité à voter sur les propositions de cette communauté",
+      "confirmHelp": "Cette confirmation permet d’éviter un départ accidentel de la communauté.",
+      "confirmLabel": "Tapez « QUITTER » pour confirmer *",
+      "confirmPlaceholder": "Tapez QUITTER pour confirmer",
+      "errorBody": "Assurez-vous que vous êtes membre de cette communauté et que vous disposez des autorisations appropriées pour la quitter.",
+      "errorTitle": "Impossible de quitter la communauté. Veuillez vérifier vos autorisations et réessayer.",
+      "leaving": "Partir...",
+      "successBody": "Vous avez été supprimé de la liste des membres de la communauté et pouvez désormais la consulter en lecture seule. Vos contributions historiques restent préservées.",
+      "successTitle": "Vous avez quitté la communauté avec succès !",
+      "title": "Quitter la communauté",
+      "warningIntro": "Vous êtes sur le point de quitter « {{communityName}} ». Cette action va :",
+      "warningOutro": "Vous aurez besoin de l’aide de l’administrateur pour vous réinscrire en tant que membre si vous souhaitez participer à nouveau.",
+      "warningTitle": "Confirmer le départ de la communauté"
+    },
+    "membership": {
+      "body": "Attributions d'adhésion basées sur les rôles pour cette communauté.",
+      "communityAdmins": "Administrateurs de la communauté",
+      "emptyCommunityAdmins": "Aucun administrateur de communauté affecté.",
+      "emptyMembers": "Aucun membre affecté à cette communauté.",
+      "kicker": "Modèle de rôle",
+      "loadError": "Impossible de charger les informations sur l'adhésion à la communauté.",
+      "members": "Membres",
+      "title": "Adhésion à la communauté",
+      "unnamedMember": "Membre anonyme",
+      "viewerAccessBody": "Les téléspectateurs sont implicites et ne sont pas répertoriés ici. Cette liste affiche uniquement les principaux auxquels un rôle de communauté est attribué : administrateurs et membres de la communauté.",
+      "viewerAccessTitle": "L’accès des spectateurs reste implicite"
+    },
+    "portal": {
+      "accessBanners": {
+        "communityAdminBody": "Vous pouvez participer à la gouvernance et gérer les attributions de rôles communautaires au sein de cet espace.",
+        "communityAdminTitle": "Intendance communautaire",
+        "memberBody": "Vous pouvez créer des propositions, voter, contribuer à des campagnes et vous retirer de cette communauté si nécessaire.",
+        "memberTitle": "Participation communautaire",
+        "platformAdminBody": "Vous pouvez participer ici et gérer l'adhésion à la communauté car vous détenez le rôle d'administrateur de la plateforme.",
+        "platformAdminTitle": "Intendance à l’échelle de la plateforme",
+        "viewerBody": "Vous pouvez lire le contexte, les propositions et les campagnes de la communauté. La participation s'ouvre une fois qu'un rôle est attribué.",
+        "viewerTitle": "Accès spectateur"
+      },
+      "assignedParticipants": "Participants assignés",
+      "backToCommunities": "Retour aux communautés",
+      "campaignsBodyEnabled": "Soutenez des campagnes ou lancez-en une nouvelle pour cette communauté.",
+      "campaignsBodyViewer": "Suivez l'avancement de la campagne ici. La contribution s'ouvre une fois qu'un rôle communautaire est attribué.",
+      "campaignsKicker": "Campagnes",
+      "campaignsTitle": "Financer l’action locale",
+      "capabilities": "Vos capacités",
+      "capabilitiesEnabled": "Créez des propositions, votez et aidez à façonner l’action communautaire.",
+      "capabilitiesViewer": "Lisez le contexte complet de la communauté tout en restant en mode visionneuse.",
+      "createCampaignLockedTitle": "Seuls les membres de la communauté et les administrateurs affectés peuvent créer des campagnes",
+      "createProposalLockedTitle": "Seuls les membres de la communauté et les administrateurs affectés peuvent créer des propositions.",
+      "emptyCampaignsAdmin": "Démarrez la première campagne de financement pour cette communauté lorsque le moment appelle un soutien collectif.",
+      "emptyCampaignsViewer": "Aucune campagne n'a encore été créée pour cette communauté.",
+      "emptyProposalsAdmin": "Soyez le premier à soumettre une proposition dans cet espace communautaire.",
+      "emptyProposalsViewer": "Aucune proposition n'a encore été créée pour cette communauté.",
+      "kicker": "Portail communautaire",
+      "loadErrorBody": "La communauté demandée est manquante ou n'a pas pu être chargée pour le moment.",
+      "loadErrorTitle": "Nous n'avons pas pu charger cette communauté.",
+      "platformAccessTitle": "Accès à la plateforme",
+      "proposalsBodyEnabled": "Créez une proposition ou votez sur la direction que cette communauté devrait prendre ensuite.",
+      "proposalsBodyViewer": "Lisez la liste des propositions actuelles et regardez la prise de décision rester visible.",
+      "proposalsKicker": "Propositions",
+      "proposalsTitle": "Façonner les décisions communautaires",
+      "roleAccessTitle": "Accès aux rôles"
+    },
+    "setupKicker": "Configuration de la communauté",
+    "title": "Lisez chaque communauté. Participez là où on vous fait confiance pour agir."
+  },
+  "i18n": {
+    "language": {
+      "helper": "Choisissez la langue utilisée dans Amnesty DAO sur cet appareil.",
+      "label": "Langue",
+      "machineTranslationNote": "Des traductions automatiques préliminaires sont fournies pour aider les réviseurs à démarrer plus vite. Veuillez relire les textes destinés à la communauté avant publication."
+    }
+  },
+  "mainTabs": {
+    "body": "Lisez les communautés en tant que spectateur, participez à la prise de décision partout où vous occupez un rôle et maintenez la participation à la plateforme ancrée dans le pouvoir des personnes.",
+    "claimAction": "Administrateur de la plateforme de réclamation",
+    "kicker": "Communauté d'amnistie",
+    "platformRoles": "Rôles de plateforme",
+    "platformRolesBody": "Les administrateurs de plateforme gèrent l’accès à l’ensemble de la plateforme et peuvent prendre en charge l’adhésion dans chaque communauté.",
+    "roleModelBody": "L'accès à l'ensemble de la plateforme est réservé aux personnes qui gèrent les rôles de la communauté. La participation elle-même reste à l'échelle de la communauté, de sorte que les membres peuvent se concentrer sur l'organisation et la prise de décision locales.",
+    "roleModelKicker": "Modèle de rôle",
+    "setupBody": "Aucun administrateur de plateforme n’existe encore. Réclamez explicitement le premier rôle avant que les communautés et les affectations de membres puissent être gérées.",
+    "setupKicker": "Configuration de la plateforme",
+    "setupTitle": "Réclamez le premier administrateur de la plateforme",
+    "tabs": {
+      "dashboard": "Tableau de bord",
+      "platformAdmin": "Administrateur de la plateforme"
+    },
+    "title": "Agir ensemble",
+    "yourAccess": "Votre accès",
+    "yourAccessBody": "Les téléspectateurs peuvent lire sur la plateforme. Les rôles communautaires débloquent les propositions, le vote, la collecte de fonds et la gestion des membres."
+  },
+  "profile": {
+    "body": "Ajoutez le nom que les autres défenseurs devraient voir lorsque les propositions, les campagnes et les décisions sont attribuées sur la plateforme.",
+    "kicker": "Communauté d'amnistie",
+    "nameLabel": "Votre nom",
+    "namePlaceholder": "Comment la communauté devrait-elle vous connaître ?",
+    "page": {
+      "body": "Gardez à jour le nom que les gens voient à côté de vos propositions, campagnes, modifications de l'espace de travail et participation à la communauté.",
+      "identityKicker": "Principal d'identité Internet",
+      "kicker": "Profil",
+      "title": "Gérez l'identité de votre communauté"
+    },
+    "saveError": "Nous n'avons pas encore pu enregistrer votre profil.",
+    "title": "Bienvenue dans le mouvement"
+  },
+  "proposals": {
+    "card": {
+      "alreadyVotedBody": "Le système impose un vote par personne et par proposition. Votre vote a été enregistré et compté.",
+      "alreadyVotedCreator": "En tant que créateur de la proposition, vous avez pu voter sur votre propre proposition.",
+      "alreadyVotedTitle": "Vous avez déjà voté sur cette proposition",
+      "creatorUnknown": "Membre inconnu",
+      "daysCount": "{{count}} jours",
+      "finalizeErrorTitle": "Échec de la finalisation de la proposition.",
+      "finalizeSuccessBody": "La proposition a été finalisée et son statut final a été déterminé sur la base des résultats du vote.",
+      "finalizeSuccessTitle": "Proposition finalisée avec succès !",
+      "governanceSettings": "Paramètres de gouvernance",
+      "lessThanMinute": "Moins d'un million restant",
+      "no": "Non : {{count}} ({{percentage}}%)",
+      "passThreshold": "Seuil de réussite",
+      "passThresholdValue": "{{count}}% oui vote",
+      "quorum": "Quorum",
+      "timeDaysHours": "{{days}}d {{hours}}h restantes",
+      "timeHoursMinutes": "{{hours}}h {{minutes}}m restant",
+      "timeMinutes": "{{minutes}}m restants",
+      "timeRemaining": "Temps restant : {{value}}",
+      "totalVotesRequired": "Total des votes : {{total}} / {{required}} requis",
+      "viewerAccess": "Accès spectateur",
+      "voteButtonTitles": {
+        "alreadyVoted": "Vous avez déjà voté sur cette proposition",
+        "no": "Votez non à cette proposition",
+        "viewer": "Seuls les membres assignés à la communauté et les administrateurs peuvent voter",
+        "votingClosed": "La fenêtre de vote est fermée",
+        "votingNotStarted": "Le vote n'a pas encore commencé",
+        "yes": "Votez oui sur cette proposition"
+      },
+      "voteErrorTitle": "Je n'ai pas voté. Veuillez réessayer.",
+      "voteNo": "Votez non",
+      "voteSuccessBody": "Votre vote a été enregistré. Le système garantit un vote par personne et par proposition.",
+      "voteSuccessCreator": "En tant que créateur de la proposition, vous avez voté avec succès sur votre propre proposition.",
+      "voteSuccessTitle": "Votez avec succès !",
+      "voteYes": "Votez oui",
+      "votedBadge": "Vous avez voté",
+      "votesMinimum": "{{count}} voix minimum",
+      "votingClosed": "Vote clos",
+      "votingNotStarted": "Le vote n'a pas commencé",
+      "votingResults": "Résultats du vote",
+      "votingWindow": "Fenêtre de vote",
+      "yes": "Oui : {{count}} ({{percentage}}%)",
+      "yourProposal": "Votre proposition"
+    },
+    "create": {
+      "customizeGovernance": "Personnaliser les paramètres de gouvernance",
+      "defaultPassThreshold": "50% des votes doivent être oui",
+      "defaultQuorum": "1 voix minimum",
+      "defaultSettings": "Paramètres par défaut",
+      "defaultVotingWindow": "3 jours",
+      "descriptionLabel": "Description de la proposition *",
+      "descriptionPlaceholder": "Décrivez votre proposition en détail. Que proposez-vous ? Pourquoi la communauté devrait-elle le soutenir ?",
+      "error": "Échec de la création de la proposition. Veuillez vérifier vos autorisations et réessayer.",
+      "minimumVotesHelp": "Total minimum de votes requis pour que la proposition soit valide",
+      "minimumVotesLabel": "Votes minimum (quorum)",
+      "passThreshold": "Seuil de réussite",
+      "passThresholdHelp": "Pourcentage de votes oui nécessaires pour réussir (1-100 %)",
+      "passThresholdLabel": "Seuil de réussite (%)",
+      "quorum": "Quorum",
+      "submissionBody": "Une fois soumise, les membres de la communauté pourront voter oui ou non sur votre proposition pendant la fenêtre de vote. Une fois la période de vote terminée, n'importe quel membre peut finaliser la proposition pour déterminer si elle a réussi ou échoué.",
+      "submissionTitle": "Soumission de la proposition",
+      "title": "Créer une nouvelle proposition",
+      "titleLabel": "Titre de la proposition *",
+      "titlePlaceholder": "Entrez le titre de la proposition",
+      "votingWindow": "Fenêtre de vote",
+      "votingWindowDaysLabel": "Période de vote (jours)",
+      "votingWindowHelp": "Combien de temps les membres peuvent voter (1 à 30 jours)"
+    }
+  },
+  "workspace": {
+    "actions": {
+      "archive": "Archiver",
+      "compact": "Instantané compact",
+      "copyLink": "Copier le lien",
+      "debugExport": "Télécharger JSON",
+      "grant": "Accorder l'accès",
+      "importMarkdown": "Importer une démarque",
+      "markdownExport": "Télécharger la démarque",
+      "menu": "Actions",
+      "pin": "Épingler par défaut",
+      "redo": "Refaire",
+      "sync": "Synchroniser",
+      "undo": "Annuler",
+      "unpin": "Désépingler par défaut",
+      "updateShare": "Mettre à jour le partage"
+    },
+    "blockMenu": {
+      "autoListNumbering": "Numérotation automatique",
+      "continuePreviousList": "Continuer la liste précédente",
+      "copyBlockLink": "Copier le lien du bloc",
+      "disableHyperlink": "Désactiver le lien hypertexte",
+      "duplicate": "Double",
+      "enableHyperlink": "Activer le lien hypertexte",
+      "formatBlock": "Bloc de formatage",
+      "insertAbove": "Insérer ci-dessus",
+      "insertBelow": "Insérer ci-dessous",
+      "listNumbering": "Numérotation des listes",
+      "moveDown": "Descendre",
+      "moveUp": "Monter",
+      "restartAtOne": "Redémarrer à 1",
+      "turnInto": "Devenir"
+    },
+    "blockRenderer": {
+      "addCaption": "Ajouter une légende",
+      "blockAria": "Bloquer {{index}} : {{label}}",
+      "blockControls": "Bloquer les contrôles",
+      "blockMenu": "Menu Bloquer",
+      "collapseToggle": "Bouton Réduire",
+      "dividerBlock": "Bloc diviseur",
+      "dragBlock": "Faites glisser le bloc",
+      "dragToReorder": "Faites glisser pour réorganiser",
+      "expandToggle": "Développer la bascule",
+      "fileLabel": "Étiquette du fichier",
+      "fileUrl": "URL du fichier",
+      "imageCaption": "Légende de l'image",
+      "imageUrl": "URL de l'image",
+      "markChecked": "Marque vérifiée",
+      "markUnchecked": "Marquer comme décoché",
+      "pasteFileUrl": "Collez une URL de fichier pour le lier.",
+      "pasteImageUrl": "Collez l'URL d'une image pour l'intégrer.",
+      "typeForCommands": "Tapez '/' pour les commandes",
+      "workspaceImage": "Image de l'espace de travail"
+    },
+    "body": "Conservez les notes de travail, les tableaux de tâches pratiques et les événements communautaires limités à cette communauté uniquement.",
+    "commands": {
+      "aria": "Commandes barre oblique",
+      "groups": {
+        "Lists": "Listes",
+        "Media": "Médias",
+        "Structure": "Structure",
+        "Text": "Texte"
+      },
+      "items": {
+        "bullet": {
+          "hint": "Élément de liste simple",
+          "label": "Liste à puces"
+        },
+        "callout": {
+          "hint": "Boîte à notes lumineuse",
+          "label": "Appeler"
+        },
+        "checklist": {
+          "hint": "Suivre une tâche",
+          "label": "Liste de contrôle"
+        },
+        "divider": {
+          "hint": "Règle horizontale",
+          "label": "Diviseur"
+        },
+        "fileLink": {
+          "hint": "URL du fichier externe",
+          "label": "Lien vers le fichier"
+        },
+        "heading1": {
+          "hint": "Titre de grande section",
+          "label": "Titre 1"
+        },
+        "heading2": {
+          "hint": "Titre de la section moyenne",
+          "label": "Titre 2"
+        },
+        "heading3": {
+          "hint": "Titre de la petite section",
+          "label": "Titre 3"
+        },
+        "image": {
+          "hint": "URL de l'image externe",
+          "label": "Image"
+        },
+        "numbered": {
+          "hint": "Élément de liste ordonné",
+          "label": "Liste numérotée"
+        },
+        "paragraph": {
+          "hint": "Paragraphe simple",
+          "label": "Texte"
+        },
+        "quote": {
+          "hint": "Citation en retrait",
+          "label": "Citation"
+        },
+        "toggle": {
+          "hint": "Section pliable",
+          "label": "Basculer"
+        }
+      },
+      "noMatches": "Aucune commande correspondante",
+      "placeholder": "Tapez une commande"
+    },
+    "comments": {
+      "add": "Commentaire",
+      "compose": "Ajouter un commentaire",
+      "documentComments": "Commentaires sur les documents",
+      "empty": "Aucun commentaire ouvert pour l'instant.",
+      "openCount": "{{count}} ouvert",
+      "openTitle": "Commentaires ouverts",
+      "placeholder": "Écrivez un commentaire. Cmd/Ctrl+Entrée soumet.",
+      "resolve": "Résoudre",
+      "submit": "Soumettre un commentaire"
+    },
+    "documents": {
+      "bodyPlaceholder": "Rédigez des notes, des plans, des liens ou des résultats de réunions...",
+      "empty": "Aucun document de l'espace de travail ne vous est encore visible.",
+      "emptyBody": "Créez ou sélectionnez un document pour commencer à écrire au sein de cette communauté.",
+      "emptyBodyTitle": "Choisir ou créer un document",
+      "emptyMine": "Aucun document pour l'instant.",
+      "emptyShared": "Aucun document partagé avec vous pour l'instant.",
+      "emptyTitle": "Aucun document sélectionné",
+      "emptyWorkspace": "Aucun document d'espace de travail pour l'instant.",
+      "newPlaceholder": "Nouveau titre du document",
+      "sidebarTitle": "Documents communautaires"
+    },
+    "editor": {
+      "addFirstBlock": "Ajouter le premier bloc",
+      "documentTitle": "Titre du document",
+      "tailEditable": "Tapez '/' pour les commandes ou appuyez sur Entrée pour un nouveau bloc",
+      "tailReadonly": "L'accès du lecteur est en lecture seule pour ce document."
+    },
+    "grants": {
+      "selectMember": "Sélectionnez un membre de la communauté",
+      "title": "Accès membre spécifique"
+    },
+    "kicker": "Espace de travail communautaire",
+    "library": {
+      "mine": "Mes documents",
+      "shared": "Partagé avec moi",
+      "workspace": "Documents de l'espace de travail"
+    },
+    "nesting": {
+      "dragHint": "Faites glisser les documents pour les imbriquer, les réorganiser ou les déplacer vers le niveau supérieur.",
+      "title": "Imbrication de documents",
+      "topLevel": "Niveau supérieur"
+    },
+    "pageBody": "Gérez des documents, collaborez avec votre communauté et transformez vos idées en impact.",
+    "pageTitle": "Construire et coordonner l’action ensemble.",
+    "roles": {
+      "editor": "Éditeur",
+      "owner": "Propriétaire",
+      "viewer": "Visionneuse"
+    },
+    "search": {
+      "empty": "Aucun contenu de page ne correspond.",
+      "loading": "Recherche de documents...",
+      "matches": "Correspondance {{count}}",
+      "matches_plural": "{{count}} correspond",
+      "placeholder": "Contenu de la page de recherche"
+    },
+    "selection": {
+      "bold": "Audacieux",
+      "boldSelected": "Texte sélectionné en gras",
+      "clear": "Effacer la sélection",
+      "colorHighlight": "{{color}} point culminant",
+      "colors": {
+        "blue": "Bleu",
+        "green": "Vert",
+        "pink": "Rose",
+        "purple": "Violet",
+        "yellow": "Jaune"
+      },
+      "commentSelected": "Commentaire sur le texte sélectionné",
+      "copied": "Blocs sélectionnés copiés en tant que Markdown.",
+      "copyFallback": "L'accès au presse-papiers a échoué. Copiez le Markdown ci-dessous.",
+      "copyMarkdown": "Copier en Markdown",
+      "decreaseIndent": "Diminuer le retrait",
+      "done": "Terminé",
+      "formatBlockAs": "Formater le bloc en tant que {{label}}",
+      "formatSelected": "Formater le texte sélectionné",
+      "highlight": "Souligner",
+      "highlightColors": "Mettre en surbrillance les couleurs",
+      "highlightSelected": "Surligner le texte sélectionné",
+      "increaseIndent": "Augmenter le retrait",
+      "indent": "Retrait",
+      "italic": "Italique",
+      "italicSelected": "Texte sélectionné en italique",
+      "outdent": "Dépassé",
+      "selectBlocks": "Sélectionnez des blocs",
+      "selected": "{{count}} sélectionné",
+      "selectedBlockActions": "Actions de blocage sélectionnées"
+    },
+    "share": {
+      "communityEditor": "Partagé avec la communauté en tant qu'éditeur",
+      "communityViewer": "Partagé avec la communauté en tant que spectateur",
+      "private": "Privé",
+      "title": "Partage communautaire"
+    },
+    "syncStatus": {
+      "compactError": "Erreur de compactage",
+      "compacted": "Compacté",
+      "compacting": "Compactage",
+      "loaded": "Chargé",
+      "persisted": "Persisté",
+      "saveError": "Enregistrer l'erreur",
+      "saving": "Économie",
+      "titleSaved": "Titre enregistré",
+      "unsavedChanges": "Modifications non enregistrées"
+    },
+    "tabs": {
+      "boards": "Planches",
+      "calendar": "Calendrier",
+      "documents": "Documents"
+    },
+    "title": "Planifier, documenter et coordonner l'action locale",
+    "viewerLockedBody": "Les documents, les tableaux et les événements peuvent inclure du matériel privé ou partagé par les membres, ils ne sont donc disponibles qu'aux membres et administrateurs désignés de la communauté.",
+    "viewerLockedTitle": "L'accès à l'espace de travail est réservé aux membres"
+  }
+}

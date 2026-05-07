@@ -1,0 +1,960 @@
+{
+  "admin": {
+    "assignmentEffectTitle": "这是做什么的",
+    "assignmentEffects": {
+      "communityAdmin": "为所选社区分配社区管理员权限。",
+      "member": "为选定的社区分配成员参与。",
+      "platformAdmin": "授予平台范围的管理员权限。此人将能够创建社区并管理整个平台的会员资格。",
+      "removePlatformAdmin": "删除平台范围的管理员权限，同时保持社区范围的分配不变。",
+      "viewer": "删除任何分配的社区角色。该人仍然可以作为经过身份验证的查看者阅读社区。"
+    },
+    "assignmentKicker": "作业",
+    "assignmentLabel": "作业",
+    "assignmentTitle": "更新此范围的访问权限",
+    "chooseScopeTitle": "选择工作范围",
+    "currentInScope": "当前范围：{{assignment}}",
+    "errors": {
+      "lookup": "查找用户个人资料失败：",
+      "save": "无法保存角色分配："
+    },
+    "focusBody": "平台管理员可以管理任何社区。社区角色保留在所选社区空间的本地。",
+    "focusKicker": "当前焦点",
+    "heroBody": "审查谁拥有平台范围的访问权限，检查本地花名册，并在查看者、成员和社区管理员角色之间切换人员，而无需离开此空间。",
+    "heroKicker": "平台管理",
+    "heroTitle": "从一处分配平台管理员和社区角色。",
+    "noPlatformAdmins": "目前未分配任何平台管理员。",
+    "platformAdminsCount": "平台管理员",
+    "principalHelp": "输入有效的主体来管理尚未出现在已保存配置文件列表中的用户。",
+    "principalLabel": "用户主体 ID",
+    "principalPlaceholder": "输入主体 ID",
+    "roles": {
+      "viewerOnly": "仅限浏览者"
+    },
+    "rosterKicker": "社区花名册",
+    "rosterNobody": "尚未在该社区中分配角色。",
+    "rosterPrompt": "选择社区范围来检查其当前的角色分配。查看者访问权限仍然是隐式的，并且永远不会列在名册中。",
+    "rosterShowing": "显示此社区中分配的 {{total}} 人员中的 {{visible}}。",
+    "scopeLabel": "工作范围",
+    "selectedScopeFallback": "社区",
+    "selectedUserKicker": "选定的用户",
+    "stewardsKicker": "平台管理员",
+    "stewardsTitle": "现任干事",
+    "userSelectionKicker": "用户选择",
+    "userSelectionTitle": "选择要更新的人",
+    "whatChangesCommunity": "社区角色更改仅影响选定的社区。平台管理员访问权限（如果有）保持不变。",
+    "whatChangesKicker": "这里有什么变化",
+    "whatChangesPlatform": "平台管理员变更仅影响平台范围内的管理权。任何特定于社区的角色都保持不变。",
+    "workingScope": "工作范围"
+  },
+  "app": {
+    "footer": {
+      "actionBody": "支持活动，共同资助紧急工作，并使社区行动以问责制为基础。",
+      "actionTitle": "行动",
+      "communityBody": "浏览社区空间，阅读每个小组背后的 kaupapa，并查看您可以参加的地方。",
+      "communityTitle": "社区",
+      "governanceBody": "具有可见投票窗口、法定人数设置和明确归属决策的辩论提案。",
+      "governanceTitle": "治理",
+      "intro": "国际特赦组织在当地的表达方式，旨在为新西兰各地的提案、活动和人民力量而打造。"
+    },
+    "landing": {
+      "accessBody": "观众可以探索每个社区。指定的成员和社区管理员可以一起提议、投票和贡献。",
+      "actionBody": "国际特赦组织的实时网站平衡了紧迫性和开放性。该应用程序现在遵循相同的节奏：更多的编辑空间、更清晰的号召性用语以及更少的盒装仪表板感觉。",
+      "actionKicker": "一起行动起来",
+      "actionTitle": "在社区、提案和活动中建立当地动力。",
+      "artBody": "制定集体决策，支持紧急活动，并使社区行动以问责制为基础。",
+      "artKicker": "人民力量",
+      "artTitle": "如果你足够关心去质疑，你就足够关心去采取行动。",
+      "cards": {
+        "campaignsBody": "支持共同目标、明显进展和社区主导的筹款决策的紧急工作。",
+        "campaignsTitle": "实践慷慨",
+        "communitiesBody": "组织社区空间，刻意邀请参与，让人权工作植根于人民力量。",
+        "communitiesTitle": "建立当地势头",
+        "proposalsBody": "通过清晰的窗口、可见的投票结果和社区责任，将想法从讨论转化为决策。",
+        "proposalsTitle": "使用社区声音"
+      },
+      "heroBody": "将国际特赦组织社区聚集在一起，组织当地活动、辩论提案并为紧急行动提供资金，并明确问责制。",
+      "heroKicker": "新西兰的人权运动",
+      "heroTitle": "社区治理的人民力量",
+      "joinBody": "社区创建一个共享场所，围绕当地行动、明确参与和实际团结进行组织。",
+      "joinKicker": "加入国际特赦组织社区",
+      "joinTitle": "认识其他人权倡导者",
+      "statement": "社区声音、可见的问责制和集体行动属于同一位置。",
+      "visibilityBody": "阅读社区空间，了解当地的考帕帕，看看你可以在哪里帮助组织提案、活动和人力。",
+      "visibilityCallout": "公开查看社区。参与您被信任的角色。",
+      "visibilityTitle": "当社区的声音变得可见时，行动就会加快。"
+    },
+    "nav": {
+      "admin": "管理员",
+      "boards": "板",
+      "calendar": "日历",
+      "campaigns": "活动",
+      "communities": "社区",
+      "community": "社区",
+      "dashboard": "仪表板",
+      "hub": "枢纽",
+      "platform": "平台",
+      "profile": "公司简介",
+      "proposals": "提案",
+      "workspace": "工作空间"
+    }
+  },
+  "auth": {
+    "action": {
+      "loggingIn": "正在登录...",
+      "login": "登录",
+      "logout": "退出",
+      "signOut": "退出"
+    }
+  },
+  "boards": {
+    "actions": {
+      "addCard": "添加卡",
+      "addColumn": "添加栏目",
+      "createBoard": "创建板",
+      "moveLeft": "向左移动",
+      "moveRight": "向右移动",
+      "pin": "别针",
+      "pinned": "已固定"
+    },
+    "board": {
+      "columns": "板柱",
+      "newColumn": "新专栏",
+      "newColumnTitle": "新列标题",
+      "searchCards": "搜索卡",
+      "title": "董事会标题"
+    },
+    "card": {
+      "addDetails": "添加详细信息",
+      "assignees": "受让人",
+      "closeDetails": "关闭卡详细信息",
+      "created": "已创建",
+      "creator": "创作者",
+      "descriptionMode": "描述方式",
+      "detailTitle": "卡片详细标题",
+      "details": "卡详情",
+      "dragCard": "拖卡",
+      "due": "截止日期 {{date}}",
+      "dueDate": "到期日",
+      "editMarkdownSyntax": "编辑 Markdown 语法",
+      "linkedDocument": "链接文档",
+      "linkedDocumentNotVisible": "您不再可以看到链接的文档。",
+      "linkedEvent": "关联事件",
+      "linkedEventNotVisible": "您不再可以看到链接的事件。",
+      "markdownDescription": "降价描述",
+      "markdownPlaceholder": "用 Markdown 编写卡片描述...",
+      "noDescription": "还没有描述。",
+      "noDetailsYet": "尚无详细信息",
+      "noLinkedDocument": "没有链接文档",
+      "noLinkedEvent": "无关联事件",
+      "openDetails": "打开卡详细信息",
+      "openDocument": "打开文档",
+      "openEvent": "开放活动",
+      "preview": "预览",
+      "saveCard": "保存卡",
+      "title": "卡标题",
+      "updated": "已更新"
+    },
+    "column": {
+      "addCardTo": "将卡添加到 {{columnTitle}}",
+      "deleteColumn": "删除列",
+      "deleteEmpty": "删除空列",
+      "dragColumn": "拖列",
+      "moveCardsBeforeDelete": "删除此列之前移动卡片",
+      "title": "栏目标题"
+    },
+    "empty": {
+      "chooseBoard": "从侧边栏中选择一个委员会以开始协调工作。",
+      "createFirst": "为 {{communityName}} 创建一个委员会来协调任务、阻碍因素和后续步骤。",
+      "noSelectionTitle": "未选择任何板",
+      "unavailableBody": "该图板可能已被存档、删除或未与您共享。",
+      "unavailableTitle": "董事会不可用"
+    },
+    "emptyBody": "创建一个委员会来协调该社区的任务。",
+    "emptyTitle": "未选择任何板",
+    "hero": {
+      "boardStats": "董事会统计数据",
+      "body": "组织任务、找出阻碍因素，并使社区的工作产生影响。",
+      "kicker": "板",
+      "manageAccessBody": "您可以管理看板、专栏、卡片和成员。",
+      "shareAccessBody": "您可以根据论坛共享设置进行查看或贡献。",
+      "title": "协调工作并共同跟踪进度。",
+      "yourAccess": "您的访问权限"
+    },
+    "labels": {
+      "activeCardsCount": "{{count}} 有效卡",
+      "boardsCount": "{{count}} 板",
+      "cards": "卡片",
+      "cardsCountWithValue": "{{value}} 卡",
+      "columnsCount": "{{count}} 列",
+      "filteredCardsCount": "{{count}} 张卡（共 {{total}} 张）",
+      "workspaceCardsCount": "{{count}} 工作区卡"
+    },
+    "messages": {
+      "archiveConfirm": "存档此板？它将从活动板列表中消失。",
+      "archived": "董事会存档。",
+      "communityShareUpdated": "社区委员会共享已更新为 {{role}}。",
+      "grantedAccess": "已授予 {{role}} 访问权限。",
+      "pinned": "固定为您的默认板。",
+      "private": "董事会现在是私人的。",
+      "publicLinkCreated": "创建并复制了公共板链接。",
+      "publicLinkDisabled": "公共板链接已禁用。",
+      "synced": "董事会已同步。",
+      "unpinned": "已作为您的默认板被删除。"
+    },
+    "newCardPlaceholder": "新卡牌名称",
+    "newColumnPlaceholder": "新列标题",
+    "newPlaceholder": "新版块标题",
+    "page": {
+      "body": "通过涵盖该社区及其成员的董事会，将计划转化为实际任务。",
+      "title": "在董事会上协调社区工作"
+    },
+    "public": {
+      "body": "该板作为只读公共链接共享。登录以在您的社区工作区中进行协作。",
+      "homeAria": "打开 Amnesty DAO 主页",
+      "noSignIn": "此只读视图无需登录。",
+      "readOnlyBoard": "只读板",
+      "sharedWorkspaceView": "共享工作区视图",
+      "title": "公共板视图",
+      "unavailableBody": "此公共板链接可能已被禁用或该板不再可见。",
+      "unavailableTitle": "公共板不可用"
+    },
+    "share": {
+      "anyoneWithLink": "任何有链接的人",
+      "close": "关闭图板共享",
+      "communityBoardRole": "社区委员会的角色",
+      "communityWorkspace": "社区工作区",
+      "copyLink": "复制链接",
+      "createPublicLink": "创建公共链接",
+      "description": "授予直接访问权限、与社区工作区成员共享或创建公共只读链接。",
+      "directGrantRole": "直接授予角色",
+      "directMember": "直接会员",
+      "disable": "禁用",
+      "ownerOnlyPublicLink": "只有版主才能管理公共链接。",
+      "principalPlaceholder": "aaaaa-aa 或会员主体",
+      "principalToGrant": "委托人授予访问权限",
+      "publicBoardUrl": "公共板网址",
+      "publicLinksBody": "为社区外的人员创建只读公共链接。",
+      "title": "分享板",
+      "updateCommunityShare": "更新社区分享",
+      "workspaceVisibility": "控制是否为工作区成员显示此板。"
+    },
+    "sidebar": {
+      "aria": "板库",
+      "emptyMine": "您还没有拥有任何板。",
+      "emptyShared": "未找到直接共享的板。",
+      "emptyWorkspace": "未找到工作区板。",
+      "meta": "{{role}} · {{columns}} 列 · {{cards}} 卡",
+      "myBoards": "我的图板",
+      "newBoardTitle": "新版块标题",
+      "search": "搜索板",
+      "sharedWithMe": "与我分享",
+      "title": "板",
+      "workspaceBoards": "工作区板"
+    }
+  },
+  "calendar": {
+    "actions": {
+      "create": "创建活动",
+      "new": "新的",
+      "saveEvent": "保存事件",
+      "update": "更新事件"
+    },
+    "createTitle": "创建社区活动",
+    "editTitle": "编辑社区活动",
+    "editor": {
+      "aria": "活动编辑",
+      "planMeeting": "计划一次会议"
+    },
+    "emptyBody": "创建第一个活动，让即将开展的社区工作可见。",
+    "emptyTitle": "还没有活动",
+    "errors": {
+      "loadFailed": "无法加载日历事件。"
+    },
+    "fields": {
+      "allDay": "全天",
+      "description": "描述",
+      "end": "结尾",
+      "location": "地点",
+      "locationPlaceholder": "房间、呼叫链接或地点",
+      "meetingTitlePlaceholder": "会议标题",
+      "notes": "笔记",
+      "notesPlaceholder": "目的、议程或准备说明",
+      "shareToWorkspace": "共享到工作区",
+      "start": "开始",
+      "title": "活动标题"
+    },
+    "hero": {
+      "body": "安排活动、会议和行动，以便您的社区可以共同采取行动。",
+      "kicker": "日历",
+      "title": "有目的地计划。",
+      "utcBacked": "支持 UTC 的日历"
+    },
+    "legend": {
+      "dragToReschedule": "拖动即可重新安排",
+      "myEvents": "我的活动",
+      "workspaceVisible": "工作区可见"
+    },
+    "loadingEvents": "正在加载事件...",
+    "messages": {
+      "chooseParticipant": "选择一个参与者来授予访问权限。",
+      "copied": "{{label}} 已复制。",
+      "created": "活动已创建。",
+      "deleted": "活动已删除。",
+      "grantedAccess": "已授予 {{role}} 访问权限。",
+      "publicLinkDisabled": "公共活动链接已禁用。",
+      "releaseToSave": "释放以保存新时间。",
+      "timeSaved": "活动时间已保存。",
+      "updated": "活动已更新。"
+    },
+    "meta": {
+      "owner": "所有者",
+      "ownerOnly": "只有所有者才能管理公共链接。",
+      "participants": "参加者",
+      "privateShared": "私有/共享",
+      "role": "角色",
+      "start": "开始",
+      "visibility": "能见度",
+      "workspace": "工作空间"
+    },
+    "page": {
+      "body": "在一份社区日历中规划聚会、行动、会议和截止日期。",
+      "title": "让社区活动可见"
+    },
+    "public": {
+      "calendar": "公共日历",
+      "detailsAria": "公开活动详情",
+      "event": "事件",
+      "noEdits": "此视图中没有任何编辑",
+      "notFoundBody": "此公共活动链接可能已被禁用或该活动不再可见。",
+      "notFoundTitle": "公共活动不可用",
+      "openingBody": "正在加载共享事件详细信息。",
+      "openingTitle": "公开活动开幕...",
+      "readOnly": "只读",
+      "readOnlyRole": "只读查看器"
+    },
+    "share": {
+      "addParticipant": "添加参与者",
+      "copyEventLink": "复制活动链接",
+      "copyPublicLink": "复制公共链接",
+      "createPublicLink": "创建公共链接",
+      "disablePublicLink": "禁用公共链接",
+      "eventLink": "活动链接",
+      "eventRole": "事件角色",
+      "grantAccess": "授予访问权限",
+      "principalPlaceholder": "aaaaa-aa 或会员主体",
+      "principalToGrant": "委托人授予活动访问权限",
+      "publicEventLink": "公开活动链接",
+      "title": "活动分享"
+    },
+    "visibleEvents": "{{count}} 可见事件"
+  },
+  "campaigns": {
+    "card": {
+      "allOrNothing": "全有或全无：只有在截止日期前达到目标时才会筹集资金。",
+      "contributeLockedTitle": "只有指定的社区成员和管理员才能为活动做出贡献",
+      "daysLeft": "还剩 {{days}} 天",
+      "ended": "结束",
+      "progress": "{{raised}} / {{goal}}",
+      "progressPercentage": "{{percentage}}%",
+      "yourCampaign": "您的活动"
+    },
+    "create": {
+      "durationLabel": "活动持续时间（天）*",
+      "durationPlaceholder": "输入天数",
+      "error": "未能创建营销活动：{{message}}",
+      "fundingBody": "您的营销活动将遵循“全有或全无”的模式。仅当在截止日期前达到目标金额时才会收取资金。如果未达到目标，则不会收取任何资金。",
+      "fundingTitle": "全有或全无资金",
+      "goalLabel": "目标金额 ($) *",
+      "goalPlaceholder": "输入目标金额",
+      "storyHelp": "包括叙述、受益者和预算大纲",
+      "storyLabel": "活动故事*",
+      "storyPlaceholder": "描述您的活动、它将帮助谁以及资金将如何使用......",
+      "title": "创建筹款活动",
+      "titleLabel": "活动标题 *",
+      "titlePlaceholder": "输入活动标题",
+      "validationAllFields": "请填写所有字段",
+      "validationDays": "请输入有效的天数",
+      "validationGoalAmount": "请输入有效的目标金额"
+    },
+    "detail": {
+      "amountLabel": "金额 ($)",
+      "amountPlaceholder": "输入金额",
+      "campaignEnded": "活动结束",
+      "contributeError": "贡献失败：{{message}}",
+      "contributeSuccess": "贡献成功！",
+      "contributeTitle": "为本次活动做出贡献",
+      "contributionValidation": "请输入有效的捐款金额",
+      "contributionsTab": "贡献 ({{count}})",
+      "creatorActionsTitle": "创作者行动",
+      "creatorTooltip": {
+        "goalNotMet": "只有达到资助目标后才能最终确定活动",
+        "notActive": "活动已经完成",
+        "notCreator": "只有活动创建者才能完成活动",
+        "ready": "资金目标已达到，完成活动"
+      },
+      "detailsTab": "详情",
+      "finalizeConfirm": "您确定要完成此活动吗？这将标志着该活动的成功和完成。此操作无法撤消。",
+      "finalizeError": "未能完成营销活动：{{message}}",
+      "finalizeStatusGoalMet": "活动目标已达成！您可以完成该活动。",
+      "finalizeStatusPending": "一旦达到 {{goal}} 的资助目标，活动即可最终确定。",
+      "finalizeStatusReady": "由于资金目标已经达到，活动可以最终确定。",
+      "finalizeSuccess": "活动圆满结束！",
+      "fundingBody": "该活动遵循“全有或全无”的模式。仅当在截止日期前达到目标金额或活动创建者在达到目标后提前确定资金时，才会收取资金。如果未达到目标，则不会收取任何资金。",
+      "fundingTitle": "全有或全无资金",
+      "goalReached": "融资目标达成！活动现已完成。",
+      "goalReachedNote": "融资目标已达到。活动创建者现在可以完成此活动。",
+      "noteLabel": "注意：",
+      "postUpdatePlaceholder": "与支持者分享进展、成果或其他更新...",
+      "postUpdateTitle": "发布更新",
+      "progressSummary": "{{raised}} / {{goal}}",
+      "stateLabel": "州：{{state}}",
+      "storyTitle": "竞选故事",
+      "updateError": "无法发布更新：{{message}}",
+      "updateLabel": "更新#{{id}}",
+      "updateSuccess": "更新发布成功！",
+      "updateValidation": "请输入更新内容",
+      "updatesTab": "更新（{{count}}）"
+    }
+  },
+  "common": {
+    "actions": {
+      "back": "返回",
+      "cancel": "取消",
+      "close": "关闭",
+      "continue": "继续",
+      "contribute": "贡献",
+      "create": "创建",
+      "createCampaign": "创建营销活动",
+      "createCommunity": "创建社区",
+      "createFirstCampaign": "创建第一个营销活动",
+      "createFirstCommunity": "创建第一个社区",
+      "createFirstProposal": "创建第一个提案",
+      "createProposal": "创建提案",
+      "delete": "删除",
+      "edit": "编辑",
+      "enterPrincipal": "输入本金",
+      "finalizeCampaign": "完成活动",
+      "finalizeProposal": "敲定提案",
+      "leaveCommunity": "离开社区",
+      "logIn": "登录",
+      "logOut": "退出",
+      "lookUp": "抬头看",
+      "openCommunity": "开放社区",
+      "postUpdate": "更新后",
+      "save": "保存",
+      "saveAssignment": "保存作业",
+      "selectFromList": "从列表中选择",
+      "share": "分享",
+      "viewDetails": "查看详情"
+    },
+    "buttons": {
+      "campaignAccessLocked": "活动访问权限已锁定",
+      "proposalAccessLocked": "提案访问已锁定"
+    },
+    "empty": {
+      "noCampaigns": "还没有活动",
+      "noCommunities": "尚未发布任何社区。",
+      "noContributions": "还没有贡献。",
+      "noProposals": "还没有提案",
+      "noUpdates": "尚未发布任何更新。",
+      "noUsers": "尚未保存用户配置文件。"
+    },
+    "errors": {
+      "genericFinalizeProposal": "最终确定提案时出现错误。请再试一次。",
+      "genericVote": "处理您的投票时发生错误。请再试一次。"
+    },
+    "labels": {
+      "accessModel": "接入模式",
+      "by": "通过 {{name}}",
+      "byPrefix": "经过",
+      "campaign": "活动",
+      "campaignId": "活动 ID：{{id}}",
+      "characters": "{{count}}/{{max}} 字符",
+      "community": "社区",
+      "contribution": "贡献",
+      "platformAccess": "平台接入",
+      "principal": "校长",
+      "proposal": "提案",
+      "roleAccess": "角色访问",
+      "scope": "范围：{{scope}}",
+      "signedIn": "已登录",
+      "totalVotes": "总票数",
+      "unknown": "未知",
+      "updates": "更新",
+      "viewerOnly": "仅限浏览者"
+    },
+    "loading": {
+      "checkingAccess": "检查访问权限",
+      "checkingRole": "检查角色",
+      "checkingStatus": "正在检查最终状态...",
+      "contributing": "贡献...",
+      "creating": "创造...",
+      "finalizing": "正在敲定...",
+      "leaving": "离开...",
+      "loggingIn": "正在登录...",
+      "posting": "发布...",
+      "saving": "正在保存...",
+      "voting": "投票..."
+    },
+    "roles": {
+      "communityAdmin": "社区管理员",
+      "member": "会员",
+      "platformAdmin": "平台管理员",
+      "viewer": "观众"
+    },
+    "states": {
+      "campaign": {
+        "active": "活跃",
+        "expired": "已过期",
+        "failed": "失败",
+        "successful": "成功"
+      },
+      "proposal": {
+        "active": "活跃",
+        "failed": "失败",
+        "passed": "通过",
+        "pendingFinalization": "待最终确定"
+      }
+    }
+  },
+  "communities": {
+    "body": "社区角色是明确的，但浏览对每个经过身份验证的人保持开放，因此想法、活动和本地背景仍然可见。",
+    "card": {
+      "accessLoading": "我们正在检查您的社区访问权限。",
+      "accessParticipant": "您可以帮助制定此社区中的提案和活动。",
+      "accessViewer": "在分配角色之前，您具有此处的只读查看者访问权限。",
+      "assignedCount": "{{count}} 已分配",
+      "kicker": "社区空间"
+    },
+    "create": {
+      "error": "创建社区失败。请检查您的权限并重试。",
+      "nameLabel": "社区名称 *",
+      "namePlaceholder": "输入社区名称",
+      "panelBody": "您将成为第一个社区管理员并被自动分配到社区。平台管理员仍然可以监督社区，但本地会员管理从这里开始。",
+      "panelTitle": "社区创建",
+      "policyLabel": "社区政策 *",
+      "policyPlaceholder": "描述社区的宗旨、治理规则和指导方针......",
+      "title": "创建新社区"
+    },
+    "emptyAdmin": "创建第一个社区来开始分配角色、制定提案和协调活动。",
+    "emptyViewer": "平台管理员需要先创建第一个社区，然后才能分配成员。",
+    "kicker": "社区",
+    "leave": {
+      "bulletBrowse": "允许您以经过身份验证的查看者身份继续查看社区",
+      "bulletPreserve": "保留您的历史提案和投票（它们将保持可见）",
+      "bulletProposal": "撤销您在此社区中创建新提案的能力",
+      "bulletRemove": "将您从社区成员列表中删除",
+      "bulletViewer": "让您恢复对此社区的只读查看者访问权限",
+      "bulletVote": "撤销您在此社区中对该提案进行投票的能力",
+      "confirmHelp": "此确认有助于防止社区意外离开。",
+      "confirmLabel": "输入“离开”以确认*",
+      "confirmPlaceholder": "输入 LEAVE 进行确认",
+      "errorBody": "确保您是该社区的成员并拥有正确的离开权限。",
+      "errorTitle": "无法离开社区。请检查您的权限并重试。",
+      "leaving": "离开...",
+      "successBody": "您已从社区成员列表中删除，现在可以以只读查看者的身份查看。您的历史贡献将被保留。",
+      "successTitle": "成功退出社区！",
+      "title": "离开社区",
+      "warningIntro": "您即将离开“{{communityName}}”。这一行动将：",
+      "warningOutro": "如果您想再次参与，您将需要管理员协助才能以会员身份重新加入。",
+      "warningTitle": "确认社区离开"
+    },
+    "membership": {
+      "body": "该社区基于角色的成员资格分配。",
+      "communityAdmins": "社区管理员",
+      "emptyCommunityAdmins": "没有分配社区管理员。",
+      "emptyMembers": "没有成员分配到该社区。",
+      "kicker": "榜样",
+      "loadError": "无法加载社区成员信息。",
+      "members": "会员",
+      "title": "社区会员资格",
+      "unnamedMember": "未透露姓名的成员",
+      "viewerAccessBody": "查看者是隐式的，此处未列出。此名册仅显示分配了社区角色的主体：社区管理员和成员。",
+      "viewerAccessTitle": "查看者访问保持隐式"
+    },
+    "portal": {
+      "accessBanners": {
+        "communityAdminBody": "您可以参与治理并管理此空间内的社区角色分配。",
+        "communityAdminTitle": "社区管理",
+        "memberBody": "您可以创建提案、投票、为活动做出贡献，并在需要时退出此社区。",
+        "memberTitle": "社区参与",
+        "platformAdminBody": "您可以在此处参与并管理社区成员资格，因为您拥有平台管理员角色。",
+        "platformAdminTitle": "全平台管理",
+        "viewerBody": "您可以阅读社区背景、提案和活动。分配角色后即可开始参与。",
+        "viewerTitle": "观众访问"
+      },
+      "assignedParticipants": "指定参与者",
+      "backToCommunities": "返回社区",
+      "campaignsBodyEnabled": "支持该社区的活动或发起新的活动。",
+      "campaignsBodyViewer": "请在此处关注活动进展。一旦分配了社区角色，贡献就会开始。",
+      "campaignsKicker": "活动",
+      "campaignsTitle": "资助地方行动",
+      "capabilities": "你的能力",
+      "capabilitiesEnabled": "创建提案、投票并帮助塑造社区行动。",
+      "capabilitiesViewer": "当您保持查看模式时，请阅读完整的社区背景。",
+      "createCampaignLockedTitle": "只有指定的社区成员和管理员才能创建营销活动",
+      "createProposalLockedTitle": "只有指定的社区成员和管理员才能创建提案",
+      "emptyCampaignsAdmin": "当需要集体支持的时候，为这个社区启动第一次筹款活动。",
+      "emptyCampaignsViewer": "尚未为该社区创建任何活动。",
+      "emptyProposalsAdmin": "成为第一个将提案带入此社区空间的人。",
+      "emptyProposalsViewer": "尚未为此社区创建任何提案。",
+      "kicker": "社区门户",
+      "loadErrorBody": "请求的社区丢失或无法立即加载。",
+      "loadErrorTitle": "我们无法加载该社区。",
+      "platformAccessTitle": "平台接入",
+      "proposalsBodyEnabled": "创建提案或对该社区下一步应采取的方向进行投票。",
+      "proposalsBodyViewer": "阅读当前的提案清单并观察决策过程的可见性。",
+      "proposalsKicker": "提案",
+      "proposalsTitle": "塑造社区决策",
+      "roleAccessTitle": "角色访问"
+    },
+    "setupKicker": "社区设置",
+    "title": "阅读每个社区。参与您被信任的活动。"
+  },
+  "i18n": {
+    "language": {
+      "helper": "选择此设备上 Amnesty DAO 使用的语言。",
+      "label": "语言",
+      "machineTranslationNote": "我们提供机器翻译初稿，帮助审核人员更快开始。发布前请审核面向社区的文案。"
+    }
+  },
+  "mainTabs": {
+    "body": "以查看者的身份阅读社区，无论您担任什么角色，都可以参与决策，并以人民的力量为平台参与的基础。",
+    "claimAction": "认领平台管理员",
+    "kicker": "国际特赦组织",
+    "platformRoles": "平台角色",
+    "platformRolesBody": "平台管理员管理整个平台的访问权限，并可以支持每个社区的成员资格。",
+    "roleModelBody": "平台范围内的访问权限是为管理社区角色的人员保留的。参与本身仍然是社区范围的，因此成员可以专注于当地的组织和决策。",
+    "roleModelKicker": "榜样",
+    "setupBody": "尚无平台管理员。在管理社区和成员分配之前明确声明第一个角色。",
+    "setupKicker": "平台设置",
+    "setupTitle": "领取第一个平台管理员",
+    "tabs": {
+      "dashboard": "仪表板",
+      "platformAdmin": "平台管理员"
+    },
+    "title": "一起行动起来",
+    "yourAccess": "您的访问权限",
+    "yourAccessBody": "观众可以通过平台阅读。社区角色解锁提案、投票、筹款和会员管理。"
+  },
+  "profile": {
+    "body": "添加当提案、活动和决策在平台上进行归因时其他倡导者应该看到的名称。",
+    "kicker": "国际特赦组织",
+    "nameLabel": "你的名字",
+    "namePlaceholder": "社区应该如何认识你？",
+    "page": {
+      "body": "让人们在您的提案、活动、工作区编辑和社区参与旁边看到的名称保持最新。",
+      "identityKicker": "互联网身份主体",
+      "kicker": "公司简介",
+      "title": "管理您的社区身份"
+    },
+    "saveError": "我们还无法保存您的个人资料。",
+    "title": "欢迎来到运动"
+  },
+  "proposals": {
+    "card": {
+      "alreadyVotedBody": "该系统强制每人对每个提案投一票。您的投票已被记录并计入。",
+      "alreadyVotedCreator": "作为提案创建者，您可以对自己的提案进行投票。",
+      "alreadyVotedTitle": "您已对此提案投票",
+      "creatorUnknown": "未知成员",
+      "daysCount": "{{count}} 天",
+      "finalizeErrorTitle": "未能最终确定提案。",
+      "finalizeSuccessBody": "该提案已最终确定，其最终状态已根据投票结果确定。",
+      "finalizeSuccessTitle": "提案顺利完成！",
+      "governanceSettings": "治理设置",
+      "lessThanMinute": "剩余不足1m",
+      "no": "否：{{count}} ({{percentage}}%)",
+      "passThreshold": "通过门槛",
+      "passThresholdValue": "{{count}}% 赞成票",
+      "quorum": "法定人数",
+      "timeDaysHours": "剩余 {{days}}d {{hours}}h",
+      "timeHoursMinutes": "剩余 {{hours}}h {{minutes}}m",
+      "timeMinutes": "剩余 {{minutes}}m",
+      "timeRemaining": "剩余时间：{{value}}",
+      "totalVotesRequired": "总票数：需要 {{total}} / {{required}}",
+      "viewerAccess": "观众访问",
+      "voteButtonTitles": {
+        "alreadyVoted": "您已对此提案投票",
+        "no": "对该提案投反对票",
+        "viewer": "只有指定的社区成员和管理员才能投票",
+        "votingClosed": "投票窗口已关闭",
+        "votingNotStarted": "投票尚未开始",
+        "yes": "对此提案投赞成票"
+      },
+      "voteErrorTitle": "投票失败。请再试一次。",
+      "voteNo": "投反对票",
+      "voteSuccessBody": "您的投票已被记录。该系统确保每人每个提案一票。",
+      "voteSuccessCreator": "作为提案创建者，您已成功对自己的提案进行了投票。",
+      "voteSuccessTitle": "投票成功！",
+      "voteYes": "投赞成票",
+      "votedBadge": "您已投票",
+      "votesMinimum": "至少 {{count}} 票",
+      "votingClosed": "投票结束",
+      "votingNotStarted": "投票尚未开始",
+      "votingResults": "投票结果",
+      "votingWindow": "投票窗口",
+      "yes": "是：{{count}} ({{percentage}}%)",
+      "yourProposal": "您的建议"
+    },
+    "create": {
+      "customizeGovernance": "自定义治理设置",
+      "defaultPassThreshold": "50% 的选票必须是赞成票",
+      "defaultQuorum": "最少 1 票",
+      "defaultSettings": "默认设置",
+      "defaultVotingWindow": "3天",
+      "descriptionLabel": "提案描述 *",
+      "descriptionPlaceholder": "详细描述您的建议。你有什么建议？社会为什么要支持？",
+      "error": "创建提案失败。请检查您的权限并重试。",
+      "minimumVotesHelp": "提案生效所需的最低总票数",
+      "minimumVotesLabel": "最低投票数（法定人数）",
+      "passThreshold": "通过门槛",
+      "passThresholdHelp": "通过所需赞成票的百分比（1-100%）",
+      "passThresholdLabel": "通过阈值（%）",
+      "quorum": "法定人数",
+      "submissionBody": "提交后，社区成员将能够在投票窗口内对您的提案投赞成或反对票。投票期结束后，任何成员都可以敲定提案以确定其是否通过。",
+      "submissionTitle": "提案提交",
+      "title": "创建新提案",
+      "titleLabel": "提案标题 *",
+      "titlePlaceholder": "输入提案标题",
+      "votingWindow": "投票窗口",
+      "votingWindowDaysLabel": "投票窗口（天）",
+      "votingWindowHelp": "会员可以投票多久（1-30天）"
+    }
+  },
+  "workspace": {
+    "actions": {
+      "archive": "存档",
+      "compact": "紧凑快照",
+      "copyLink": "复制链接",
+      "debugExport": "下载 JSON",
+      "grant": "授予访问权限",
+      "importMarkdown": "导入降价",
+      "markdownExport": "下载 Markdown",
+      "menu": "行动",
+      "pin": "默认引脚",
+      "redo": "重做",
+      "sync": "同步",
+      "undo": "撤消",
+      "unpin": "取消固定默认值",
+      "updateShare": "更新分享"
+    },
+    "blockMenu": {
+      "autoListNumbering": "自动编号",
+      "continuePreviousList": "继续上一个列表",
+      "copyBlockLink": "复制块链接",
+      "disableHyperlink": "禁用超链接",
+      "duplicate": "复制",
+      "enableHyperlink": "启用超链接",
+      "formatBlock": "格式化块",
+      "insertAbove": "在上面插入",
+      "insertBelow": "在下面插入",
+      "listNumbering": "列表编号",
+      "moveDown": "下移",
+      "moveUp": "向上移动",
+      "restartAtOne": "1点重新启动",
+      "turnInto": "变成"
+    },
+    "blockRenderer": {
+      "addCaption": "添加标题",
+      "blockAria": "块{{index}}：{{label}}",
+      "blockControls": "块控制",
+      "blockMenu": "块菜单",
+      "collapseToggle": "折叠切换",
+      "dividerBlock": "分隔块",
+      "dragBlock": "拖动块",
+      "dragToReorder": "拖动以重新排序",
+      "expandToggle": "展开切换",
+      "fileLabel": "文件标签",
+      "fileUrl": "文件网址",
+      "imageCaption": "图片说明",
+      "imageUrl": "图片网址",
+      "markChecked": "标记已选中",
+      "markUnchecked": "标记为未选中",
+      "pasteFileUrl": "粘贴文件 URL 以链接它。",
+      "pasteImageUrl": "粘贴图像 URL 以嵌入它。",
+      "typeForCommands": "输入“/”作为命令",
+      "workspaceImage": "工作区图像"
+    },
+    "body": "保留仅限于该社区的工作笔记、实用任务板和社区活动。",
+    "commands": {
+      "aria": "斜杠命令",
+      "groups": {
+        "Lists": "列表",
+        "Media": "媒体",
+        "Structure": "结构",
+        "Text": "文本"
+      },
+      "items": {
+        "bullet": {
+          "hint": "简单的列表项",
+          "label": "项目符号列表"
+        },
+        "callout": {
+          "hint": "灯条盒",
+          "label": "大喊"
+        },
+        "checklist": {
+          "hint": "跟踪任务",
+          "label": "清单"
+        },
+        "divider": {
+          "hint": "水平尺",
+          "label": "分频器"
+        },
+        "fileLink": {
+          "hint": "外部文件网址",
+          "label": "文件链接"
+        },
+        "heading1": {
+          "hint": "大节标题",
+          "label": "标题 1"
+        },
+        "heading2": {
+          "hint": "中节标题",
+          "label": "标题 2"
+        },
+        "heading3": {
+          "hint": "小节标题",
+          "label": "标题 3"
+        },
+        "image": {
+          "hint": "外部图片网址",
+          "label": "图像"
+        },
+        "numbered": {
+          "hint": "有序列表项",
+          "label": "编号列表"
+        },
+        "paragraph": {
+          "hint": "纯款",
+          "label": "文本"
+        },
+        "quote": {
+          "hint": "缩进报价",
+          "label": "引用"
+        },
+        "toggle": {
+          "hint": "可折叠部分",
+          "label": "切换"
+        }
+      },
+      "noMatches": "没有匹配的命令",
+      "placeholder": "输入命令"
+    },
+    "comments": {
+      "add": "评论",
+      "compose": "添加评论",
+      "documentComments": "文档评论",
+      "empty": "还没有公开评论。",
+      "openCount": "{{count}} 开放",
+      "openTitle": "打开评论",
+      "placeholder": "写评论。 Cmd/Ctrl+Enter 提交。",
+      "resolve": "解决",
+      "submit": "提交评论"
+    },
+    "documents": {
+      "bodyPlaceholder": "写笔记、计划、链接或会议结果......",
+      "empty": "您还看不到任何工作区文档。",
+      "emptyBody": "创建或选择一个文档以开始在该社区内写作。",
+      "emptyBodyTitle": "选择或创建文档",
+      "emptyMine": "还没有文件。",
+      "emptyShared": "尚未与您共享任何文档。",
+      "emptyTitle": "未选择文档",
+      "emptyWorkspace": "还没有工作区文档。",
+      "newPlaceholder": "新文档标题",
+      "sidebarTitle": "社区文档"
+    },
+    "editor": {
+      "addFirstBlock": "添加第一个块",
+      "documentTitle": "文件标题",
+      "tailEditable": "输入“/”作为命令或按 Enter 键创建新块",
+      "tailReadonly": "此文档的查看者访问权限是只读的。"
+    },
+    "grants": {
+      "selectMember": "选择社区成员",
+      "title": "特定会员访问权限"
+    },
+    "kicker": "社区工作区",
+    "library": {
+      "mine": "我的文件",
+      "shared": "与我分享",
+      "workspace": "工作区文档"
+    },
+    "nesting": {
+      "dragHint": "拖动文档以嵌套、重新排序或将其移回顶层。",
+      "title": "文档嵌套",
+      "topLevel": "顶级"
+    },
+    "pageBody": "管理文档、与社区协作并将想法转化为影响。",
+    "pageTitle": "共同制定和协调行动。",
+    "roles": {
+      "editor": "编辑",
+      "owner": "业主",
+      "viewer": "观众"
+    },
+    "search": {
+      "empty": "没有页面内容匹配。",
+      "loading": "正在搜索文档...",
+      "matches": "{{count}} 匹配",
+      "matches_plural": "{{count}} 匹配",
+      "placeholder": "搜索页面内容"
+    },
+    "selection": {
+      "bold": "大胆的",
+      "boldSelected": "将所选文本加粗",
+      "clear": "清除选择",
+      "colorHighlight": "{{color}} 突出显示",
+      "colors": {
+        "blue": "蓝色的",
+        "green": "绿色的",
+        "pink": "粉色的",
+        "purple": "紫色的",
+        "yellow": "黄色的"
+      },
+      "commentSelected": "对所选文本发表评论",
+      "copied": "将选定的块复制为 Markdown。",
+      "copyFallback": "剪贴板访问失败。复制下面的 Markdown。",
+      "copyMarkdown": "复制为 Markdown",
+      "decreaseIndent": "减少缩进",
+      "done": "完成",
+      "formatBlockAs": "将块格式设置为 {{label}}",
+      "formatSelected": "设置选定文本的格式",
+      "highlight": "强调",
+      "highlightColors": "突出显示颜色",
+      "highlightSelected": "突出显示选定的文本",
+      "increaseIndent": "增加缩进",
+      "indent": "缩进",
+      "italic": "斜体",
+      "italicSelected": "所选文本斜体",
+      "outdent": "减少缩进",
+      "selectBlocks": "选择区块",
+      "selected": "已选择 {{count}}",
+      "selectedBlockActions": "选定的块操作"
+    },
+    "share": {
+      "communityEditor": "作为编辑与社区共享",
+      "communityViewer": "作为查看者与社区共享",
+      "private": "私人",
+      "title": "社区分享"
+    },
+    "syncStatus": {
+      "compactError": "紧凑错误",
+      "compacted": "压实",
+      "compacting": "压实",
+      "loaded": "已加载",
+      "persisted": "坚持",
+      "saveError": "保存错误",
+      "saving": "保存",
+      "titleSaved": "标题已保存",
+      "unsavedChanges": "未保存的更改"
+    },
+    "tabs": {
+      "boards": "板",
+      "calendar": "日历",
+      "documents": "文档"
+    },
+    "title": "计划、记录和协调当地行动",
+    "viewerLockedBody": "文档、论坛和活动可以包含私人或成员共享的材料，因此它们仅可供指定的社区成员和管理员使用。",
+    "viewerLockedTitle": "工作区访问权限仅限会员"
+  }
+}

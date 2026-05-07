@@ -1,5 +1,6 @@
 import { CalendarDays, Edit3, Globe2, MapPin, Users } from 'lucide-react';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   dateFromUtcNanos,
   formFromEvent,
@@ -10,6 +11,7 @@ import LoadingSpinner from '../LoadingSpinner';
 import { EventCalendarWidget } from './EventCalendarWidget';
 
 export default function PublicEventPage({ token }: { token?: string }) {
+  const { t } = useTranslation();
   const { data: event, error, isLoading } = useGetPublicCommunityEvent(token ?? null);
   const events = useMemo(() => (event ? [event] : []), [event]);
   const form = formFromEvent(event);
@@ -18,8 +20,8 @@ export default function PublicEventPage({ token }: { token?: string }) {
     return (
       <section className="calendar-shell public-calendar-shell">
         <div className="calendar-lock">
-          <h1>Public event not found.</h1>
-          <p>{error ? String(error) : 'This public event link may have been disabled or mistyped.'}</p>
+          <h1>{t('calendar.public.notFoundTitle')}</h1>
+          <p>{error ? String(error) : t('calendar.public.notFoundBody')}</p>
         </div>
       </section>
     );
@@ -30,8 +32,8 @@ export default function PublicEventPage({ token }: { token?: string }) {
       <section className="calendar-shell public-calendar-shell">
         <div className="calendar-lock">
           <LoadingSpinner size="large" />
-          <h1>Opening public event.</h1>
-          <p>Loading the single event attached to this public link.</p>
+          <h1>{t('calendar.public.openingTitle')}</h1>
+          <p>{t('calendar.public.openingBody')}</p>
         </div>
       </section>
     );
@@ -40,58 +42,58 @@ export default function PublicEventPage({ token }: { token?: string }) {
   return (
     <section className="calendar-shell public-calendar-shell">
       <div className="calendar-layout">
-        <aside className="calendar-sidebar" aria-label="Public event details">
+        <aside className="calendar-sidebar" aria-label={t('calendar.public.detailsAria')}>
           <div className="calendar-sidebar-head">
             <div>
-              <div className="amnesty-kicker">Public event</div>
+              <div className="amnesty-kicker">{t('calendar.public.event')}</div>
               <h2>{event.title}</h2>
             </div>
             <Globe2 size={20} />
           </div>
 
           <label className="field-label">
-            Title
+            {t('calendar.fields.title')}
             <input disabled value={form.title} />
           </label>
 
           <div className="calendar-time-grid">
             <label className="field-label">
-              Start
+              {t('calendar.fields.start')}
               <input disabled type="datetime-local" value={form.startLocal} />
             </label>
             <label className="field-label">
-              End
+              {t('calendar.fields.end')}
               <input disabled type="datetime-local" value={form.endLocal} />
             </label>
           </div>
 
           <label className="calendar-check-row">
             <input checked={form.allDay} disabled readOnly type="checkbox" />
-            All-day event
+            {t('calendar.fields.allDay')}
           </label>
 
           <label className="field-label">
-            Location
+            {t('calendar.fields.location')}
             <input disabled value={form.location} />
           </label>
 
           <label className="field-label">
-            Notes
+            {t('calendar.fields.notes')}
             <textarea disabled rows={4} value={form.description} />
           </label>
 
           <div className="calendar-meta-panel">
             <div className="mini-row">
-              <span>Role</span>
-              <strong>public read-only</strong>
+              <span>{t('calendar.meta.role')}</span>
+              <strong>{t('calendar.public.readOnlyRole')}</strong>
             </div>
             <div className="mini-row">
-              <span>Start</span>
+              <span>{t('calendar.meta.start')}</span>
               <strong>{readableDateTime(event.startUtc)}</strong>
             </div>
             {event.location ? (
               <div className="mini-row">
-                <span>Location</span>
+                <span>{t('calendar.fields.location')}</span>
                 <strong><MapPin size={13} /> {event.location}</strong>
               </div>
             ) : null}
@@ -101,13 +103,13 @@ export default function PublicEventPage({ token }: { token?: string }) {
         <div className="calendar-main">
           <div className="calendar-toolbar">
             <div>
-              <div className="amnesty-kicker text-amnesty-orange">Public calendar</div>
+              <div className="amnesty-kicker text-amnesty-orange">{t('calendar.public.calendar')}</div>
               <h1>{event.title}</h1>
             </div>
             <div className="calendar-legend">
-              <span><CalendarDays size={15} /> Public event</span>
-              <span><Users size={15} /> Read-only</span>
-              <span><Edit3 size={15} /> No edits</span>
+              <span><CalendarDays size={15} /> {t('calendar.public.event')}</span>
+              <span><Users size={15} /> {t('calendar.public.readOnly')}</span>
+              <span><Edit3 size={15} /> {t('calendar.public.noEdits')}</span>
             </div>
           </div>
           <EventCalendarWidget

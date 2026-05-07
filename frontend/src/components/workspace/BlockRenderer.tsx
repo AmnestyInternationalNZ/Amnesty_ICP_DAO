@@ -17,6 +17,7 @@ import {
 import { Fragment, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useTranslation } from 'react-i18next';
 import type { NumberedListMarker } from '../../workspace/numberedLists';
 import {
   commandForBlockType,
@@ -29,6 +30,7 @@ import {
   slashQueryForText,
   type MarkdownShortcutResult,
 } from '../../workspace/editorCommands';
+import { blockCommandHint, blockCommandLabel, blockTypeLabel } from '../../workspace/localizedEditorCommands';
 import type {
   WorkspaceBlock,
   WorkspaceBlockType,
@@ -192,6 +194,7 @@ export function BlockRenderer({
   onToggleLink: (blockId: string, disabled: boolean) => void;
   onTypeChange: (blockId: string, type: WorkspaceBlockType) => void;
 }) {
+  const { t } = useTranslation();
   const blockRef = useRef<HTMLDivElement | null>(null);
   const editableRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -423,31 +426,31 @@ export function BlockRenderer({
 
   const blockBody =
     block.type === 'divider' ? (
-      <button aria-label="Divider block" className="divider-block" disabled={!canEdit} onClick={() => onOpenSlash(block.id)} type="button" />
+      <button aria-label={t('workspace.blockRenderer.dividerBlock')} className="divider-block" disabled={!canEdit} onClick={() => onOpenSlash(block.id)} type="button" />
     ) : block.type === 'image' ? (
       <div className="media-block image-block">
         {mediaHref ? (
-          <img alt={block.caption || block.text || 'Workspace image'} src={mediaHref} />
+          <img alt={block.caption || block.text || t('workspace.blockRenderer.workspaceImage')} src={mediaHref} />
         ) : (
           <div className="media-placeholder">
             <ImageIcon size={18} />
-            Paste an image URL
+            {t('workspace.blockRenderer.pasteImageUrl')}
           </div>
         )}
         {canEdit ? (
           <>
             <input
-              aria-label="Image URL"
+              aria-label={t('workspace.blockRenderer.imageUrl')}
               className="media-url-field"
               onChange={(event) => onMediaChange(block.id, { url: event.currentTarget.value })}
               placeholder="https://example.com/image.jpg"
               value={block.url ?? ''}
             />
             <input
-              aria-label="Image caption"
+              aria-label={t('workspace.blockRenderer.imageCaption')}
               className="media-caption-field"
               onChange={(event) => onMediaChange(block.id, { caption: event.currentTarget.value })}
-              placeholder="Add a caption"
+              placeholder={t('workspace.blockRenderer.addCaption')}
               value={block.caption ?? ''}
             />
           </>
@@ -465,23 +468,23 @@ export function BlockRenderer({
         ) : (
           <div className="media-placeholder">
             <FileText size={18} />
-            Paste a file URL
+            {t('workspace.blockRenderer.pasteFileUrl')}
           </div>
         )}
         {canEdit ? (
           <>
             <input
-              aria-label="File URL"
+              aria-label={t('workspace.blockRenderer.fileUrl')}
               className="media-url-field"
               onChange={(event) => onMediaChange(block.id, { url: event.currentTarget.value })}
               placeholder="https://example.com/file.pdf"
               value={block.url ?? ''}
             />
             <input
-              aria-label="File label"
+              aria-label={t('workspace.blockRenderer.fileLabel')}
               className="media-caption-field"
               onChange={(event) => onMediaChange(block.id, { text: event.currentTarget.value })}
-              placeholder="File label"
+              placeholder={t('workspace.blockRenderer.fileLabel')}
               value={block.text}
             />
           </>
@@ -491,7 +494,7 @@ export function BlockRenderer({
       <>
         {block.type === 'toggle' ? (
           <button
-            aria-label={block.collapsed ? 'Expand toggle' : 'Collapse toggle'}
+            aria-label={block.collapsed ? t('workspace.blockRenderer.expandToggle') : t('workspace.blockRenderer.collapseToggle')}
             className="toggle-button"
             disabled={!canEdit}
             onClick={() => onToggleCollapsed(block.id, !block.collapsed)}
@@ -502,7 +505,7 @@ export function BlockRenderer({
         ) : null}
         {block.type === 'checklist' ? (
           <button
-            aria-label={block.checked ? 'Mark unchecked' : 'Mark checked'}
+            aria-label={block.checked ? t('workspace.blockRenderer.markUnchecked') : t('workspace.blockRenderer.markChecked')}
             className={block.checked ? 'check-toggle checked' : 'check-toggle'}
             disabled={!canEdit}
             onClick={() => onCheckedChange(block.id, !block.checked)}
@@ -519,7 +522,7 @@ export function BlockRenderer({
         ) : null}
         {renderLinkedText ? (
           <div
-            aria-label={`${command.label} block ${index + 1}`}
+            aria-label={t('workspace.blockRenderer.blockAria', { index: index + 1, label: blockCommandLabel(command, t) })}
             className="editable-block-text linked-block-text"
             data-block-text={block.text}
             data-render-mode="linked"
@@ -543,7 +546,7 @@ export function BlockRenderer({
           </div>
         ) : hasInlineMarks && !focused ? (
           <div
-            aria-label={`${command.label} block ${index + 1}`}
+            aria-label={t('workspace.blockRenderer.blockAria', { index: index + 1, label: blockCommandLabel(command, t) })}
             className="editable-block-text marked-block-text"
             data-block-text={block.text}
             data-render-mode="marked"
@@ -568,11 +571,11 @@ export function BlockRenderer({
           </div>
         ) : (
           <div
-            aria-label={`${command.label} block ${index + 1}`}
+            aria-label={t('workspace.blockRenderer.blockAria', { index: index + 1, label: blockCommandLabel(command, t) })}
             className="editable-block-text"
             contentEditable={editable}
             data-block-text={block.text}
-            data-placeholder={focused && block.text.length === 0 ? "Type '/' for commands" : undefined}
+            data-placeholder={focused && block.text.length === 0 ? t('workspace.blockRenderer.typeForCommands') : undefined}
             data-render-mode="editable"
             key={`${block.id}-editable`}
             onBlur={() => setFocused(false)}
@@ -608,11 +611,11 @@ export function BlockRenderer({
       data-selection-mode={selectionMode ? 'true' : undefined}
     >
       {canEdit && !selectionMode ? (
-        <div className="block-hover-controls" aria-label="Block controls">
-          <button aria-label="Drag block to reorder" className="icon-button subtle drag-handle" title="Drag to reorder" type="button" {...attributes} {...listeners}>
+        <div className="block-hover-controls" aria-label={t('workspace.blockRenderer.blockControls')}>
+          <button aria-label={t('workspace.blockRenderer.dragBlock')} className="icon-button subtle drag-handle" title={t('workspace.blockRenderer.dragToReorder')} type="button" {...attributes} {...listeners}>
             <GripVertical size={15} />
           </button>
-          <button aria-label="Block menu" className="icon-button subtle" onClick={() => setMenuOpen((value) => !value)} type="button">
+          <button aria-label={t('workspace.blockRenderer.blockMenu')} className="icon-button subtle" onClick={() => setMenuOpen((value) => !value)} type="button">
             <MoreHorizontal size={15} />
           </button>
         </div>
@@ -629,10 +632,10 @@ export function BlockRenderer({
 
       {menuOpen ? (
         <div className="block-popover" ref={menuRef}>
-          <div className="block-popover-head">Format block</div>
+          <div className="block-popover-head">{t('workspace.blockMenu.formatBlock')}</div>
           <button onClick={() => onDuplicate(block.id)} type="button">
             <Copy size={14} />
-            Duplicate
+            {t('workspace.blockMenu.duplicate')}
           </button>
           <button
             onClick={() => {
@@ -642,7 +645,7 @@ export function BlockRenderer({
             type="button"
           >
             <Plus size={14} />
-            Insert above
+            {t('workspace.blockMenu.insertAbove')}
           </button>
           <button
             onClick={() => {
@@ -652,7 +655,7 @@ export function BlockRenderer({
             type="button"
           >
             <Plus size={14} />
-            Insert below
+            {t('workspace.blockMenu.insertBelow')}
           </button>
           <button
             disabled={index <= 0}
@@ -663,7 +666,7 @@ export function BlockRenderer({
             type="button"
           >
             <ArrowUp size={14} />
-            Move up
+            {t('workspace.blockMenu.moveUp')}
           </button>
           <button
             disabled={index >= totalBlocks - 1}
@@ -674,32 +677,32 @@ export function BlockRenderer({
             type="button"
           >
             <ArrowDown size={14} />
-            Move down
+            {t('workspace.blockMenu.moveDown')}
           </button>
           {block.type === 'numbered' ? (
             <>
               <div className="block-popover-divider" />
-              <div className="block-popover-head">List numbering</div>
+              <div className="block-popover-head">{t('workspace.blockMenu.listNumbering')}</div>
               <button className={block.numbering === undefined ? 'selected' : undefined} onClick={() => onNumberingChange(block.id, undefined)} type="button">
-                Auto list numbering
+                {t('workspace.blockMenu.autoListNumbering')}
               </button>
               <button className={block.numbering === 'continue' ? 'selected' : undefined} onClick={() => onNumberingChange(block.id, 'continue')} type="button">
-                Continue previous list
+                {t('workspace.blockMenu.continuePreviousList')}
               </button>
               <button className={block.numbering === 'restart' ? 'selected' : undefined} onClick={() => onNumberingChange(block.id, 'restart')} type="button">
-                Restart at 1
+                {t('workspace.blockMenu.restartAtOne')}
               </button>
             </>
           ) : null}
           {detectedHref ? (
             <button onClick={() => onToggleLink(block.id, !block.linkDisabled)} type="button">
               <Link size={14} />
-              {block.linkDisabled ? 'Enable hyperlink' : 'Disable hyperlink'}
+              {block.linkDisabled ? t('workspace.blockMenu.enableHyperlink') : t('workspace.blockMenu.disableHyperlink')}
             </button>
           ) : null}
           <button onClick={() => onOpenComments(block.id)} type="button">
             <MessageCircle size={14} />
-            Comment
+            {t('workspace.comments.add')}
           </button>
           <button
             onClick={() => {
@@ -710,14 +713,14 @@ export function BlockRenderer({
             type="button"
           >
             <Link size={14} />
-            Copy block link
+            {t('workspace.blockMenu.copyBlockLink')}
           </button>
           <button disabled={totalBlocks <= 1} onClick={() => onDelete(block.id)} type="button">
             <Trash2 size={14} />
-            Delete
+            {t('common.actions.delete')}
           </button>
           <div className="block-popover-divider" />
-          <div className="block-popover-head">Turn into</div>
+          <div className="block-popover-head">{t('workspace.blockMenu.turnInto')}</div>
           {filterSlashCommands('').map((slashCommand) => (
             <button
               className={block.type === slashCommand.type ? 'selected' : undefined}
@@ -728,7 +731,7 @@ export function BlockRenderer({
               }}
               type="button"
             >
-              {slashCommand.label}
+              {blockCommandLabel(slashCommand, t)}
             </button>
           ))}
         </div>

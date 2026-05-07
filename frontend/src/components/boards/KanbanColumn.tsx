@@ -3,6 +3,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Plus, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { CommunityDocumentSummary, CommunityEventPayload, CommunityMember, KanbanCard as KanbanCardType, KanbanColumn as KanbanColumnType } from '../../backend';
 import KanbanCard, { cardKey, type KanbanCardUpdateFields } from './KanbanCard';
 
@@ -55,6 +56,7 @@ export default function KanbanColumn({
   onRenameColumn: (columnId: bigint, title: string) => void;
   onUpdateCard: (cardId: bigint, fields: KanbanCardUpdateFields) => Promise<boolean | void> | boolean | void;
 }) {
+  const { t } = useTranslation();
   const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
     id: columnKey(column.id),
     data: { kind: 'column', columnId: column.id },
@@ -99,12 +101,12 @@ export default function KanbanColumn({
     <section className={[isDragging ? 'kanban-column dragging' : 'kanban-column', isOver ? 'drop-target' : ''].filter(Boolean).join(' ')} ref={setNodeRef} style={style}>
       <header className="kanban-column-head">
         {canEdit ? (
-          <button aria-label="Drag column" className="kanban-drag-handle" type="button" {...attributes} {...listeners}>
+          <button aria-label={t('boards.column.dragColumn')} className="kanban-drag-handle" type="button" {...attributes} {...listeners}>
             <GripVertical size={14} />
           </button>
         ) : null}
         <input
-          aria-label="Column title"
+          aria-label={t('boards.column.title')}
           disabled={!canEdit}
           onBlur={commitTitle}
           onChange={(event) => setTitle(event.currentTarget.value)}
@@ -115,7 +117,14 @@ export default function KanbanColumn({
         />
         <span>{cards.length}</span>
         {canEdit ? (
-          <button aria-label="Delete empty column" className="icon-button subtle" disabled={column.cardIds.length > 0} onClick={() => onDeleteColumn(column.id)} title={column.cardIds.length > 0 ? 'Move cards before deleting this column' : 'Delete column'} type="button">
+          <button
+            aria-label={t('boards.column.deleteEmpty')}
+            className="icon-button subtle"
+            disabled={column.cardIds.length > 0}
+            onClick={() => onDeleteColumn(column.id)}
+            title={column.cardIds.length > 0 ? t('boards.column.moveCardsBeforeDelete') : t('boards.column.deleteColumn')}
+            type="button"
+          >
             <Trash2 size={14} />
           </button>
         ) : null}
@@ -142,17 +151,17 @@ export default function KanbanColumn({
       {canEdit ? (
         <div className="kanban-add-card">
           <input
-            aria-label={`Add card to ${column.title}`}
+            aria-label={t('boards.column.addCardTo', { columnTitle: column.title })}
             onChange={(event) => setNewCardTitle(event.currentTarget.value)}
             onKeyDown={(event) => {
               if (event.key === 'Enter') addCard();
             }}
-            placeholder="Add card"
+            placeholder={t('boards.actions.addCard')}
             value={newCardTitle}
           />
           <button disabled={!newCardTitle.trim()} onClick={addCard} type="button">
             <Plus size={15} />
-            Add card
+            {t('boards.actions.addCard')}
           </button>
         </div>
       ) : null}

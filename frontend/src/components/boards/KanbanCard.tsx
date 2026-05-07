@@ -3,6 +3,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { CalendarDays, Code2, FileText, GripVertical, Maximize2, Save, Trash2, X } from 'lucide-react';
 import type { Principal } from '@dfinity/principal';
+import { useTranslation } from 'react-i18next';
 import type { CommunityDocumentSummary, CommunityEventPayload, CommunityMember, KanbanCard as KanbanCardType, KanbanCardInput } from '../../backend';
 import { routePaths } from '../../routing/appRoutes';
 import { compactPrincipal, readableDate } from '../../workspace/workspaceApi';
@@ -83,6 +84,7 @@ export default function KanbanCard({
   onDelete: (cardId: bigint) => void;
   onUpdate: (cardId: bigint, fields: KanbanCardUpdateFields) => Promise<boolean | void> | boolean | void;
 }) {
+  const { t } = useTranslation();
   const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
     id: cardKey(card.id),
     data: { kind: 'card', cardId: card.id },
@@ -161,14 +163,14 @@ export default function KanbanCard({
     <article className={[isDragging ? 'kanban-card dragging' : 'kanban-card', overdue ? 'overdue' : ''].filter(Boolean).join(' ')} ref={setNodeRef} style={style}>
       <div className="kanban-card-top">
         {canEdit ? (
-          <button aria-label="Drag card" className="kanban-drag-handle" type="button" {...attributes} {...listeners}>
+          <button aria-label={t('boards.card.dragCard')} className="kanban-drag-handle" type="button" {...attributes} {...listeners}>
             <GripVertical size={14} />
           </button>
         ) : (
           <span aria-hidden="true" />
         )}
         <input
-          aria-label="Card title"
+          aria-label={t('boards.card.title')}
           disabled={!canEdit}
           onBlur={() => void commitTitle()}
           onChange={(event) => setTitle(event.currentTarget.value)}
@@ -177,7 +179,7 @@ export default function KanbanCard({
           }}
           value={title}
         />
-        <button aria-label="Open card details" className="icon-button subtle" onClick={openDetails} type="button">
+        <button aria-label={t('boards.card.openDetails')} className="icon-button subtle" onClick={openDetails} type="button">
           <Maximize2 size={14} />
         </button>
       </div>
@@ -186,7 +188,7 @@ export default function KanbanCard({
         <CardMarkdown compact text={card.description} />
       ) : (
         <button className="kanban-card-empty-detail" onClick={openDetails} type="button">
-          {canEdit ? 'Add details' : 'No details yet'}
+          {canEdit ? t('boards.card.addDetails') : t('boards.card.noDetailsYet')}
         </button>
       )}
 
@@ -197,46 +199,46 @@ export default function KanbanCard({
         {card.dueDateUtc !== null ? (
           <span className={overdue ? 'kanban-card-due overdue' : 'kanban-card-due'}>
             <CalendarDays size={12} />
-            Due {dueDateLabel(card.dueDateUtc)}
+            {t('boards.card.due', { date: dueDateLabel(card.dueDateUtc) })}
           </span>
         ) : null}
       </div>
 
       {detailsOpen ? (
         <div className="kanban-card-modal-backdrop" onMouseDown={() => setDetailsOpen(false)} role="presentation">
-          <section aria-label="Card details" aria-modal="true" className="kanban-card-modal" onMouseDown={(event) => event.stopPropagation()} role="dialog">
+          <section aria-label={t('boards.card.details')} aria-modal="true" className="kanban-card-modal" onMouseDown={(event) => event.stopPropagation()} role="dialog">
             <header>
               <div>
-                <span className="eyebrow">Card details</span>
-                <input aria-label="Card detail title" disabled={!canEdit} onChange={(event) => setTitle(event.currentTarget.value)} value={title} />
+                <span className="eyebrow">{t('boards.card.details')}</span>
+                <input aria-label={t('boards.card.detailTitle')} disabled={!canEdit} onChange={(event) => setTitle(event.currentTarget.value)} value={title} />
               </div>
-              <button aria-label="Close card details" className="icon-button subtle" onClick={() => setDetailsOpen(false)} type="button">
+              <button aria-label={t('boards.card.closeDetails')} className="icon-button subtle" onClick={() => setDetailsOpen(false)} type="button">
                 <X size={18} />
               </button>
             </header>
 
             <dl className="kanban-card-detail-grid">
               <div>
-                <dt>Creator</dt>
+                <dt>{t('boards.card.creator')}</dt>
                 <dd>{principalLabel(memberOptions, card.createdBy)}</dd>
               </div>
               <div>
-                <dt>Created</dt>
+                <dt>{t('boards.card.created')}</dt>
                 <dd>{readableDate(card.createdAt)}</dd>
               </div>
               <div>
-                <dt>Updated</dt>
+                <dt>{t('boards.card.updated')}</dt>
                 <dd>{readableDate(card.updatedAt)}</dd>
               </div>
               <div>
-                <dt>Due date</dt>
-                <dd><input aria-label="Card due date" disabled={!canEdit} onChange={(event) => setDueDate(event.currentTarget.value)} type="date" value={dueDate} /></dd>
+                <dt>{t('boards.card.dueDate')}</dt>
+                <dd><input aria-label={t('boards.card.dueDate')} disabled={!canEdit} onChange={(event) => setDueDate(event.currentTarget.value)} type="date" value={dueDate} /></dd>
               </div>
               <div>
-                <dt>Assignees</dt>
+                <dt>{t('boards.card.assignees')}</dt>
                 <dd>
                   <select
-                    aria-label="Card assignees"
+                    aria-label={t('boards.card.assignees')}
                     disabled={!canEdit}
                     multiple
                     onChange={(event) => setAssignedTo(selectValues(event.currentTarget.options))}
@@ -251,10 +253,10 @@ export default function KanbanCard({
                 </dd>
               </div>
               <div>
-                <dt>Linked document</dt>
+                <dt>{t('boards.card.linkedDocument')}</dt>
                 <dd>
-                  <select aria-label="Linked document" disabled={!canEdit} onChange={(event) => setDocId(event.currentTarget.value)} value={docId}>
-                    <option value="">No linked document</option>
+                  <select aria-label={t('boards.card.linkedDocument')} disabled={!canEdit} onChange={(event) => setDocId(event.currentTarget.value)} value={docId}>
+                    <option value="">{t('boards.card.noLinkedDocument')}</option>
                     {documents.map((document) => (
                       <option key={document.id.toString()} value={document.id.toString()}>{document.title}</option>
                     ))}
@@ -262,16 +264,16 @@ export default function KanbanCard({
                   {documentLink ? (
                     <a className="kanban-linked-resource" href={routePaths.document(communityId, documentLink.id)}>
                       <FileText size={14} />
-                      Open document
+                      {t('boards.card.openDocument')}
                     </a>
-                  ) : card.docId !== null ? <p className="inline-error">Linked document is not visible.</p> : null}
+                  ) : card.docId !== null ? <p className="inline-error">{t('boards.card.linkedDocumentNotVisible')}</p> : null}
                 </dd>
               </div>
               <div>
-                <dt>Linked event</dt>
+                <dt>{t('boards.card.linkedEvent')}</dt>
                 <dd>
-                  <select aria-label="Linked event" disabled={!canEdit} onChange={(event) => setEventId(event.currentTarget.value)} value={eventId}>
-                    <option value="">No linked event</option>
+                  <select aria-label={t('boards.card.linkedEvent')} disabled={!canEdit} onChange={(event) => setEventId(event.currentTarget.value)} value={eventId}>
+                    <option value="">{t('boards.card.noLinkedEvent')}</option>
                     {events.map((event) => (
                       <option key={event.id.toString()} value={event.id.toString()}>{event.title}</option>
                     ))}
@@ -279,33 +281,33 @@ export default function KanbanCard({
                   {eventLink ? (
                     <a className="kanban-linked-resource" href={routePaths.event(communityId, eventLink.id)}>
                       <CalendarDays size={14} />
-                      Open event
+                      {t('boards.card.openEvent')}
                     </a>
-                  ) : card.eventId !== null ? <p className="inline-error">Linked event is not visible.</p> : null}
+                  ) : card.eventId !== null ? <p className="inline-error">{t('boards.card.linkedEventNotVisible')}</p> : null}
                 </dd>
               </div>
             </dl>
 
-            <div className="kanban-card-mode-toggle" role="group" aria-label="Description mode">
-              <button className={detailsMode === 'preview' ? 'selected' : ''} onClick={() => setDetailsMode('preview')} type="button">Preview</button>
+            <div className="kanban-card-mode-toggle" role="group" aria-label={t('boards.card.descriptionMode')}>
+              <button className={detailsMode === 'preview' ? 'selected' : ''} onClick={() => setDetailsMode('preview')} type="button">{t('boards.card.preview')}</button>
               {canEdit ? (
-                <button className={detailsMode === 'edit' ? 'selected' : ''} onClick={() => setDetailsMode('edit')} title="Edit Markdown syntax" type="button">
+                <button className={detailsMode === 'edit' ? 'selected' : ''} onClick={() => setDetailsMode('edit')} title={t('boards.card.editMarkdownSyntax')} type="button">
                   <Code2 size={15} />
-                  Edit
+                  {t('common.actions.edit')}
                 </button>
               ) : null}
             </div>
 
             {detailsMode === 'edit' && canEdit ? (
               <textarea
-                aria-label="Card markdown description"
+                aria-label={t('boards.card.markdownDescription')}
                 onChange={(event) => setDescription(event.currentTarget.value)}
-                placeholder="Add Markdown details. Use # for headings, - for lists, [text](url) for links, and ![alt](url) for images."
+                placeholder={t('boards.card.markdownPlaceholder')}
                 value={description}
               />
             ) : (
               <div className="kanban-card-preview-panel">
-                {description.trim() ? <CardMarkdown text={description} /> : <p className="muted">No description yet.</p>}
+                {description.trim() ? <CardMarkdown text={description} /> : <p className="muted">{t('boards.card.noDescription')}</p>}
               </div>
             )}
 
@@ -315,11 +317,11 @@ export default function KanbanCard({
               {canEdit ? (
                 <button className="ghost-button danger" onClick={() => onDelete(card.id)} type="button">
                   <Trash2 size={16} />
-                  Delete
+                  {t('common.actions.delete')}
                 </button>
               ) : <span />}
               <div>
-                <button className="ghost-button" onClick={() => setDetailsOpen(false)} type="button">Cancel</button>
+                <button className="ghost-button" onClick={() => setDetailsOpen(false)} type="button">{t('common.actions.cancel')}</button>
                 {canEdit ? (
                   <button
                     className="btn-primary rounded-full px-4 py-2 text-sm"
@@ -328,7 +330,7 @@ export default function KanbanCard({
                     type="button"
                   >
                     <Save size={16} />
-                    {isSaving ? 'Saving...' : 'Save card'}
+                    {isSaving ? t('common.loading.saving') : t('boards.card.saveCard')}
                   </button>
                 ) : null}
               </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Principal } from '@dfinity/principal';
 import { BarChart3, RefreshCw, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   CommunityAccess,
   CommunityBoardPayload,
@@ -100,6 +101,7 @@ export default function CommunityBoardsWorkspace({
   initialBoardId,
   onOpenBoardRoute,
 }: CommunityBoardsWorkspaceProps) {
+  const { t } = useTranslation();
   const { identity } = useInternetIdentity();
   const currentPrincipal = identity?.getPrincipal().toText() ?? null;
   const canCreateBoard = access.isPlatformAdmin || access.communityRole !== null;
@@ -321,7 +323,7 @@ export default function CommunityBoardsWorkspace({
 
   async function archiveSelectedBoard() {
     if (!hasSelectedCommunityBoardId(selectedBoardId)) return;
-    const confirmed = window.confirm('Archive this board? It will disappear from the workspace lists.');
+    const confirmed = window.confirm(t('boards.messages.archiveConfirm'));
     if (!confirmed) return;
     try {
       await archiveBoard.mutateAsync({ communityId, boardId: selectedBoardId });
@@ -329,7 +331,7 @@ export default function CommunityBoardsWorkspace({
       const nextBoard = sortedBoards.find((board) => board.id !== selectedBoardId);
       setSelectedBoardId(nextBoard?.id ?? null);
       if (nextBoard) onOpenBoardRoute?.(nextBoard.id);
-      setMessage('Board archived.');
+      setMessage(t('boards.messages.archived'));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     }
@@ -345,7 +347,7 @@ export default function CommunityBoardsWorkspace({
         user: Principal.fromText(principalText),
         role,
       });
-      setMessage(`Granted ${roleName(role)} access.`);
+      setMessage(t('boards.messages.grantedAccess', { role: t(`workspace.roles.${roleName(role)}`) }));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     }
@@ -357,7 +359,11 @@ export default function CommunityBoardsWorkspace({
     setBoardDraft((board) => applyBoardPatch(board, selectedBoardId, (draft) => ({ ...draft, communityShare: role })));
     try {
       await setShare.mutateAsync({ communityId, boardId: selectedBoardId, role });
-      setMessage(role ? `Community members now have ${roleName(role)} access.` : 'Board is private.');
+      setMessage(
+        role
+          ? t('boards.messages.communityShareUpdated', { role: t(`workspace.roles.${roleName(role)}`) })
+          : t('boards.messages.private'),
+      );
     } catch (error) {
       setBoardDraft(previous);
       setMessage(error instanceof Error ? error.message : String(error));
@@ -370,7 +376,7 @@ export default function CommunityBoardsWorkspace({
     try {
       const confirmedToken = await setPublicLink.mutateAsync({ communityId, boardId: selectedBoardId, token });
       setBoardDraft((board) => applyBoardPatch(board, selectedBoardId, (draft) => ({ ...draft, publicToken: confirmedToken })));
-      setMessage('Public read-only link created and copied.');
+      setMessage(t('boards.messages.publicLinkCreated'));
       return confirmedToken ? publicBoardUrl(confirmedToken) : undefined;
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
@@ -383,7 +389,7 @@ export default function CommunityBoardsWorkspace({
     try {
       await setPublicLink.mutateAsync({ communityId, boardId: selectedBoardId, token: null });
       setBoardDraft((board) => applyBoardPatch(board, selectedBoardId, (draft) => ({ ...draft, publicToken: null })));
-      setMessage('Public link disabled.');
+      setMessage(t('boards.messages.publicLinkDisabled'));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     }
@@ -393,19 +399,19 @@ export default function CommunityBoardsWorkspace({
     if (!boardDraft) return;
     const nextPinned = pinnedBoardId === boardDraft.id ? null : boardDraft.id;
     writePinnedBoardId(currentPrincipal, communityId, nextPinned);
-    setMessage(nextPinned ? 'Pinned as your default board for this community.' : 'Default board pin removed.');
+    setMessage(nextPinned ? t('boards.messages.pinned') : t('boards.messages.unpinned'));
   }
 
   async function reloadBoard() {
     await Promise.all([refetchBoards(), refetchSelectedBoard()]);
-    setMessage('Board synced.');
+    setMessage(t('boards.messages.synced'));
   }
 
   const accessLabel =
-    access.isPlatformAdmin ? 'Platform admin' :
-      access.communityRole === CommunityRole.communityAdmin ? 'Community admin' :
-        access.communityRole === CommunityRole.member ? 'Member' :
-          'Viewer';
+    access.isPlatformAdmin ? t('common.roles.platformAdmin') :
+      access.communityRole === CommunityRole.communityAdmin ? t('common.roles.communityAdmin') :
+        access.communityRole === CommunityRole.member ? t('common.roles.member') :
+          t('common.roles.viewer');
   const boardPublicUrl = boardDraft?.publicToken ? publicBoardUrl(boardDraft.publicToken) : undefined;
 
   return (
@@ -425,22 +431,32 @@ export default function CommunityBoardsWorkspace({
       <main className="kanban-stage">
         <header className="kanban-hero">
           <div>
-            <p className="amnesty-kicker text-amnesty-pink mb-3">Boards</p>
-            <h1 className="text-4xl text-amnesty-ink md:text-5xl amnesty-heading">Coordinate work and track progress together.</h1>
-            <p>Organise tasks, surface blockers, and move your community's work toward impact.</p>
+            <p className="amnesty-kicker text-amnesty-pink mb-3">{t('boards.hero.kicker')}</p>
+            <h1 className="text-4xl text-amnesty-ink md:text-5xl amnesty-heading">{t('boards.hero.title')}</h1>
+            <p>{t('boards.hero.body')}</p>
             <small>{communityName}</small>
           </div>
           <div className="kanban-hero-stats">
             <article>
-              <span>Your access</span>
+              <span>{t('boards.hero.yourAccess')}</span>
               <strong>{accessLabel}</strong>
-              <p>{canManageCommunityWorkspace ? 'You can manage workspace boards, columns, and members.' : 'Your board actions follow each board share setting.'}</p>
+              <p>{canManageCommunityWorkspace ? t('boards.hero.manageAccessBody') : t('boards.hero.shareAccessBody')}</p>
               <Users size={25} />
             </article>
             <article>
-              <span>Board stats</span>
-              <strong>{boardDraft ? `${boardDraft.columns.length} columns` : `${sortedBoards.length} boards`}</strong>
-              <p>{boardDraft ? `${boardDraft.cards.length} active cards` : `${sortedBoards.reduce((sum, board) => sum + Number(board.cardCount), 0)} cards across this workspace`}</p>
+              <span>{t('boards.hero.boardStats')}</span>
+              <strong>
+                {boardDraft
+                  ? t('boards.labels.columnsCount', { count: boardDraft.columns.length })
+                  : t('boards.labels.boardsCount', { count: sortedBoards.length })}
+              </strong>
+              <p>
+                {boardDraft
+                  ? t('boards.labels.activeCardsCount', { count: boardDraft.cards.length })
+                  : t('boards.labels.workspaceCardsCount', {
+                      count: sortedBoards.reduce((sum, board) => sum + Number(board.cardCount), 0),
+                    })}
+              </p>
               <BarChart3 size={25} />
             </article>
           </div>
@@ -483,13 +499,13 @@ export default function CommunityBoardsWorkspace({
         ) : (
           <div className="kanban-empty-state">
             <RefreshCw size={32} />
-            <h2>{selectedBoardId !== null || selectedBoardError ? 'Board unavailable' : 'No board selected'}</h2>
+            <h2>{selectedBoardId !== null || selectedBoardError ? t('boards.empty.unavailableTitle') : t('boards.empty.noSelectionTitle')}</h2>
             <p>
               {selectedBoardId !== null || selectedBoardError
-                ? 'This board is not visible to you, archived, or no longer exists.'
+                ? t('boards.empty.unavailableBody')
                 : sortedBoards.length > 0
-                ? 'Choose a board from the sidebar to continue.'
-                : `Create the first board for ${communityName}.`}
+                ? t('boards.empty.chooseBoard')
+                : t('boards.empty.createFirst', { communityName })}
             </p>
             {message ? <p className="notice document-notice">{message}</p> : null}
             <small>{memberNameFromPrincipal(identity?.getPrincipal() ?? null)}</small>

@@ -1,11 +1,13 @@
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { I18nextProvider } from 'react-i18next';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { Principal } from '@dfinity/principal';
 import { CommunityRole, WorkspaceRole, type CommunityBoardPayload, type CommunityBoardSummary, type CommunityMember } from '../../../frontend/src/backend';
 import BoardLibrarySidebar from '../../../frontend/src/components/boards/BoardLibrarySidebar';
 import KanbanBoard from '../../../frontend/src/components/boards/KanbanBoard';
 import CardMarkdown from '../../../frontend/src/components/boards/cardMarkdown';
+import { i18n } from '../../../frontend/src/i18n';
 
 const owner = Principal.fromText('2vxsx-fae');
 const editor = Principal.fromText('aaaaa-aa');
@@ -14,6 +16,10 @@ const members: CommunityMember[] = [
   { principal: owner, role: CommunityRole.member, profile: { name: 'JaiJai' } },
   { principal: editor, role: CommunityRole.member, profile: { name: 'Aroha' } },
 ];
+
+function renderWithI18n(node: React.ReactElement): string {
+  return renderToStaticMarkup(<I18nextProvider i18n={i18n}>{node}</I18nextProvider>);
+}
 
 function boardSummary(overrides: Partial<CommunityBoardSummary> = {}): CommunityBoardSummary {
   return {
@@ -59,6 +65,10 @@ function board(): CommunityBoardPayload {
 }
 
 describe('kanban rendering', () => {
+  beforeAll(async () => {
+    await i18n.changeLanguage('en');
+  });
+
   it('renders markdown details with checklists and links', () => {
     const html = renderToStaticMarkup(
       <CardMarkdown text={'# Plan\n- [x] Ship board\n[Evidence](https://example.com)'} />,
@@ -71,7 +81,7 @@ describe('kanban rendering', () => {
   });
 
   it('renders sidebar sections for my boards, workspace boards, and shared boards', () => {
-    const html = renderToStaticMarkup(
+    const html = renderWithI18n(
       <BoardLibrarySidebar
         boards={[
           boardSummary({ id: 1n, role: WorkspaceRole.owner }),
@@ -98,7 +108,7 @@ describe('kanban rendering', () => {
   });
 
   it('renders board controls, public link sharing, and read-only card metadata', () => {
-    const html = renderToStaticMarkup(
+    const html = renderWithI18n(
       <KanbanBoard
         board={board()}
         canManageCommunityWorkspace={false}
@@ -138,7 +148,7 @@ describe('kanban rendering', () => {
 
   it('hides owner-only board controls in viewer/read-only rendering', () => {
     const readOnlyBoard = { ...board(), role: WorkspaceRole.viewer };
-    const html = renderToStaticMarkup(
+    const html = renderWithI18n(
       <KanbanBoard
         board={readOnlyBoard}
         canManageCommunityWorkspace={false}
