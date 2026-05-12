@@ -14,6 +14,8 @@ import {
     CommunityEventPayload,
     CommunityMember,
     CommunityRole,
+    FundraisingCampaignInput,
+    FundraisingCampaignPayload,
     KanbanCardInput,
     PlatformRole,
     Proposal,
@@ -43,6 +45,8 @@ function invalidateCommunity(queryClient: ReturnType<typeof useQueryClient>, com
         queryClient.invalidateQueries({ queryKey: ['callerCommunityRole', key] });
         queryClient.invalidateQueries({ queryKey: ['proposals', key] });
         queryClient.invalidateQueries({ queryKey: ['campaigns', key] });
+        queryClient.invalidateQueries({ queryKey: ['fundraisingCampaigns', key] });
+        queryClient.invalidateQueries({ queryKey: ['fundraisingCampaign'] });
         queryClient.invalidateQueries({ queryKey: ['communityDocuments', key] });
         queryClient.invalidateQueries({ queryKey: ['communityDocument'] });
         queryClient.invalidateQueries({ queryKey: ['communityBoards', key] });
@@ -539,6 +543,139 @@ export function useCanFinalizeCampaign(campaignId: bigint) {
         enabled,
         retry: false,
         staleTime: 5 * 1000
+    });
+}
+
+export function useCreateFundraisingCampaign() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, input }: { communityId: bigint; input: FundraisingCampaignInput }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.createFundraisingCampaign(communityId, input);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['campaigns', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['fundraisingCampaigns', variables.communityId.toString()] });
+        }
+    });
+}
+
+export function useListFundraisingCampaigns(communityId: bigint) {
+    const { actor, enabled } = useAuthedActor();
+
+    return useQuery<FundraisingCampaignPayload[]>({
+        queryKey: ['fundraisingCampaigns', communityId.toString()],
+        queryFn: async () => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.listFundraisingCampaigns(communityId);
+        },
+        enabled,
+        retry: false,
+        staleTime: 5 * 1000
+    });
+}
+
+export function useGetFundraisingCampaign(communityId: bigint, campaignId: bigint | null) {
+    const { actor, enabled } = useAuthedActor();
+
+    return useQuery<FundraisingCampaignPayload | null>({
+        queryKey: ['fundraisingCampaign', communityId.toString(), campaignId?.toString() ?? 'none'],
+        queryFn: async () => {
+            if (!actor) throw new Error('Actor not available');
+            if (campaignId === null) return null;
+            return actor.getFundraisingCampaign(communityId, campaignId);
+        },
+        enabled: enabled && campaignId !== null,
+        retry: false,
+        staleTime: 5 * 1000
+    });
+}
+
+export function useGetPublicCampaign(token: string | null) {
+    const { actor, isFetching } = useActor();
+
+    return useQuery<FundraisingCampaignPayload | null>({
+        queryKey: ['publicCampaign', token ?? 'none'],
+        queryFn: async () => {
+            if (!actor) throw new Error('Actor not available');
+            if (!token) return null;
+            return actor.getPublicCampaign(token);
+        },
+        enabled: !!actor && !isFetching && !!token,
+        retry: false,
+        staleTime: 5 * 1000
+    });
+}
+
+export function useContributeToPublicCampaign() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ token, amount }: { token: string; amount: bigint }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.contributeToPublicCampaign(token, amount);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['publicCampaign', variables.token] });
+            queryClient.invalidateQueries({ queryKey: ['fundraisingCampaigns'] });
+            queryClient.invalidateQueries({ queryKey: ['fundraisingCampaign'] });
+        }
+    });
+}
+
+export function useUpdateFundraisingCampaign() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, campaignId, input }: { communityId: bigint; campaignId: bigint; input: FundraisingCampaignInput }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.updateFundraisingCampaign(communityId, campaignId, input);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['campaigns', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['fundraisingCampaigns', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['fundraisingCampaign', variables.communityId.toString(), variables.campaignId.toString()] });
+        }
+    });
+}
+
+export function useArchiveCampaign() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, campaignId }: { communityId: bigint; campaignId: bigint }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.archiveCampaign(communityId, campaignId);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['campaigns', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['fundraisingCampaigns', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['fundraisingCampaign', variables.communityId.toString(), variables.campaignId.toString()] });
+        }
+    });
+}
+
+export function useSetCampaignPublicLink() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, campaignId, token }: { communityId: bigint; campaignId: bigint; token: string | null }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.setCampaignPublicLink(communityId, campaignId, token);
+        },
+        onSuccess: (token, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['fundraisingCampaigns', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['fundraisingCampaign', variables.communityId.toString(), variables.campaignId.toString()] });
+            if (token) {
+                queryClient.invalidateQueries({ queryKey: ['publicCampaign', token] });
+            }
+        }
     });
 }
 

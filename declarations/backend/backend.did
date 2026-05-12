@@ -1,27 +1,27 @@
-type WorkspaceRole =
+type WorkspaceRole = 
  variant {
    editor;
    owner;
    viewer;
  };
-type WorkspaceAccessEntry =
+type WorkspaceAccessEntry = 
  record {
    role: WorkspaceRole;
    user: principal;
  };
 type UserProfile = record {name: text;};
-type TransformationOutput =
+type TransformationOutput = 
  record {
    body: blob;
    headers: vec Header;
    status: nat;
  };
-type TransformationInput =
+type TransformationInput = 
  record {
    context: blob;
    response: TransformationOutput;
  };
-type StripeSessionStatus =
+type StripeSessionStatus = 
  variant {
    completed: record {
                 response: text;
@@ -29,12 +29,12 @@ type StripeSessionStatus =
               };
    failed: record {error: text;};
  };
-type StripeConfiguration =
+type StripeConfiguration = 
  record {
    allowedCountries: vec text;
    secretKey: text;
  };
-type ShoppingItem =
+type ShoppingItem = 
  record {
    currency: text;
    priceInCents: nat;
@@ -42,20 +42,20 @@ type ShoppingItem =
    productName: text;
    quantity: nat;
  };
-type ProposalState =
+type ProposalState = 
  variant {
    active;
    failed;
    passed;
    pendingFinalization;
  };
-type ProposalOverrides =
+type ProposalOverrides = 
  record {
    passPct: opt nat;
    quorum: opt nat;
    windowNs: opt nat;
  };
-type Proposal =
+type Proposal = 
  record {
    communityId: nat;
    creator: principal;
@@ -71,13 +71,13 @@ type Proposal =
    yes: nat;
  };
 type PlatformRole = variant {platformAdmin;};
-type KanbanColumn =
+type KanbanColumn = 
  record {
    cardIds: vec nat;
    id: nat;
    title: text;
  };
-type KanbanCardInput =
+type KanbanCardInput = 
  record {
    assignedTo: vec principal;
    description: opt text;
@@ -86,7 +86,7 @@ type KanbanCardInput =
    eventId: opt nat;
    title: text;
  };
-type KanbanCard =
+type KanbanCard = 
  record {
    assignedTo: vec principal;
    createdAt: int;
@@ -99,29 +99,71 @@ type KanbanCard =
    title: text;
    updatedAt: int;
  };
-type Header =
+type Header = 
  record {
    name: text;
    value: text;
  };
-type Contribution =
+type FundraisingCampaignPayload = 
+ record {
+   archived: bool;
+   canContribute: bool;
+   canEdit: bool;
+   canManagePublicLink: bool;
+   communityId: nat;
+   contributions: vec CampaignContributionPayload;
+   createdNs: int;
+   creator: opt principal;
+   creatorContact: opt text;
+   creatorName: text;
+   deadlineNs: int;
+   fundsUse: text;
+   goalAmount: nat;
+   id: nat;
+   impact: text;
+   mediaUrl: opt text;
+   publicToken: opt text;
+   shortDescription: text;
+   state: CampaignState;
+   story: text;
+   title: text;
+   totalRaised: nat;
+   updatedNs: int;
+   updates: vec CampaignUpdatePayload;
+   visibility: CampaignVisibility;
+ };
+type FundraisingCampaignInput = 
+ record {
+   creatorContact: opt text;
+   creatorName: text;
+   deadlineNs: int;
+   fundsUse: text;
+   goalAmount: nat;
+   impact: text;
+   mediaUrl: opt text;
+   shortDescription: text;
+   story: text;
+   title: text;
+   visibility: CampaignVisibility;
+ };
+type Contribution = 
  record {
    amount: nat;
    contributor: principal;
    timestampNs: int;
  };
-type CommunityRole =
+type CommunityRole = 
  variant {
    communityAdmin;
    member;
  };
-type CommunityMember =
+type CommunityMember = 
  record {
    "principal": principal;
    profile: opt UserProfile;
    role: CommunityRole;
  };
-type CommunityEventPayload =
+type CommunityEventPayload = 
  record {
    access: vec WorkspaceAccessEntry;
    allDay: bool;
@@ -140,7 +182,7 @@ type CommunityEventPayload =
    title: text;
    updatedAt: int;
  };
-type CommunityEventInput =
+type CommunityEventInput = 
  record {
    allDay: bool;
    description: opt text;
@@ -149,7 +191,7 @@ type CommunityEventInput =
    startUtc: int;
    title: text;
  };
-type CommunityDocumentSummary =
+type CommunityDocumentSummary = 
  record {
    archived: bool;
    communityId: nat;
@@ -163,7 +205,7 @@ type CommunityDocumentSummary =
    updatedAt: int;
    version: nat;
  };
-type CommunityDocumentPayload =
+type CommunityDocumentPayload = 
  record {
    access: vec WorkspaceAccessEntry;
    archived: bool;
@@ -180,7 +222,7 @@ type CommunityDocumentPayload =
    updates: vec blob;
    version: nat;
  };
-type CommunityBoardSummary =
+type CommunityBoardSummary = 
  record {
    archived: bool;
    cardCount: nat;
@@ -190,12 +232,11 @@ type CommunityBoardSummary =
    createdAt: int;
    id: nat;
    owner: principal;
-   publicToken: opt text;
    role: WorkspaceRole;
    title: text;
    updatedAt: int;
  };
-type CommunityBoardPayload =
+type CommunityBoardPayload = 
  record {
    access: vec WorkspaceAccessEntry;
    archived: bool;
@@ -206,11 +247,12 @@ type CommunityBoardPayload =
    createdAt: int;
    id: nat;
    owner: principal;
+   publicToken: opt text;
    role: WorkspaceRole;
    title: text;
    updatedAt: int;
  };
-type CommunityAccess =
+type CommunityAccess = 
  record {
    canContributeToCampaign: bool;
    canCreateCampaign: bool;
@@ -221,7 +263,7 @@ type CommunityAccess =
    communityRole: opt CommunityRole;
    isPlatformAdmin: bool;
  };
-type Community =
+type Community = 
  record {
    admin: principal;
    id: nat;
@@ -229,7 +271,20 @@ type Community =
    name: text;
    policy: text;
  };
-type CampaignUpdate =
+type CampaignVisibility = 
+ variant {
+   community;
+   publicCampaign;
+ };
+type CampaignUpdatePayload = 
+ record {
+   campaignId: nat;
+   content: text;
+   creatorName: text;
+   id: nat;
+   timestampNs: int;
+ };
+type CampaignUpdate = 
  record {
    campaignId: nat;
    content: text;
@@ -237,14 +292,20 @@ type CampaignUpdate =
    id: nat;
    timestampNs: int;
  };
-type CampaignState =
+type CampaignState = 
  variant {
    active;
    expired;
    failed;
    successful;
  };
-type Campaign =
+type CampaignContributionPayload = 
+ record {
+   amount: nat;
+   contributorName: text;
+   timestampNs: int;
+ };
+type Campaign = 
  record {
    communityId: nat;
    createdNs: int;
@@ -265,12 +326,14 @@ service : {
    (KanbanColumn);
   appendCommunityDocumentUpdate: (communityId: nat, documentId: nat, update:
    blob) -> (nat);
+  archiveCampaign: (communityId: nat, campaignId: nat) -> ();
   archiveCommunityBoard: (communityId: nat, boardId: nat) -> ();
   archiveCommunityDocument: (communityId: nat, documentId: nat) -> ();
   archiveCommunityEvent: (communityId: nat, eventId: nat) -> ();
   bootstrapPlatformAdmin: () -> ();
   canFinalizeCampaign: (campaignId: nat) -> (bool) query;
   contributeToCampaign: (campaignId: nat, amount: nat) -> ();
+  contributeToPublicCampaign: (token: text, amount: nat) -> ();
   createCampaign: (communityId: nat, title: text, description: text,
    goalAmount: nat, deadlineNs: int) -> ();
   createCheckoutSession: (items: vec ShoppingItem, successUrl: text,
@@ -280,9 +343,11 @@ service : {
   createCommunityDocument: (communityId: nat, title: text) -> (nat);
   createCommunityEvent: (communityId: nat, input: CommunityEventInput) ->
    (nat);
+  createFundraisingCampaign: (communityId: nat, input:
+   FundraisingCampaignInput) -> (nat);
   createProposal: (communityId: nat, title: text, description: text,
    overrides: opt ProposalOverrides) -> ();
-  deleteCommunityBoardCard: (communityId: nat, boardId: nat, cardId:
+  deleteCommunityBoardCard: (communityId: nat, boardId: nat, cardId: 
    nat) -> ();
   deleteCommunityBoardColumn: (communityId: nat, boardId: nat, columnId:
    nat) -> ();
@@ -302,11 +367,12 @@ service : {
    (opt CommunityDocumentPayload) query;
   getCommunityEvent: (communityId: nat, eventId: nat) ->
    (opt CommunityEventPayload) query;
-  getPublicCommunityBoard: (token: text) ->
-   (opt CommunityBoardPayload) query;
-  getPublicCommunityEvent: (token: text) ->
-   (opt CommunityEventPayload) query;
+  getFundraisingCampaign: (communityId: nat, campaignId: nat) ->
+   (opt FundraisingCampaignPayload) query;
   getProposalById: (proposalId: nat) -> (opt Proposal) query;
+  getPublicCampaign: (token: text) -> (opt FundraisingCampaignPayload) query;
+  getPublicCommunityBoard: (token: text) -> (opt CommunityBoardPayload) query;
+  getPublicCommunityEvent: (token: text) -> (opt CommunityEventPayload) query;
   getStripeSessionStatus: (sessionId: text) -> (StripeSessionStatus);
   getUserProfile: (user: principal) -> (opt UserProfile) query;
   isCallerPlatformAdmin: () -> (bool) query;
@@ -325,12 +391,14 @@ service : {
   listCommunityEvents: (communityId: nat) ->
    (vec CommunityEventPayload) query;
   listCommunityMembers: (communityId: nat) -> (vec CommunityMember) query;
+  listFundraisingCampaigns: (communityId: nat) ->
+   (vec FundraisingCampaignPayload) query;
   listPlatformAdmins: () -> (vec principal) query;
   listProposalsByCommunity: (communityId: nat) -> (vec Proposal) query;
   moveCommunityBoardCard: (communityId: nat, boardId: nat, cardId: nat,
    toColumnId: nat, toIndex: nat) -> ();
   renameCommunityBoard: (communityId: nat, boardId: nat, title: text) -> ();
-  renameCommunityBoardColumn: (communityId: nat, boardId: nat, columnId:
+  renameCommunityBoardColumn: (communityId: nat, boardId: nat, columnId: 
    nat, title: text) -> ();
   renameCommunityDocument: (communityId: nat, documentId: nat, title:
    text) -> ();
@@ -339,6 +407,8 @@ service : {
   saveCallerUserProfile: (profile: UserProfile) -> ();
   saveCommunityDocumentSnapshot: (communityId: nat, documentId: nat,
    snapshot: blob, compactThroughVersion: nat) -> ();
+  setCampaignPublicLink: (communityId: nat, campaignId: nat, token:
+   opt text) -> (opt text);
   setCommunityBoardGrant: (communityId: nat, boardId: nat, user: principal,
    role: opt WorkspaceRole) -> ();
   setCommunityBoardPublicLink: (communityId: nat, boardId: nat, token:
@@ -362,9 +432,11 @@ service : {
   setPlatformAdmin: (user: principal, enabled: bool) -> ();
   setStripeConfiguration: (config: StripeConfiguration) -> ();
   transform: (input: TransformationInput) -> (TransformationOutput) query;
-  updateCommunityBoardCard: (communityId: nat, boardId: nat, cardId:
+  updateCommunityBoardCard: (communityId: nat, boardId: nat, cardId: 
    nat, input: KanbanCardInput) -> ();
   updateCommunityEvent: (communityId: nat, eventId: nat, input:
    CommunityEventInput) -> ();
+  updateFundraisingCampaign: (communityId: nat, campaignId: nat, input:
+   FundraisingCampaignInput) -> ();
   voteOnProposal: (proposalId: nat, voteYes: bool) -> ();
 }

@@ -1,11 +1,14 @@
-export type AppPage = 'hub' | 'community' | 'proposals' | 'workspace' | 'boards' | 'calendar' | 'admin' | 'profile' | 'publicBoard' | 'publicEvent';
+export type AppPage = 'hub' | 'community' | 'proposals' | 'fundraise' | 'workspace' | 'boards' | 'calendar' | 'admin' | 'profile' | 'publicBoard' | 'publicEvent' | 'publicCampaign';
 
 export interface ParsedAppRoute {
   page: AppPage;
   communityId: bigint | null;
   documentId?: bigint;
+  campaignId?: bigint;
+  campaignCreate?: boolean;
   boardId?: bigint;
   eventId?: bigint;
+  publicCampaignToken?: string;
   publicBoardToken?: string;
   publicEventToken?: string;
   canonicalPath?: string;
@@ -40,6 +43,11 @@ export const routePaths = {
   admin: () => '/admin',
   community: (communityId: bigint) => `/communities/${communityId.toString()}`,
   proposals: (communityId: bigint) => `/communities/${communityId.toString()}/proposals`,
+  fundraise: (communityId: bigint) => `/communities/${communityId.toString()}/fundraise`,
+  newCampaign: (communityId: bigint) => `/communities/${communityId.toString()}/fundraise/new`,
+  campaign: (communityId: bigint, campaignId: bigint) =>
+    `/communities/${communityId.toString()}/fundraise/campaigns/${campaignId.toString()}`,
+  publicCampaign: (token: string) => `/campaigns/public/${encodeURIComponent(token)}`,
   workspace: (communityId: bigint) => `/communities/${communityId.toString()}/workspace`,
   document: (communityId: bigint, documentId: bigint) =>
     `/communities/${communityId.toString()}/workspace/docs/${documentId.toString()}`,
@@ -58,6 +66,9 @@ export function parseAppPath(pathname: string, legacyCommunityId: bigint | null 
   if (segments.length === 0) return { page: 'hub', communityId: null };
   if (segments[0] === 'boards' && segments[1] === 'public' && segments[2]) {
     return { page: 'publicBoard', communityId: null, publicBoardToken: segments[2] };
+  }
+  if (segments[0] === 'campaigns' && segments[1] === 'public' && segments[2]) {
+    return { page: 'publicCampaign', communityId: null, publicCampaignToken: segments[2] };
   }
   if (segments[0] === 'calendar' && segments[1] === 'public' && segments[2]) {
     return { page: 'publicEvent', communityId: null, publicEventToken: segments[2] };
@@ -80,6 +91,15 @@ export function parseAppPath(pathname: string, legacyCommunityId: bigint | null 
   if (communityId === undefined) return { page: 'hub', communityId: null };
   if (segments.length === 2) return { page: 'community', communityId };
   if (segments[2] === 'proposals') return { page: 'proposals', communityId };
+  if (segments[2] === 'fundraise' || segments[2] === 'campaigns') {
+    if (segments[3] === 'new') return { page: 'fundraise', communityId, campaignCreate: true };
+    const campaignId = segments[3] === 'campaigns' || segments[3] === 'campaign'
+      ? parseBigIntSegment(segments[4])
+      : parseBigIntSegment(segments[3]);
+    return campaignId === undefined
+      ? { page: 'fundraise', communityId }
+      : { page: 'fundraise', communityId, campaignId };
+  }
 
   if (segments[2] !== 'workspace') return { page: 'community', communityId };
   if (segments.length === 3) return { page: 'workspace', communityId };

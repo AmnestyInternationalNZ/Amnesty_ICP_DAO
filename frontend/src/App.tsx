@@ -11,6 +11,7 @@ import AmnestyLogo from './components/AmnestyLogo';
 import SiteFooter from './components/SiteFooter';
 import PublicBoardPage from './components/boards/PublicBoardPage';
 import PublicEventPage from './components/calendar/PublicEventPage';
+import PublicCampaignPage from './components/fundraising/PublicCampaignPage';
 import { parseAppPath } from './routing/appRoutes';
 
 export default function App() {
@@ -23,6 +24,7 @@ export default function App() {
   const isCommunityDeepLink = currentRoute.communityId !== null;
   const isPublicBoardRoute = currentRoute.page === 'publicBoard' && Boolean(currentRoute.publicBoardToken);
   const isPublicEventRoute = currentRoute.page === 'publicEvent' && Boolean(currentRoute.publicEventToken);
+  const isPublicCampaignRoute = currentRoute.page === 'publicCampaign' && Boolean(currentRoute.publicCampaignToken);
   const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
   const shouldShowProfileSetup = showProfileSetup && !isCommunityDeepLink;
   const landingNav = [
@@ -44,6 +46,15 @@ export default function App() {
     return (
       <div className="min-h-screen bg-amnesty-paper text-amnesty-ink">
         <PublicEventPage token={currentRoute.publicEventToken} />
+        <SiteFooter />
+      </div>
+    );
+  }
+
+  if (isPublicCampaignRoute && currentRoute.publicCampaignToken) {
+    return (
+      <div className="min-h-screen bg-amnesty-paper text-amnesty-ink">
+        <PublicCampaignPage token={currentRoute.publicCampaignToken} />
         <SiteFooter />
       </div>
     );

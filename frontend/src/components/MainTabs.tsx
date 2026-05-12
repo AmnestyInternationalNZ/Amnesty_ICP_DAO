@@ -13,6 +13,7 @@ import AdminPanel from './AdminPanel';
 import AmnestyLogo from './AmnestyLogo';
 import CommunityPortal from './CommunityPortal';
 import CommunityProposalsPage from './CommunityProposalsPage';
+import CommunityFundraisingPage from './fundraising/CommunityFundraisingPage';
 import CommunityWorkspacePage from './CommunityWorkspacePage';
 import Dashboard from './Dashboard';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -21,7 +22,7 @@ import ProfilePage from './ProfilePage';
 import SiteFooter from './SiteFooter';
 import { parseAppPath, routePaths, type AppPage, type ParsedAppRoute } from '../routing/appRoutes';
 
-const communityScopedPages: AppPage[] = ['community', 'proposals', 'workspace', 'boards', 'calendar'];
+const communityScopedPages: AppPage[] = ['community', 'proposals', 'fundraise', 'workspace', 'boards', 'calendar'];
 const LAST_COMMUNITY_KEY = 'amnesty.lastCommunityId';
 
 function readLastCommunityId(): bigint | null {
@@ -45,6 +46,8 @@ export default function MainTabs() {
   const [activePage, setActivePage] = useState<AppPage>(() => readCurrentRoute().page);
   const [selectedCommunityId, setSelectedCommunityId] = useState<bigint | null>(() => readCurrentRoute().communityId);
   const [initialWorkspaceDocumentId, setInitialWorkspaceDocumentId] = useState<bigint | undefined>(() => readCurrentRoute().documentId);
+  const [initialCampaignId, setInitialCampaignId] = useState<bigint | undefined>(() => readCurrentRoute().campaignId);
+  const [initialCampaignCreate, setInitialCampaignCreate] = useState<boolean>(() => readCurrentRoute().campaignCreate ?? false);
   const [initialWorkspaceBoardId, setInitialWorkspaceBoardId] = useState<bigint | undefined>(() => readCurrentRoute().boardId);
   const [initialWorkspaceEventId, setInitialWorkspaceEventId] = useState<bigint | undefined>(() => readCurrentRoute().eventId);
   const { data: platformRole, isLoading: roleLoading } = useGetCallerPlatformRole();
@@ -58,7 +61,7 @@ export default function MainTabs() {
   const isLoadingShell = roleLoading || adminLoading || platformAdminsLoading;
   const roleLabel =
     platformRole === PlatformRole.platformAdmin ? t('common.roles.platformAdmin') : t('common.roles.viewer');
-  const isFullWidthPage = activePage === 'workspace' || activePage === 'boards' || activePage === 'calendar';
+  const isFullWidthPage = activePage === 'workspace' || activePage === 'boards' || activePage === 'calendar' || activePage === 'fundraise';
 
   const applyRoute = (route: ParsedAppRoute) => {
     setActivePage(route.page);
@@ -68,6 +71,8 @@ export default function MainTabs() {
     } else if (route.page === 'hub') {
       setSelectedCommunityId(null);
     }
+    setInitialCampaignId(route.page === 'fundraise' ? route.campaignId : undefined);
+    setInitialCampaignCreate(route.page === 'fundraise' ? route.campaignCreate ?? false : false);
     setInitialWorkspaceDocumentId(route.page === 'workspace' ? route.documentId : undefined);
     setInitialWorkspaceBoardId(route.page === 'boards' ? route.boardId : undefined);
     setInitialWorkspaceEventId(route.page === 'calendar' ? route.eventId : undefined);
@@ -87,6 +92,7 @@ export default function MainTabs() {
     if (selectedCommunityId === null) return routePaths.hub();
     if (page === 'community') return routePaths.community(selectedCommunityId);
     if (page === 'proposals') return routePaths.proposals(selectedCommunityId);
+    if (page === 'fundraise') return routePaths.fundraise(selectedCommunityId);
     if (page === 'workspace') return routePaths.workspace(selectedCommunityId);
     if (page === 'boards') return routePaths.boards(selectedCommunityId);
     if (page === 'calendar') return routePaths.calendar(selectedCommunityId);
@@ -146,6 +152,7 @@ export default function MainTabs() {
       ? [
           { id: 'community' as const, label: t('app.nav.community'), contextual: true },
           { id: 'proposals' as const, label: t('app.nav.proposals'), contextual: true },
+          { id: 'fundraise' as const, label: t('app.nav.fundraise', { defaultValue: 'Fundraise' }), contextual: true },
           { id: 'workspace' as const, label: t('app.nav.workspace'), contextual: true },
           { id: 'boards' as const, label: t('app.nav.boards'), contextual: true },
           { id: 'calendar' as const, label: t('app.nav.calendar'), contextual: true },
@@ -227,11 +234,38 @@ export default function MainTabs() {
             )}
 
             {activePage === 'community' && selectedCommunityId !== null && (
-              <CommunityPortal communityId={selectedCommunityId} onBack={handleBackToHub} />
+              <CommunityPortal
+                communityId={selectedCommunityId}
+                onBack={handleBackToHub}
+                onOpenFundraise={(options) => {
+                  if (options?.campaignId !== undefined) {
+                    navigateTo(routePaths.campaign(selectedCommunityId, options.campaignId));
+                    return;
+                  }
+                  navigateTo(options?.create ? routePaths.newCampaign(selectedCommunityId) : routePaths.fundraise(selectedCommunityId));
+                }}
+              />
             )}
 
             {activePage === 'proposals' && selectedCommunityId !== null && (
               <CommunityProposalsPage communityId={selectedCommunityId} />
+            )}
+
+            {activePage === 'fundraise' && selectedCommunityId !== null && (
+              <CommunityFundraisingPage
+                communityId={selectedCommunityId}
+                initialCampaignId={initialCampaignId}
+                initialCreate={initialCampaignCreate}
+                onCreateCampaignRoute={() => {
+                  setInitialCampaignCreate(true);
+                  window.history.pushState({}, '', routePaths.newCampaign(selectedCommunityId));
+                }}
+                onOpenCampaignRoute={(campaignId) => {
+                  setInitialCampaignCreate(false);
+                  setInitialCampaignId(campaignId);
+                  window.history.pushState({}, '', routePaths.campaign(selectedCommunityId, campaignId));
+                }}
+              />
             )}
 
             {activePage === 'workspace' && selectedCommunityId !== null && (

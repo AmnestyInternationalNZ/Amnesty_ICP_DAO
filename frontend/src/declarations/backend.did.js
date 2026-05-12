@@ -39,6 +39,23 @@ export const idlFactory = ({ IDL }) => {
     'location' : IDL.Opt(IDL.Text),
     'endUtc' : IDL.Int,
   });
+  const CampaignVisibility = IDL.Variant({
+    'publicCampaign' : IDL.Null,
+    'community' : IDL.Null,
+  });
+  const FundraisingCampaignInput = IDL.Record({
+    'impact' : IDL.Text,
+    'title' : IDL.Text,
+    'creatorContact' : IDL.Opt(IDL.Text),
+    'goalAmount' : IDL.Nat,
+    'deadlineNs' : IDL.Int,
+    'creatorName' : IDL.Text,
+    'mediaUrl' : IDL.Opt(IDL.Text),
+    'story' : IDL.Text,
+    'shortDescription' : IDL.Text,
+    'fundsUse' : IDL.Text,
+    'visibility' : CampaignVisibility,
+  });
   const ProposalOverrides = IDL.Record({
     'passPct' : IDL.Opt(IDL.Nat),
     'windowNs' : IDL.Opt(IDL.Nat),
@@ -105,10 +122,10 @@ export const idlFactory = ({ IDL }) => {
     'title' : IDL.Text,
     'communityId' : IDL.Nat,
     'owner' : IDL.Principal,
-    'publicToken' : IDL.Opt(IDL.Text),
     'cards' : IDL.Vec(KanbanCard),
     'createdAt' : IDL.Int,
     'role' : WorkspaceRole,
+    'publicToken' : IDL.Opt(IDL.Text),
     'updatedAt' : IDL.Int,
     'communityShare' : IDL.Opt(WorkspaceRole),
     'archived' : IDL.Bool,
@@ -147,13 +164,52 @@ export const idlFactory = ({ IDL }) => {
     'startUtc' : IDL.Int,
     'createdAt' : IDL.Int,
     'role' : WorkspaceRole,
-    'publicToken' : IDL.Opt(IDL.Text),
     'description' : IDL.Opt(IDL.Text),
+    'publicToken' : IDL.Opt(IDL.Text),
     'updatedAt' : IDL.Int,
     'communityShare' : IDL.Opt(WorkspaceRole),
     'location' : IDL.Opt(IDL.Text),
     'archived' : IDL.Bool,
     'endUtc' : IDL.Int,
+  });
+  const CampaignContributionPayload = IDL.Record({
+    'contributorName' : IDL.Text,
+    'amount' : IDL.Nat,
+    'timestampNs' : IDL.Int,
+  });
+  const CampaignUpdatePayload = IDL.Record({
+    'id' : IDL.Nat,
+    'content' : IDL.Text,
+    'campaignId' : IDL.Nat,
+    'creatorName' : IDL.Text,
+    'timestampNs' : IDL.Int,
+  });
+  const FundraisingCampaignPayload = IDL.Record({
+    'id' : IDL.Nat,
+    'impact' : IDL.Text,
+    'canManagePublicLink' : IDL.Bool,
+    'title' : IDL.Text,
+    'creator' : IDL.Opt(IDL.Principal),
+    'creatorContact' : IDL.Opt(IDL.Text),
+    'goalAmount' : IDL.Nat,
+    'communityId' : IDL.Nat,
+    'contributions' : IDL.Vec(CampaignContributionPayload),
+    'deadlineNs' : IDL.Int,
+    'createdNs' : IDL.Int,
+    'canEdit' : IDL.Bool,
+    'creatorName' : IDL.Text,
+    'publicToken' : IDL.Opt(IDL.Text),
+    'mediaUrl' : IDL.Opt(IDL.Text),
+    'totalRaised' : IDL.Nat,
+    'updatedNs' : IDL.Int,
+    'state' : CampaignState,
+    'story' : IDL.Text,
+    'shortDescription' : IDL.Text,
+    'updates' : IDL.Vec(CampaignUpdatePayload),
+    'fundsUse' : IDL.Text,
+    'canContribute' : IDL.Bool,
+    'visibility' : CampaignVisibility,
+    'archived' : IDL.Bool,
   });
   const ProposalState = IDL.Variant({
     'active' : IDL.Null,
@@ -244,12 +300,14 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat],
         [],
       ),
+    'archiveCampaign' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
     'archiveCommunityBoard' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
     'archiveCommunityDocument' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
     'archiveCommunityEvent' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
     'bootstrapPlatformAdmin' : IDL.Func([], [], []),
     'canFinalizeCampaign' : IDL.Func([IDL.Nat], [IDL.Bool], ['query']),
     'contributeToCampaign' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
+    'contributeToPublicCampaign' : IDL.Func([IDL.Text, IDL.Nat], [], []),
     'createCampaign' : IDL.Func(
         [IDL.Nat, IDL.Text, IDL.Text, IDL.Nat, IDL.Int],
         [],
@@ -265,6 +323,11 @@ export const idlFactory = ({ IDL }) => {
     'createCommunityDocument' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Nat], []),
     'createCommunityEvent' : IDL.Func(
         [IDL.Nat, CommunityEventInput],
+        [IDL.Nat],
+        [],
+      ),
+    'createFundraisingCampaign' : IDL.Func(
+        [IDL.Nat, FundraisingCampaignInput],
         [IDL.Nat],
         [],
       ),
@@ -316,6 +379,17 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Opt(CommunityEventPayload)],
         ['query'],
       ),
+    'getFundraisingCampaign' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Opt(FundraisingCampaignPayload)],
+        ['query'],
+      ),
+    'getProposalById' : IDL.Func([IDL.Nat], [IDL.Opt(Proposal)], ['query']),
+    'getPublicCampaign' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(FundraisingCampaignPayload)],
+        ['query'],
+      ),
     'getPublicCommunityBoard' : IDL.Func(
         [IDL.Text],
         [IDL.Opt(CommunityBoardPayload)],
@@ -326,7 +400,6 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Opt(CommunityEventPayload)],
         ['query'],
       ),
-    'getProposalById' : IDL.Func([IDL.Nat], [IDL.Opt(Proposal)], ['query']),
     'getStripeSessionStatus' : IDL.Func([IDL.Text], [StripeSessionStatus], []),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
@@ -367,6 +440,11 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(CommunityMember)],
         ['query'],
       ),
+    'listFundraisingCampaigns' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(FundraisingCampaignPayload)],
+        ['query'],
+      ),
     'listPlatformAdmins' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
     'listProposalsByCommunity' : IDL.Func(
         [IDL.Nat],
@@ -394,6 +472,11 @@ export const idlFactory = ({ IDL }) => {
     'saveCommunityDocumentSnapshot' : IDL.Func(
         [IDL.Nat, IDL.Nat, IDL.Vec(IDL.Nat8), IDL.Nat],
         [],
+        [],
+      ),
+    'setCampaignPublicLink' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Opt(IDL.Text)],
+        [IDL.Opt(IDL.Text)],
         [],
       ),
     'setCommunityBoardGrant' : IDL.Func(
@@ -460,6 +543,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'updateCommunityEvent' : IDL.Func(
         [IDL.Nat, IDL.Nat, CommunityEventInput],
+        [],
+        [],
+      ),
+    'updateFundraisingCampaign' : IDL.Func(
+        [IDL.Nat, IDL.Nat, FundraisingCampaignInput],
         [],
         [],
       ),

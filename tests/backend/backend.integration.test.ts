@@ -274,6 +274,87 @@ describe('Amnesty backend regression baseline', () => {
     });
   });
 
+  it('supports routed fundraising metadata and privacy-safe public campaign links', async () => {
+    const adminActor = actorFor(fixture, fixture.adminIdentity);
+    const memberActor = actorFor(fixture, fixture.memberIdentity);
+    const outsiderActor = actorFor(fixture, fixture.outsiderIdentity);
+    const anonymousActor = actorFor(fixture, fixture.anonymousIdentity);
+
+    await adminActor.bootstrapPlatformAdmin();
+    await adminActor.saveCallerUserProfile({ name: 'Admin Advocate' });
+    await memberActor.saveCallerUserProfile({ name: 'Campaign Creator' });
+    await outsiderActor.saveCallerUserProfile({ name: 'Public Supporter' });
+    await adminActor.createCommunity('Fundraising Community', 'Raise support.');
+    await adminActor.setCommunityRole(
+      0n,
+      candidPrincipal(fixture.memberIdentity),
+      [{ member: null }],
+    );
+
+    const currentTimeMs = await fixture.pic.getTime();
+    const futureDeadlineNs = BigInt(currentTimeMs + 86_400_000) * 1_000_000n;
+    const input = {
+      title: 'Protect education in Myanmar',
+      shortDescription: 'Help keep learning alive.',
+      story: 'Across Myanmar, children need safe learning spaces.',
+      fundsUse: 'Funds will support learning materials and safe spaces.',
+      impact: 'Children and young people can continue education.',
+      mediaUrl: ['https://example.org/campaign.jpg'] as [] | [string],
+      creatorName: 'Campaign Creator',
+      creatorContact: ['creator@example.org'] as [] | [string],
+      goalAmount: 15000n,
+      deadlineNs: futureDeadlineNs,
+      visibility: { community: null },
+    };
+
+    const campaignId = await memberActor.createFundraisingCampaign(0n, input);
+    expect(campaignId).toBe(0n);
+
+    await adminActor.contributeToCampaign(campaignId, 100n);
+    await memberActor.addCampaignUpdate(campaignId, 'First update.');
+
+    const campaign = (await adminActor.getFundraisingCampaign(0n, campaignId))[0];
+    expect(campaign.title).toBe('Protect education in Myanmar');
+    expect(campaign.shortDescription).toBe('Help keep learning alive.');
+    expect(campaign.contributions[0].contributorName).toBe('Admin Advocate');
+    expect(campaign.updates[0].creatorName).toBe('Campaign Creator');
+
+    await expect(
+      outsiderActor.setCampaignPublicLink(0n, campaignId, ['a'.repeat(48)]),
+    ).rejects.toThrow(/Only the campaign creator can manage public links/);
+
+    const token = (await memberActor.setCampaignPublicLink(0n, campaignId, ['b'.repeat(48)]))[0];
+    expect(token).toBe('b'.repeat(48));
+
+    const publicCampaign = (await anonymousActor.getPublicCampaign(token))[0];
+    expect(publicCampaign.title).toBe('Protect education in Myanmar');
+    expect(publicCampaign.publicToken).toEqual([]);
+    expect(publicCampaign.creator).toEqual([]);
+    expect(publicCampaign.contributions[0].contributorName).toBe('Community supporter');
+    expect(publicCampaign.updates[0].creatorName).toBe('Campaign team');
+
+    await expect(
+      anonymousActor.contributeToPublicCampaign(token, 25n),
+    ).rejects.toThrow(/Anonymous callers are not allowed/);
+
+    await expect(
+      outsiderActor.contributeToCampaign(campaignId, 25n),
+    ).rejects.toThrow(/Unauthorized: Only community participants can contribute to campaigns/);
+
+    await outsiderActor.contributeToPublicCampaign(token, 250n);
+    const publicCampaignAfterDonation = (await anonymousActor.getPublicCampaign(token))[0];
+    expect(publicCampaignAfterDonation.totalRaised).toBe(350n);
+    expect(
+      publicCampaignAfterDonation.contributions.map((contribution) => contribution.contributorName),
+    ).toEqual(['Community supporter', 'Community supporter']);
+
+    const ownerCampaignAfterDonation = (await memberActor.getFundraisingCampaign(0n, campaignId))[0];
+    expect(ownerCampaignAfterDonation.contributions[1].contributorName).toBe('Public Supporter');
+
+    await memberActor.setCampaignPublicLink(0n, campaignId, []);
+    expect(await anonymousActor.getPublicCampaign(token)).toEqual([]);
+  });
+
   it('enforces leaveCommunity rules for members, viewers, and community admins', async () => {
     const adminActor = actorFor(fixture, fixture.adminIdentity);
     const memberActor = actorFor(fixture, fixture.memberIdentity);

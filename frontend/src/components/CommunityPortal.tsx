@@ -1,33 +1,31 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CommunityRole } from '../backend';
-import { formatNumber } from '../i18n/format';
+import { formatCurrency, formatNumber } from '../i18n/format';
 import { useLocalePreference } from '../i18n/preferences';
 import {
   useGetCommunityAccess,
   useGetCommunityById,
-  useListCampaignsByCommunity
+  useListFundraisingCampaigns
 } from '../hooks/useQueries';
 import LoadingSpinner from './LoadingSpinner';
-import CreateCampaignModal from './CreateCampaignModal';
-import CampaignCard from './CampaignCard';
 import CommunityMembersList from './CommunityMembersList';
 import LeaveCommunityModal from './LeaveCommunityModal';
 
 interface CommunityPortalProps {
   communityId: bigint;
   onBack: () => void;
+  onOpenFundraise?: (options?: { create?: boolean; campaignId?: bigint }) => void;
 }
 
-export default function CommunityPortal({ communityId, onBack }: CommunityPortalProps) {
+export default function CommunityPortal({ communityId, onBack, onOpenFundraise }: CommunityPortalProps) {
   const { t } = useTranslation();
   const { locale } = useLocalePreference();
-  const [showCreateCampaign, setShowCreateCampaign] = useState(false);
   const [showLeaveCommunity, setShowLeaveCommunity] = useState(false);
 
   const { data: community, isLoading: communityLoading, error: communityError } = useGetCommunityById(communityId);
   const { data: access, isLoading: accessLoading } = useGetCommunityAccess(communityId);
-  const { data: campaigns, isLoading: campaignsLoading } = useListCampaignsByCommunity(communityId);
+  const { data: campaigns, isLoading: campaignsLoading } = useListFundraisingCampaigns(communityId);
 
   if (communityLoading || accessLoading) {
     return (
@@ -146,7 +144,7 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
 
               <div className="mt-8 flex flex-col gap-3">
                 {access.canCreateCampaign ? (
-                  <button onClick={() => setShowCreateCampaign(true)} className="btn-primary rounded-full">
+                  <button onClick={() => onOpenFundraise?.({ create: true })} className="btn-primary rounded-full">
                     {t('common.actions.createCampaign')}
                   </button>
                 ) : (
@@ -195,7 +193,7 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
                   : t('communities.portal.emptyCampaignsViewer')}
               </p>
               {access.canCreateCampaign && (
-                <button onClick={() => setShowCreateCampaign(true)} className="btn-primary mt-8 rounded-full">
+                <button onClick={() => onOpenFundraise?.({ create: true })} className="btn-primary mt-8 rounded-full">
                   {t('common.actions.createFirstCampaign')}
                 </button>
               )}
@@ -203,13 +201,32 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
           ) : (
             <div className="space-y-6">
               {campaigns.map((campaign) => (
-                <CampaignCard
+                <button
                   key={campaign.id.toString()}
-                  campaign={campaign}
-                  canInteract={access.canContributeToCampaign}
-                  communityRole={access.communityRole}
-                  isPlatformAdmin={access.isPlatformAdmin}
-                />
+                  type="button"
+                  className="amnesty-panel flex w-full flex-col gap-4 bg-white p-6 text-left transition hover:-translate-y-0.5 hover:shadow-[0_24px_54px_rgba(4,31,45,0.12)]"
+                  onClick={() => onOpenFundraise?.({ campaignId: campaign.id })}
+                >
+                  <div className="h-1.5 w-24 bg-amnesty-green" />
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <p className="amnesty-kicker text-amnesty-green mb-3">{t('common.labels.campaign')}</p>
+                      <h3 className="text-4xl text-amnesty-ink amnesty-heading">{campaign.title}</h3>
+                      <p className="mt-3 max-w-3xl text-lg leading-8 text-[#38505d]">{campaign.shortDescription}</p>
+                    </div>
+                    <div className="min-w-[12rem]">
+                      <strong className="block text-3xl text-amnesty-ink amnesty-heading">
+                        {formatCurrency(campaign.totalRaised, locale)}
+                      </strong>
+                      <span className="text-sm text-[#5d6d77]">
+                        {t('campaigns.card.progress', {
+                          raised: formatCurrency(campaign.totalRaised, locale),
+                          goal: formatCurrency(campaign.goalAmount, locale)
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                </button>
               ))}
             </div>
           )}
@@ -217,14 +234,6 @@ export default function CommunityPortal({ communityId, onBack }: CommunityPortal
 
         <CommunityMembersList communityId={communityId} />
       </div>
-
-      {showCreateCampaign && access.canCreateCampaign && (
-        <CreateCampaignModal
-          isOpen={showCreateCampaign}
-          onClose={() => setShowCreateCampaign(false)}
-          communityId={communityId}
-        />
-      )}
 
       {showLeaveCommunity && access.canLeaveCommunity && (
         <LeaveCommunityModal

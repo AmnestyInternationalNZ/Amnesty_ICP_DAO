@@ -14,6 +14,11 @@ export interface Campaign {
   'totalRaised' : bigint,
   'state' : CampaignState,
 }
+export interface CampaignContributionPayload {
+  'contributorName' : string,
+  'amount' : bigint,
+  'timestampNs' : bigint,
+}
 export type CampaignState = { 'active' : null } |
   { 'expired' : null } |
   { 'successful' : null } |
@@ -25,6 +30,15 @@ export interface CampaignUpdate {
   'campaignId' : bigint,
   'timestampNs' : bigint,
 }
+export interface CampaignUpdatePayload {
+  'id' : bigint,
+  'content' : string,
+  'campaignId' : bigint,
+  'creatorName' : string,
+  'timestampNs' : bigint,
+}
+export type CampaignVisibility = { 'publicCampaign' : null } |
+  { 'community' : null };
 export interface Community {
   'id' : bigint,
   'members' : Array<Principal>,
@@ -48,10 +62,10 @@ export interface CommunityBoardPayload {
   'title' : string,
   'communityId' : bigint,
   'owner' : Principal,
-  'publicToken' : [] | [string],
   'cards' : Array<KanbanCard>,
   'createdAt' : bigint,
   'role' : WorkspaceRole,
+  'publicToken' : [] | [string],
   'updatedAt' : bigint,
   'communityShare' : [] | [WorkspaceRole],
   'archived' : boolean,
@@ -117,8 +131,8 @@ export interface CommunityEventPayload {
   'startUtc' : bigint,
   'createdAt' : bigint,
   'role' : WorkspaceRole,
-  'publicToken' : [] | [string],
   'description' : [] | [string],
+  'publicToken' : [] | [string],
   'updatedAt' : bigint,
   'communityShare' : [] | [WorkspaceRole],
   'location' : [] | [string],
@@ -136,6 +150,46 @@ export interface Contribution {
   'amount' : bigint,
   'timestampNs' : bigint,
   'contributor' : Principal,
+}
+export interface FundraisingCampaignInput {
+  'impact' : string,
+  'title' : string,
+  'creatorContact' : [] | [string],
+  'goalAmount' : bigint,
+  'deadlineNs' : bigint,
+  'creatorName' : string,
+  'mediaUrl' : [] | [string],
+  'story' : string,
+  'shortDescription' : string,
+  'fundsUse' : string,
+  'visibility' : CampaignVisibility,
+}
+export interface FundraisingCampaignPayload {
+  'id' : bigint,
+  'impact' : string,
+  'canManagePublicLink' : boolean,
+  'title' : string,
+  'creator' : [] | [Principal],
+  'creatorContact' : [] | [string],
+  'goalAmount' : bigint,
+  'communityId' : bigint,
+  'contributions' : Array<CampaignContributionPayload>,
+  'deadlineNs' : bigint,
+  'createdNs' : bigint,
+  'canEdit' : boolean,
+  'creatorName' : string,
+  'publicToken' : [] | [string],
+  'mediaUrl' : [] | [string],
+  'totalRaised' : bigint,
+  'updatedNs' : bigint,
+  'state' : CampaignState,
+  'story' : string,
+  'shortDescription' : string,
+  'updates' : Array<CampaignUpdatePayload>,
+  'fundsUse' : string,
+  'canContribute' : boolean,
+  'visibility' : CampaignVisibility,
+  'archived' : boolean,
 }
 export interface Header { 'value' : string, 'name' : string }
 export interface KanbanCard {
@@ -233,12 +287,14 @@ export interface _SERVICE {
     [bigint, bigint, Uint8Array | number[]],
     bigint
   >,
+  'archiveCampaign' : ActorMethod<[bigint, bigint], undefined>,
   'archiveCommunityBoard' : ActorMethod<[bigint, bigint], undefined>,
   'archiveCommunityDocument' : ActorMethod<[bigint, bigint], undefined>,
   'archiveCommunityEvent' : ActorMethod<[bigint, bigint], undefined>,
   'bootstrapPlatformAdmin' : ActorMethod<[], undefined>,
   'canFinalizeCampaign' : ActorMethod<[bigint], boolean>,
   'contributeToCampaign' : ActorMethod<[bigint, bigint], undefined>,
+  'contributeToPublicCampaign' : ActorMethod<[string, bigint], undefined>,
   'createCampaign' : ActorMethod<
     [bigint, string, string, bigint, bigint],
     undefined
@@ -251,6 +307,10 @@ export interface _SERVICE {
   'createCommunityBoard' : ActorMethod<[bigint, string], bigint>,
   'createCommunityDocument' : ActorMethod<[bigint, string], bigint>,
   'createCommunityEvent' : ActorMethod<[bigint, CommunityEventInput], bigint>,
+  'createFundraisingCampaign' : ActorMethod<
+    [bigint, FundraisingCampaignInput],
+    bigint
+  >,
   'createProposal' : ActorMethod<
     [bigint, string, string, [] | [ProposalOverrides]],
     undefined
@@ -282,6 +342,15 @@ export interface _SERVICE {
     [bigint, bigint],
     [] | [CommunityEventPayload]
   >,
+  'getFundraisingCampaign' : ActorMethod<
+    [bigint, bigint],
+    [] | [FundraisingCampaignPayload]
+  >,
+  'getProposalById' : ActorMethod<[bigint], [] | [Proposal]>,
+  'getPublicCampaign' : ActorMethod<
+    [string],
+    [] | [FundraisingCampaignPayload]
+  >,
   'getPublicCommunityBoard' : ActorMethod<
     [string],
     [] | [CommunityBoardPayload]
@@ -290,7 +359,6 @@ export interface _SERVICE {
     [string],
     [] | [CommunityEventPayload]
   >,
-  'getProposalById' : ActorMethod<[bigint], [] | [Proposal]>,
   'getStripeSessionStatus' : ActorMethod<[string], StripeSessionStatus>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerPlatformAdmin' : ActorMethod<[], boolean>,
@@ -306,6 +374,10 @@ export interface _SERVICE {
   >,
   'listCommunityEvents' : ActorMethod<[bigint], Array<CommunityEventPayload>>,
   'listCommunityMembers' : ActorMethod<[bigint], Array<CommunityMember>>,
+  'listFundraisingCampaigns' : ActorMethod<
+    [bigint],
+    Array<FundraisingCampaignPayload>
+  >,
   'listPlatformAdmins' : ActorMethod<[], Array<Principal>>,
   'listProposalsByCommunity' : ActorMethod<[bigint], Array<Proposal>>,
   'moveCommunityBoardCard' : ActorMethod<
@@ -326,6 +398,10 @@ export interface _SERVICE {
   'saveCommunityDocumentSnapshot' : ActorMethod<
     [bigint, bigint, Uint8Array | number[], bigint],
     undefined
+  >,
+  'setCampaignPublicLink' : ActorMethod<
+    [bigint, bigint, [] | [string]],
+    [] | [string]
   >,
   'setCommunityBoardGrant' : ActorMethod<
     [bigint, bigint, Principal, [] | [WorkspaceRole]],
@@ -376,6 +452,10 @@ export interface _SERVICE {
   >,
   'updateCommunityEvent' : ActorMethod<
     [bigint, bigint, CommunityEventInput],
+    undefined
+  >,
+  'updateFundraisingCampaign' : ActorMethod<
+    [bigint, bigint, FundraisingCampaignInput],
     undefined
   >,
   'voteOnProposal' : ActorMethod<[bigint, boolean], undefined>,

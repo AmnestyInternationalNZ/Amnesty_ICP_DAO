@@ -48,9 +48,39 @@ describe('app routes', () => {
     });
   });
 
+  it('builds and parses community-scoped fundraising campaign routes', () => {
+    expect(routePaths.fundraise(3n)).toBe('/communities/3/fundraise');
+    expect(routePaths.newCampaign(3n)).toBe('/communities/3/fundraise/new');
+    expect(routePaths.campaign(3n, 12n)).toBe('/communities/3/fundraise/campaigns/12');
+    expect(parseAppPath('/communities/3/fundraise')).toMatchObject({
+      page: 'fundraise',
+      communityId: 3n,
+    });
+    expect(parseAppPath('/communities/3/fundraise/new')).toMatchObject({
+      page: 'fundraise',
+      communityId: 3n,
+      campaignCreate: true,
+    });
+    expect(parseAppPath('/communities/3/fundraise/campaigns/12')).toMatchObject({
+      page: 'fundraise',
+      communityId: 3n,
+      campaignId: 12n,
+    });
+  });
+
+  it('builds and parses public read-only campaign routes', () => {
+    expect(routePaths.publicCampaign('campaign-token')).toBe('/campaigns/public/campaign-token');
+    expect(parseAppPath('/campaigns/public/campaign-token')).toMatchObject({
+      page: 'publicCampaign',
+      communityId: null,
+      publicCampaignToken: 'campaign-token',
+    });
+  });
+
   it('parses community-level workspace pages', () => {
     expect(parseAppPath('/communities/5')).toMatchObject({ page: 'community', communityId: 5n });
     expect(parseAppPath('/communities/5/proposals')).toMatchObject({ page: 'proposals', communityId: 5n });
+    expect(parseAppPath('/communities/5/fundraise')).toMatchObject({ page: 'fundraise', communityId: 5n });
     expect(parseAppPath('/communities/5/workspace')).toMatchObject({ page: 'workspace', communityId: 5n });
     expect(parseAppPath('/communities/5/workspace/calendar')).toMatchObject({ page: 'calendar', communityId: 5n });
   });

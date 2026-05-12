@@ -121,6 +121,86 @@ persistent actor {
         timestampNs : Int;
     };
 
+    public type CampaignVisibility = {
+        #community;
+        #publicCampaign;
+    };
+
+    public type FundraisingCampaignInput = {
+        title : Text;
+        shortDescription : Text;
+        story : Text;
+        fundsUse : Text;
+        impact : Text;
+        mediaUrl : ?Text;
+        creatorName : Text;
+        creatorContact : ?Text;
+        goalAmount : Nat;
+        deadlineNs : Int;
+        visibility : CampaignVisibility;
+    };
+
+    public type CampaignMetadata = {
+        campaignId : Nat;
+        shortDescription : Text;
+        story : Text;
+        fundsUse : Text;
+        impact : Text;
+        mediaUrl : ?Text;
+        creatorName : Text;
+        creatorContact : ?Text;
+        visibility : CampaignVisibility;
+        archived : Bool;
+        updatedNs : Int;
+    };
+
+    public type CampaignPublicLink = {
+        campaignId : Nat;
+        token : Text;
+    };
+
+    public type CampaignContributionPayload = {
+        amount : Nat;
+        timestampNs : Int;
+        contributorName : Text;
+    };
+
+    public type CampaignUpdatePayload = {
+        id : Nat;
+        campaignId : Nat;
+        creatorName : Text;
+        content : Text;
+        timestampNs : Int;
+    };
+
+    public type FundraisingCampaignPayload = {
+        id : Nat;
+        title : Text;
+        shortDescription : Text;
+        story : Text;
+        fundsUse : Text;
+        impact : Text;
+        mediaUrl : ?Text;
+        creator : ?Principal;
+        creatorName : Text;
+        creatorContact : ?Text;
+        communityId : Nat;
+        goalAmount : Nat;
+        deadlineNs : Int;
+        state : CampaignState;
+        totalRaised : Nat;
+        createdNs : Int;
+        updatedNs : Int;
+        visibility : CampaignVisibility;
+        archived : Bool;
+        publicToken : ?Text;
+        canEdit : Bool;
+        canContribute : Bool;
+        canManagePublicLink : Bool;
+        contributions : [CampaignContributionPayload];
+        updates : [CampaignUpdatePayload];
+    };
+
     var userProfiles = principalMap.empty<UserProfile>();
 
     var communities = natMap.empty<Community>();
@@ -134,9 +214,20 @@ persistent actor {
     var nextCampaignId : Nat = 0;
     var contributionsByCampaign = natMap.empty<[Contribution]>();
     var campaignUpdates = natMap.empty<CampaignUpdate>();
+    var campaignMetadataByCampaign = natMap.empty<CampaignMetadata>();
+    var campaignPublicLinks : [CampaignPublicLink] = [];
     var nextUpdateId : Nat = 0;
 
     var configuration : ?Stripe.StripeConfiguration = null;
+
+    let MAX_CAMPAIGN_TITLE_SIZE : Nat = 160;
+    let MAX_CAMPAIGN_SHORT_DESCRIPTION_SIZE : Nat = 240;
+    let MAX_CAMPAIGN_STORY_SIZE : Nat = 8_000;
+    let MAX_CAMPAIGN_METADATA_SIZE : Nat = 2_000;
+    let MAX_CAMPAIGN_MEDIA_URL_SIZE : Nat = 1_000;
+    let MAX_CAMPAIGN_CREATOR_SIZE : Nat = 240;
+    let MIN_PUBLIC_TOKEN_SIZE : Nat = 32;
+    let MAX_PUBLIC_TOKEN_SIZE : Nat = 160;
 
     func requireAuthenticated(caller : Principal) {
         Membership.requireAuthenticated(caller);
@@ -290,6 +381,250 @@ persistent actor {
         ignore getCommunityOrTrap(communityId);
         if (not allowed) {
             Debug.trap(message);
+        };
+    };
+
+    func isCommunityAdmin(access : CommunityAccess) : Bool {
+        switch (access.communityRole) {
+            case (?#communityAdmin) true;
+            case _ false;
+        };
+    };
+
+    func canManageCampaign(caller : Principal, campaign : Campaign, access : CommunityAccess) : Bool {
+        campaign.creator == caller or access.isPlatformAdmin or isCommunityAdmin(access);
+    };
+
+    func getCampaignOrTrap(campaignId : Nat) : Campaign {
+        switch (natMap.get(campaigns, campaignId)) {
+            case null { Debug.trap("Campaign not found") };
+            case (?campaign) { campaign };
+        };
+    };
+
+    func campaignPublicTokenFor(campaignId : Nat) : ?Text {
+        for (link in campaignPublicLinks.vals()) {
+            if (link.campaignId == campaignId) {
+                return ?link.token;
+            };
+        };
+        null;
+    };
+
+    func campaignPublicTokenAlreadyUsed(campaignId : Nat, token : Text) : Bool {
+        for (link in campaignPublicLinks.vals()) {
+            if (link.campaignId != campaignId and link.token == token) {
+                return true;
+            };
+        };
+        false;
+    };
+
+    func setCampaignPublicToken(campaignId : Nat, token : ?Text) : [CampaignPublicLink] {
+        var nextLinks = Array.filter<CampaignPublicLink>(
+            campaignPublicLinks,
+            func(link) { link.campaignId != campaignId },
+        );
+        switch (token) {
+            case null {};
+            case (?value) {
+                nextLinks := Array.append(nextLinks, [{ campaignId; token = value }]);
+            };
+        };
+        nextLinks;
+    };
+
+    func campaignIsArchived(campaignId : Nat) : Bool {
+        switch (natMap.get(campaignMetadataByCampaign, campaignId)) {
+            case (?metadata) metadata.archived;
+            case null false;
+        };
+    };
+
+    func principalDisplayName(user : Principal, fallback : Text) : Text {
+        switch (principalMap.get(userProfiles, user)) {
+            case (?profile) {
+                if (Text.size(profile.name) > 0) {
+                    profile.name;
+                } else {
+                    fallback;
+                };
+            };
+            case null { fallback };
+        };
+    };
+
+    func getCampaignMetadata(campaign : Campaign) : CampaignMetadata {
+        switch (natMap.get(campaignMetadataByCampaign, campaign.id)) {
+            case (?metadata) metadata;
+            case null {
+                {
+                    campaignId = campaign.id;
+                    shortDescription = campaign.description;
+                    story = campaign.description;
+                    fundsUse = "";
+                    impact = "";
+                    mediaUrl = null;
+                    creatorName = principalDisplayName(campaign.creator, "Campaign creator");
+                    creatorContact = null;
+                    visibility = #community;
+                    archived = false;
+                    updatedNs = campaign.createdNs;
+                };
+            };
+        };
+    };
+
+    func validateRequiredText(value : Text, maxSize : Nat, fieldLabel : Text) {
+        let size = Text.size(value);
+        if (size == 0 or size > maxSize) {
+            Debug.trap(fieldLabel # " must be between 1 and " # Nat.toText(maxSize) # " characters");
+        };
+    };
+
+    func validateOptionalText(value : ?Text, maxSize : Nat, fieldLabel : Text) {
+        switch (value) {
+            case null {};
+            case (?text) {
+                if (Text.size(text) > maxSize) {
+                    Debug.trap(fieldLabel # " is too large");
+                };
+            };
+        };
+    };
+
+    func validatePublicToken(token : Text) {
+        let size = Text.size(token);
+        if (size < MIN_PUBLIC_TOKEN_SIZE or size > MAX_PUBLIC_TOKEN_SIZE) {
+            Debug.trap("Public link token must be between 32 and 160 characters");
+        };
+    };
+
+    func validateMediaUrl(value : ?Text) {
+        validateOptionalText(value, MAX_CAMPAIGN_MEDIA_URL_SIZE, "Campaign media URL");
+        switch (value) {
+            case null {};
+            case (?url) {
+                if (Text.size(url) > 0 and not (Text.contains(url, #text "://") or Text.contains(url, #char '/'))) {
+                    Debug.trap("Campaign media URL must be a URL or path");
+                };
+            };
+        };
+    };
+
+    func validateCampaignInput(input : FundraisingCampaignInput) {
+        validateRequiredText(input.title, MAX_CAMPAIGN_TITLE_SIZE, "Campaign title");
+        validateRequiredText(input.shortDescription, MAX_CAMPAIGN_SHORT_DESCRIPTION_SIZE, "Campaign short description");
+        validateRequiredText(input.story, MAX_CAMPAIGN_STORY_SIZE, "Campaign story");
+        validateRequiredText(input.creatorName, MAX_CAMPAIGN_CREATOR_SIZE, "Campaign creator name");
+        validateOptionalText(?input.fundsUse, MAX_CAMPAIGN_METADATA_SIZE, "Funds use");
+        validateOptionalText(?input.impact, MAX_CAMPAIGN_METADATA_SIZE, "Campaign impact");
+        validateOptionalText(input.creatorContact, MAX_CAMPAIGN_CREATOR_SIZE, "Campaign creator contact");
+        validateMediaUrl(input.mediaUrl);
+        if (input.goalAmount == 0) {
+            Debug.trap("Campaign goal amount must be greater than zero");
+        };
+        if (input.deadlineNs <= Time.now()) {
+            Debug.trap("Campaign deadline must be in the future");
+        };
+    };
+
+    func toCampaignContributionPayload(contribution : Contribution, publicView : Bool) : CampaignContributionPayload {
+        {
+            amount = contribution.amount;
+            timestampNs = contribution.timestampNs;
+            contributorName = if (publicView) {
+                "Community supporter";
+            } else {
+                principalDisplayName(contribution.contributor, "Community supporter");
+            };
+        };
+    };
+
+    func campaignContributionPayloads(campaignId : Nat, publicView : Bool) : [CampaignContributionPayload] {
+        switch (natMap.get(contributionsByCampaign, campaignId)) {
+            case null { [] };
+            case (?contributions) {
+                Array.map<Contribution, CampaignContributionPayload>(
+                    contributions,
+                    func(contribution) { toCampaignContributionPayload(contribution, publicView) },
+                );
+            };
+        };
+    };
+
+    func campaignUpdatePayloads(campaignId : Nat, publicView : Bool) : [CampaignUpdatePayload] {
+        let allUpdates = Iter.toArray(natMap.vals(campaignUpdates));
+        let matchingUpdates = Array.filter<CampaignUpdate>(
+            allUpdates,
+            func(update) { update.campaignId == campaignId },
+        );
+        Array.map<CampaignUpdate, CampaignUpdatePayload>(
+            matchingUpdates,
+            func(update) {
+                {
+                    id = update.id;
+                    campaignId = update.campaignId;
+                    creatorName = if (publicView) {
+                        "Campaign team";
+                    } else {
+                        principalDisplayName(update.creator, "Campaign team");
+                    };
+                    content = update.content;
+                    timestampNs = update.timestampNs;
+                };
+            },
+        );
+    };
+
+    func toFundraisingCampaignPayload(
+        campaign : Campaign,
+        caller : ?Principal,
+        access : ?CommunityAccess,
+        includePublicToken : Bool,
+        publicView : Bool,
+    ) : FundraisingCampaignPayload {
+        let metadata = getCampaignMetadata(campaign);
+        let editable = switch (caller, access) {
+            case (?user, ?callerAccess) { canManageCampaign(user, campaign, callerAccess) };
+            case _ false;
+        };
+        let owner = switch (caller) {
+            case (?user) { campaign.creator == user };
+            case null false;
+        };
+        let canContribute = switch (access) {
+            case (?callerAccess) {
+                callerAccess.canContributeToCampaign and campaign.state == #active and not metadata.archived and Time.now() <= campaign.deadlineNs;
+            };
+            case null false;
+        };
+        {
+            id = campaign.id;
+            title = campaign.title;
+            shortDescription = metadata.shortDescription;
+            story = metadata.story;
+            fundsUse = metadata.fundsUse;
+            impact = metadata.impact;
+            mediaUrl = metadata.mediaUrl;
+            creator = if (publicView) null else ?campaign.creator;
+            creatorName = metadata.creatorName;
+            creatorContact = metadata.creatorContact;
+            communityId = campaign.communityId;
+            goalAmount = campaign.goalAmount;
+            deadlineNs = campaign.deadlineNs;
+            state = campaign.state;
+            totalRaised = campaign.totalRaised;
+            createdNs = campaign.createdNs;
+            updatedNs = metadata.updatedNs;
+            visibility = metadata.visibility;
+            archived = metadata.archived;
+            publicToken = if (includePublicToken) campaignPublicTokenFor(campaign.id) else null;
+            canEdit = editable;
+            canContribute;
+            canManagePublicLink = owner;
+            contributions = campaignContributionPayloads(campaign.id, publicView);
+            updates = campaignUpdatePayloads(campaign.id, publicView);
         };
     };
 
@@ -705,6 +1040,54 @@ persistent actor {
         nextCampaignId += 1;
     };
 
+    public shared ({ caller }) func createFundraisingCampaign(
+        communityId : Nat,
+        input : FundraisingCampaignInput,
+    ) : async Nat {
+        let access = getCommunityAccessForCaller(caller, communityId);
+        requireCommunityCapability(
+            caller,
+            communityId,
+            access.canCreateCampaign,
+            "Unauthorized: Only community participants can create campaigns",
+        );
+        validateCampaignInput(input);
+
+        let now = Time.now();
+        let campaignId = nextCampaignId;
+        let campaign : Campaign = {
+            id = campaignId;
+            title = input.title;
+            description = input.story;
+            creator = caller;
+            communityId;
+            goalAmount = input.goalAmount;
+            deadlineNs = input.deadlineNs;
+            state = #active;
+            totalRaised = 0;
+            createdNs = now;
+        };
+        let metadata : CampaignMetadata = {
+            campaignId;
+            shortDescription = input.shortDescription;
+            story = input.story;
+            fundsUse = input.fundsUse;
+            impact = input.impact;
+            mediaUrl = input.mediaUrl;
+            creatorName = input.creatorName;
+            creatorContact = input.creatorContact;
+            visibility = input.visibility;
+            archived = false;
+            updatedNs = now;
+        };
+
+        campaigns := natMap.put(campaigns, campaignId, campaign);
+        campaignMetadataByCampaign := natMap.put(campaignMetadataByCampaign, campaignId, metadata);
+        contributionsByCampaign := natMap.put(contributionsByCampaign, campaignId, []);
+        nextCampaignId += 1;
+        campaignId;
+    };
+
     public query ({ caller }) func listCampaignsByCommunity(communityId : Nat) : async [Campaign] {
         requireAuthenticated(caller);
         ignore getCommunityOrTrap(communityId);
@@ -713,6 +1096,207 @@ persistent actor {
             allCampaigns,
             func(campaign) { campaign.communityId == communityId },
         );
+    };
+
+    public query ({ caller }) func listFundraisingCampaigns(communityId : Nat) : async [FundraisingCampaignPayload] {
+        requireAuthenticated(caller);
+        ignore getCommunityOrTrap(communityId);
+        let access = getCommunityAccessForCaller(caller, communityId);
+        var visible : [FundraisingCampaignPayload] = [];
+        for (campaign in natMap.vals(campaigns)) {
+            if (campaign.communityId == communityId) {
+                let metadata = getCampaignMetadata(campaign);
+                if (not metadata.archived or canManageCampaign(caller, campaign, access)) {
+                    visible := Array.append(
+                        visible,
+                        [toFundraisingCampaignPayload(campaign, ?caller, ?access, campaign.creator == caller, false)],
+                    );
+                };
+            };
+        };
+        visible;
+    };
+
+    public query ({ caller }) func getFundraisingCampaign(communityId : Nat, campaignId : Nat) : async ?FundraisingCampaignPayload {
+        requireAuthenticated(caller);
+        ignore getCommunityOrTrap(communityId);
+        let access = getCommunityAccessForCaller(caller, communityId);
+        switch (natMap.get(campaigns, campaignId)) {
+            case null null;
+            case (?campaign) {
+                if (campaign.communityId != communityId) {
+                    null;
+                } else {
+                    let metadata = getCampaignMetadata(campaign);
+                    if (metadata.archived and not canManageCampaign(caller, campaign, access)) {
+                        null;
+                    } else {
+                        ?toFundraisingCampaignPayload(campaign, ?caller, ?access, campaign.creator == caller, false);
+                    };
+                };
+            };
+        };
+    };
+
+    public query func getPublicCampaign(token : Text) : async ?FundraisingCampaignPayload {
+        validatePublicToken(token);
+        for (link in campaignPublicLinks.vals()) {
+            if (link.token == token) {
+                switch (natMap.get(campaigns, link.campaignId)) {
+                    case null { return null };
+                    case (?campaign) {
+                        let metadata = getCampaignMetadata(campaign);
+                        let isPublic = switch (metadata.visibility) {
+                            case (#publicCampaign) true;
+                            case (_) false;
+                        };
+                        if (metadata.archived or not isPublic) {
+                            return null;
+                        };
+                        return ?toFundraisingCampaignPayload(campaign, null, null, false, true);
+                    };
+                };
+            };
+        };
+        null;
+    };
+
+    public shared ({ caller }) func updateFundraisingCampaign(
+        communityId : Nat,
+        campaignId : Nat,
+        input : FundraisingCampaignInput,
+    ) : async () {
+        requireAuthenticated(caller);
+        ignore getCommunityOrTrap(communityId);
+        validateCampaignInput(input);
+        let access = getCommunityAccessForCaller(caller, communityId);
+        let campaign = getCampaignOrTrap(campaignId);
+        if (campaign.communityId != communityId) {
+            Debug.trap("Campaign not found in this community");
+        };
+        if (not canManageCampaign(caller, campaign, access)) {
+            Debug.trap("Only campaign creators and community admins can edit campaigns");
+        };
+        let now = Time.now();
+        campaigns := natMap.put(
+            campaigns,
+            campaignId,
+            {
+                campaign with
+                title = input.title;
+                description = input.story;
+                goalAmount = input.goalAmount;
+                deadlineNs = input.deadlineNs;
+            },
+        );
+        campaignMetadataByCampaign := natMap.put(
+            campaignMetadataByCampaign,
+            campaignId,
+            {
+                campaignId;
+                shortDescription = input.shortDescription;
+                story = input.story;
+                fundsUse = input.fundsUse;
+                impact = input.impact;
+                mediaUrl = input.mediaUrl;
+                creatorName = input.creatorName;
+                creatorContact = input.creatorContact;
+                visibility = input.visibility;
+                archived = getCampaignMetadata(campaign).archived;
+                updatedNs = now;
+            },
+        );
+    };
+
+    public shared ({ caller }) func archiveCampaign(communityId : Nat, campaignId : Nat) : async () {
+        requireAuthenticated(caller);
+        ignore getCommunityOrTrap(communityId);
+        let access = getCommunityAccessForCaller(caller, communityId);
+        let campaign = getCampaignOrTrap(campaignId);
+        if (campaign.communityId != communityId) {
+            Debug.trap("Campaign not found in this community");
+        };
+        if (not canManageCampaign(caller, campaign, access)) {
+            Debug.trap("Only campaign creators and community admins can archive campaigns");
+        };
+        let metadata = getCampaignMetadata(campaign);
+        campaignMetadataByCampaign := natMap.put(
+            campaignMetadataByCampaign,
+            campaignId,
+            { metadata with archived = true; updatedNs = Time.now() },
+        );
+        campaignPublicLinks := setCampaignPublicToken(campaignId, null);
+    };
+
+    public shared ({ caller }) func setCampaignPublicLink(communityId : Nat, campaignId : Nat, token : ?Text) : async ?Text {
+        requireAuthenticated(caller);
+        ignore getCommunityOrTrap(communityId);
+        let campaign = getCampaignOrTrap(campaignId);
+        if (campaign.communityId != communityId) {
+            Debug.trap("Campaign not found in this community");
+        };
+        if (campaign.creator != caller) {
+            Debug.trap("Only the campaign creator can manage public links");
+        };
+        let metadata = getCampaignMetadata(campaign);
+        if (metadata.archived) {
+            Debug.trap("Archived campaigns cannot be shared publicly");
+        };
+        switch (token) {
+            case null {};
+            case (?value) {
+                validatePublicToken(value);
+                if (campaignPublicTokenAlreadyUsed(campaignId, value)) {
+                    Debug.trap("Public link token is already in use");
+                };
+            };
+        };
+        campaignPublicLinks := setCampaignPublicToken(campaignId, token);
+        campaignMetadataByCampaign := natMap.put(
+            campaignMetadataByCampaign,
+            campaignId,
+            { metadata with updatedNs = Time.now(); visibility = switch (token) { case null metadata.visibility; case (?_) #publicCampaign } },
+        );
+        token;
+    };
+
+    func recordCampaignContribution(caller : Principal, campaignId : Nat, campaign : Campaign, amount : Nat) {
+        if (amount == 0) {
+            Debug.trap("Contribution amount must be greater than zero");
+        };
+
+        let now = Time.now();
+        if (now > campaign.deadlineNs) {
+            Debug.trap("Campaign deadline has passed");
+        };
+        if (campaign.state != #active) {
+            Debug.trap("Campaign is not active");
+        };
+        if (campaignIsArchived(campaign.id)) {
+            Debug.trap("Campaign is archived");
+        };
+
+        switch (natMap.get(contributionsByCampaign, campaignId)) {
+            case null {
+                Debug.trap("Contribution tracking not initialized for this campaign");
+            };
+            case (?contributions) {
+                let contribution : Contribution = {
+                    contributor = caller;
+                    amount;
+                    timestampNs = now;
+                };
+
+                let updatedContributions = Array.append(contributions, [contribution]);
+                contributionsByCampaign := natMap.put(contributionsByCampaign, campaignId, updatedContributions);
+
+                let updatedCampaign = {
+                    campaign with
+                    totalRaised = campaign.totalRaised + amount;
+                };
+                campaigns := natMap.put(campaigns, campaignId, updatedCampaign);
+            };
+        };
     };
 
     public shared ({ caller }) func contributeToCampaign(campaignId : Nat, amount : Nat) : async () {
@@ -731,37 +1315,42 @@ persistent actor {
                     "Unauthorized: Only community participants can contribute to campaigns",
                 );
 
-                let now = Time.now();
-                if (now > campaign.deadlineNs) {
-                    Debug.trap("Campaign deadline has passed");
-                };
-                if (campaign.state != #active) {
-                    Debug.trap("Campaign is not active");
-                };
+                recordCampaignContribution(caller, campaignId, campaign, amount);
+            };
+        };
+    };
 
-                switch (natMap.get(contributionsByCampaign, campaignId)) {
+    public shared ({ caller }) func contributeToPublicCampaign(token : Text, amount : Nat) : async () {
+        // Temporary bridge until formal Stripe support lands: public links can bypass
+        // community membership, but canister-ledger writes still require an authenticated
+        // principal to avoid anonymous state spam. When Stripe is integrated, replace
+        // this endpoint with guest checkout and record only Stripe-confirmed donations
+        // as external/payment-backed contributions from the checkout/webhook flow.
+        requireAuthenticated(caller);
+        validatePublicToken(token);
+
+        for (link in campaignPublicLinks.vals()) {
+            if (link.token == token) {
+                switch (natMap.get(campaigns, link.campaignId)) {
                     case null {
-                        Debug.trap("Contribution tracking not initialized for this campaign");
+                        Debug.trap("Campaign not found");
                     };
-                    case (?contributions) {
-                        let contribution : Contribution = {
-                            contributor = caller;
-                            amount;
-                            timestampNs = now;
+                    case (?campaign) {
+                        let metadata = getCampaignMetadata(campaign);
+                        switch (metadata.visibility) {
+                            case (#publicCampaign) {};
+                            case (_) {
+                                Debug.trap("Public campaign link is not available");
+                            };
                         };
-
-                        let updatedContributions = Array.append(contributions, [contribution]);
-                        contributionsByCampaign := natMap.put(contributionsByCampaign, campaignId, updatedContributions);
-
-                        let updatedCampaign = {
-                            campaign with
-                            totalRaised = campaign.totalRaised + amount;
-                        };
-                        campaigns := natMap.put(campaigns, campaignId, updatedCampaign);
+                        recordCampaignContribution(caller, campaign.id, campaign, amount);
+                        return;
                     };
                 };
             };
         };
+
+        Debug.trap("Public campaign link is not available");
     };
 
     public shared ({ caller }) func addCampaignUpdate(campaignId : Nat, content : Text) : async () {
@@ -782,6 +1371,9 @@ persistent actor {
 
                 if (campaign.creator != caller) {
                     Debug.trap("Only campaign creators can add updates");
+                };
+                if (campaignIsArchived(campaign.id)) {
+                    Debug.trap("Archived campaigns cannot be updated");
                 };
 
                 let now = Time.now();
@@ -843,6 +1435,9 @@ persistent actor {
 
                 if (campaign.state != #active) {
                     Debug.trap("Campaign is not in active state");
+                };
+                if (campaignIsArchived(campaign.id)) {
+                    Debug.trap("Archived campaigns cannot be finalized");
                 };
 
                 if (campaign.totalRaised < campaign.goalAmount) {

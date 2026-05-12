@@ -4,8 +4,11 @@ import { idlFactory } from './declarations/backend.did';
 import type {
     _SERVICE,
     Campaign as CandidCampaign,
+    CampaignContributionPayload as CandidCampaignContributionPayload,
     CampaignState as CandidCampaignState,
     CampaignUpdate as CandidCampaignUpdate,
+    CampaignUpdatePayload as CandidCampaignUpdatePayload,
+    CampaignVisibility as CandidCampaignVisibility,
     CommunityBoardPayload as CandidCommunityBoardPayload,
     CommunityBoardSummary as CandidCommunityBoardSummary,
     Community as CandidCommunity,
@@ -17,6 +20,8 @@ import type {
     CommunityMember as CandidCommunityMember,
     CommunityRole as CandidCommunityRole,
     Contribution as CandidContribution,
+    FundraisingCampaignInput as CandidFundraisingCampaignInput,
+    FundraisingCampaignPayload as CandidFundraisingCampaignPayload,
     KanbanCard as CandidKanbanCard,
     KanbanCardInput as CandidKanbanCardInput,
     KanbanColumn as CandidKanbanColumn,
@@ -58,6 +63,11 @@ export enum CampaignState {
     expired = 'expired',
     successful = 'successful',
     failed = 'failed'
+}
+
+export enum CampaignVisibility {
+    community = 'community',
+    publicCampaign = 'publicCampaign'
 }
 
 export enum ProposalState {
@@ -105,6 +115,51 @@ export interface Campaign {
     description: string;
     totalRaised: bigint;
     state: CampaignState;
+}
+
+export interface FundraisingCampaignInput {
+    title: string;
+    shortDescription: string;
+    story: string;
+    fundsUse: string;
+    impact: string;
+    mediaUrl: string | null;
+    creatorName: string;
+    creatorContact: string | null;
+    goalAmount: bigint;
+    deadlineNs: bigint;
+    visibility: CampaignVisibility;
+}
+
+export type CampaignContributionPayload = CandidCampaignContributionPayload;
+export type CampaignUpdatePayload = CandidCampaignUpdatePayload;
+
+export interface FundraisingCampaignPayload {
+    id: bigint;
+    title: string;
+    shortDescription: string;
+    story: string;
+    fundsUse: string;
+    impact: string;
+    mediaUrl: string | null;
+    creator: Principal | null;
+    creatorName: string;
+    creatorContact: string | null;
+    communityId: bigint;
+    goalAmount: bigint;
+    deadlineNs: bigint;
+    state: CampaignState;
+    totalRaised: bigint;
+    createdNs: bigint;
+    updatedNs: bigint;
+    visibility: CampaignVisibility;
+    archived: boolean;
+    publicToken: string | null;
+    canEdit: boolean;
+    canContribute: boolean;
+    canManagePublicLink: boolean;
+    contributions: CampaignContributionPayload[];
+    updates: CampaignUpdatePayload[];
 }
 
 export interface CommunityMember {
@@ -270,6 +325,21 @@ function fromCampaignState(value: CandidCampaignState): CampaignState {
     throw new Error('Unknown campaign state');
 }
 
+function fromCampaignVisibility(value: CandidCampaignVisibility): CampaignVisibility {
+    if ('community' in value) return CampaignVisibility.community;
+    if ('publicCampaign' in value) return CampaignVisibility.publicCampaign;
+    throw new Error('Unknown campaign visibility');
+}
+
+function toCampaignVisibility(value: CampaignVisibility): CandidCampaignVisibility {
+    switch (value) {
+        case CampaignVisibility.community:
+            return { community: null };
+        case CampaignVisibility.publicCampaign:
+            return { publicCampaign: null };
+    }
+}
+
 function fromProposalState(value: CandidProposalState): ProposalState {
     if ('active' in value) return ProposalState.active;
     if ('pendingFinalization' in value) return ProposalState.pendingFinalization;
@@ -282,6 +352,52 @@ function fromCampaign(value: CandidCampaign): Campaign {
     return {
         ...value,
         state: fromCampaignState(value.state)
+    };
+}
+
+function toFundraisingCampaignInput(value: FundraisingCampaignInput): CandidFundraisingCampaignInput {
+    return {
+        title: value.title,
+        shortDescription: value.shortDescription,
+        story: value.story,
+        fundsUse: value.fundsUse,
+        impact: value.impact,
+        mediaUrl: toOptional(value.mediaUrl ?? undefined),
+        creatorName: value.creatorName,
+        creatorContact: toOptional(value.creatorContact ?? undefined),
+        goalAmount: value.goalAmount,
+        deadlineNs: value.deadlineNs,
+        visibility: toCampaignVisibility(value.visibility)
+    };
+}
+
+function fromFundraisingCampaignPayload(value: CandidFundraisingCampaignPayload): FundraisingCampaignPayload {
+    return {
+        id: value.id,
+        title: value.title,
+        shortDescription: value.shortDescription,
+        story: value.story,
+        fundsUse: value.fundsUse,
+        impact: value.impact,
+        mediaUrl: fromOptional(value.mediaUrl, (url) => url),
+        creator: fromOptional(value.creator, (creator) => creator),
+        creatorName: value.creatorName,
+        creatorContact: fromOptional(value.creatorContact, (contact) => contact),
+        communityId: value.communityId,
+        goalAmount: value.goalAmount,
+        deadlineNs: value.deadlineNs,
+        state: fromCampaignState(value.state),
+        totalRaised: value.totalRaised,
+        createdNs: value.createdNs,
+        updatedNs: value.updatedNs,
+        visibility: fromCampaignVisibility(value.visibility),
+        archived: value.archived,
+        publicToken: fromOptional(value.publicToken, (token) => token),
+        canEdit: value.canEdit,
+        canContribute: value.canContribute,
+        canManagePublicLink: value.canManagePublicLink,
+        contributions: value.contributions,
+        updates: value.updates
     };
 }
 
@@ -474,18 +590,21 @@ export interface backendInterface {
     addCommunityBoardCard(communityId: bigint, boardId: bigint, columnId: bigint, input: KanbanCardInput): Promise<KanbanCard>;
     addCommunityBoardColumn(communityId: bigint, boardId: bigint, title: string): Promise<KanbanColumn>;
     appendCommunityDocumentUpdate(communityId: bigint, documentId: bigint, update: Uint8Array | number[]): Promise<bigint>;
+    archiveCampaign(communityId: bigint, campaignId: bigint): Promise<void>;
     archiveCommunityBoard(communityId: bigint, boardId: bigint): Promise<void>;
     archiveCommunityDocument(communityId: bigint, documentId: bigint): Promise<void>;
     archiveCommunityEvent(communityId: bigint, eventId: bigint): Promise<void>;
     bootstrapPlatformAdmin(): Promise<void>;
     canFinalizeCampaign(campaignId: bigint): Promise<boolean>;
     contributeToCampaign(campaignId: bigint, amount: bigint): Promise<void>;
+    contributeToPublicCampaign(token: string, amount: bigint): Promise<void>;
     createCampaign(communityId: bigint, title: string, description: string, goalAmount: bigint, deadlineNs: bigint): Promise<void>;
     createCheckoutSession(items: Array<ShoppingItem>, successUrl: string, cancelUrl: string): Promise<string>;
     createCommunity(name: string, policy: string): Promise<void>;
     createCommunityBoard(communityId: bigint, title: string): Promise<bigint>;
     createCommunityDocument(communityId: bigint, title: string): Promise<bigint>;
     createCommunityEvent(communityId: bigint, input: CommunityEventInput): Promise<bigint>;
+    createFundraisingCampaign(communityId: bigint, input: FundraisingCampaignInput): Promise<bigint>;
     createProposal(communityId: bigint, title: string, description: string, overrides: ProposalOverrides | null): Promise<void>;
     deleteCommunityBoardCard(communityId: bigint, boardId: bigint, cardId: bigint): Promise<void>;
     deleteCommunityBoardColumn(communityId: bigint, boardId: bigint, columnId: bigint): Promise<void>;
@@ -502,6 +621,8 @@ export interface backendInterface {
     getCommunityById(id: bigint): Promise<Community | null>;
     getCommunityDocument(communityId: bigint, documentId: bigint): Promise<CommunityDocumentPayload | null>;
     getCommunityEvent(communityId: bigint, eventId: bigint): Promise<CommunityEventPayload | null>;
+    getFundraisingCampaign(communityId: bigint, campaignId: bigint): Promise<FundraisingCampaignPayload | null>;
+    getPublicCampaign(token: string): Promise<FundraisingCampaignPayload | null>;
     getPublicCommunityBoard(token: string): Promise<CommunityBoardPayload | null>;
     getPublicCommunityEvent(token: string): Promise<CommunityEventPayload | null>;
     getProposalById(proposalId: bigint): Promise<Proposal | null>;
@@ -517,6 +638,7 @@ export interface backendInterface {
     listCommunityDocuments(communityId: bigint): Promise<Array<CommunityDocumentSummary>>;
     listCommunityEvents(communityId: bigint): Promise<Array<CommunityEventPayload>>;
     listCommunityMembers(communityId: bigint): Promise<Array<CommunityMember>>;
+    listFundraisingCampaigns(communityId: bigint): Promise<Array<FundraisingCampaignPayload>>;
     listPlatformAdmins(): Promise<Array<Principal>>;
     listProposalsByCommunity(communityId: bigint): Promise<Array<Proposal>>;
     moveCommunityBoardCard(communityId: bigint, boardId: bigint, cardId: bigint, toColumnId: bigint, toIndex: bigint): Promise<void>;
@@ -526,6 +648,7 @@ export interface backendInterface {
     reorderCommunityBoardColumns(communityId: bigint, boardId: bigint, columnIds: Array<bigint>): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     saveCommunityDocumentSnapshot(communityId: bigint, documentId: bigint, snapshot: Uint8Array | number[], compactThroughVersion: bigint): Promise<void>;
+    setCampaignPublicLink(communityId: bigint, campaignId: bigint, token: string | null): Promise<string | null>;
     setCommunityBoardGrant(communityId: bigint, boardId: bigint, user: Principal, role: WorkspaceRole | null): Promise<void>;
     setCommunityBoardPublicLink(communityId: bigint, boardId: bigint, token: string | null): Promise<string | null>;
     setCommunityBoardShare(communityId: bigint, boardId: bigint, role: WorkspaceRole | null): Promise<WorkspaceRole | null>;
@@ -541,6 +664,7 @@ export interface backendInterface {
     transform(input: TransformationInput): Promise<TransformationOutput>;
     updateCommunityBoardCard(communityId: bigint, boardId: bigint, cardId: bigint, input: KanbanCardInput): Promise<void>;
     updateCommunityEvent(communityId: bigint, eventId: bigint, input: CommunityEventInput): Promise<void>;
+    updateFundraisingCampaign(communityId: bigint, campaignId: bigint, input: FundraisingCampaignInput): Promise<void>;
     voteOnProposal(proposalId: bigint, voteYes: boolean): Promise<void>;
 }
 
@@ -579,6 +703,10 @@ class Backend implements backendInterface {
         return this.handle(() => this.actor.appendCommunityDocumentUpdate(communityId, documentId, update));
     }
 
+    async archiveCampaign(communityId: bigint, campaignId: bigint): Promise<void> {
+        return this.handle(() => this.actor.archiveCampaign(communityId, campaignId));
+    }
+
     async archiveCommunityBoard(communityId: bigint, boardId: bigint): Promise<void> {
         return this.handle(() => this.actor.archiveCommunityBoard(communityId, boardId));
     }
@@ -603,6 +731,10 @@ class Backend implements backendInterface {
         return this.handle(() => this.actor.contributeToCampaign(campaignId, amount));
     }
 
+    async contributeToPublicCampaign(token: string, amount: bigint): Promise<void> {
+        return this.handle(() => this.actor.contributeToPublicCampaign(token, amount));
+    }
+
     async createCampaign(communityId: bigint, title: string, description: string, goalAmount: bigint, deadlineNs: bigint): Promise<void> {
         return this.handle(() => this.actor.createCampaign(communityId, title, description, goalAmount, deadlineNs));
     }
@@ -625,6 +757,10 @@ class Backend implements backendInterface {
 
     async createCommunityEvent(communityId: bigint, input: CommunityEventInput): Promise<bigint> {
         return this.handle(() => this.actor.createCommunityEvent(communityId, toCommunityEventInput(input)));
+    }
+
+    async createFundraisingCampaign(communityId: bigint, input: FundraisingCampaignInput): Promise<bigint> {
+        return this.handle(() => this.actor.createFundraisingCampaign(communityId, toFundraisingCampaignInput(input)));
     }
 
     async createProposal(communityId: bigint, title: string, description: string, overrides: ProposalOverrides | null): Promise<void> {
@@ -697,6 +833,14 @@ class Backend implements backendInterface {
         return this.handle(async () => fromOptional(await this.actor.getCommunityEvent(communityId, eventId), fromCommunityEventPayload));
     }
 
+    async getFundraisingCampaign(communityId: bigint, campaignId: bigint): Promise<FundraisingCampaignPayload | null> {
+        return this.handle(async () => fromOptional(await this.actor.getFundraisingCampaign(communityId, campaignId), fromFundraisingCampaignPayload));
+    }
+
+    async getPublicCampaign(token: string): Promise<FundraisingCampaignPayload | null> {
+        return this.handle(async () => fromOptional(await this.actor.getPublicCampaign(token), fromFundraisingCampaignPayload));
+    }
+
     async getPublicCommunityBoard(token: string): Promise<CommunityBoardPayload | null> {
         return this.handle(async () => fromOptional(await this.actor.getPublicCommunityBoard(token), fromCommunityBoardPayload));
     }
@@ -759,6 +903,10 @@ class Backend implements backendInterface {
         return this.handle(async () => (await this.actor.listCommunityMembers(communityId)).map(fromCommunityMember));
     }
 
+    async listFundraisingCampaigns(communityId: bigint): Promise<Array<FundraisingCampaignPayload>> {
+        return this.handle(async () => (await this.actor.listFundraisingCampaigns(communityId)).map(fromFundraisingCampaignPayload));
+    }
+
     async listPlatformAdmins(): Promise<Array<Principal>> {
         return this.handle(() => this.actor.listPlatformAdmins());
     }
@@ -793,6 +941,12 @@ class Backend implements backendInterface {
 
     async saveCommunityDocumentSnapshot(communityId: bigint, documentId: bigint, snapshot: Uint8Array | number[], compactThroughVersion: bigint): Promise<void> {
         return this.handle(() => this.actor.saveCommunityDocumentSnapshot(communityId, documentId, snapshot, compactThroughVersion));
+    }
+
+    async setCampaignPublicLink(communityId: bigint, campaignId: bigint, token: string | null): Promise<string | null> {
+        return this.handle(async () =>
+            fromOptional(await this.actor.setCampaignPublicLink(communityId, campaignId, toOptional(token ?? undefined)), (value) => value)
+        );
     }
 
     async setCommunityBoardGrant(communityId: bigint, boardId: bigint, user: Principal, role: WorkspaceRole | null): Promise<void> {
@@ -865,6 +1019,10 @@ class Backend implements backendInterface {
 
     async updateCommunityEvent(communityId: bigint, eventId: bigint, input: CommunityEventInput): Promise<void> {
         return this.handle(() => this.actor.updateCommunityEvent(communityId, eventId, toCommunityEventInput(input)));
+    }
+
+    async updateFundraisingCampaign(communityId: bigint, campaignId: bigint, input: FundraisingCampaignInput): Promise<void> {
+        return this.handle(() => this.actor.updateFundraisingCampaign(communityId, campaignId, toFundraisingCampaignInput(input)));
     }
 
     async voteOnProposal(proposalId: bigint, voteYes: boolean): Promise<void> {
