@@ -19,4 +19,19 @@ describe('fundraising markdown content', () => {
     expect(html).toContain('<blockquote>Every child can learn</blockquote>');
     expect(html).toContain('href="https://example.org"');
   });
+
+  it('renders markdown pipe tables as tables', () => {
+    const html = renderToStaticMarkup(
+      <MarkdownContent
+        className="fundraising-markdown-content"
+        text={'| Item | Cost |\n| --- | ---: |\n| Textbooks | $500 |\n| Classroom materials | $300 |'}
+      />,
+    );
+
+    expect(html).toContain('<table>');
+    expect(html).toContain('<th style="text-align:left">Item</th>');
+    expect(html).toContain('<th style="text-align:right">Cost</th>');
+    expect(html).toContain('<td style="text-align:left">Textbooks</td>');
+    expect(html).toContain('<td style="text-align:right">$500</td>');
+  });
 });

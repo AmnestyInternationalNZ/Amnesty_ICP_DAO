@@ -67,6 +67,25 @@ describe('workspace helper utilities', () => {
     ]);
   });
 
+  it('restores incremental updates when initial block creation is captured', () => {
+    const yDoc = new Y.Doc();
+    const updates: Uint8Array[] = [];
+    yDoc.on('update', (update, origin) => {
+      if (origin === 'local') updates.push(update);
+    });
+
+    ensureInitialBlock(yDoc);
+    const firstBlock = readBlocks(yDoc)[0];
+    updateBlockText(yDoc, firstBlock.id, 'Autosaved text survives refresh');
+
+    const restored = new Y.Doc();
+    applyPersistedState(restored, [], updates);
+
+    expect(readBlocks(restored)).toMatchObject([
+      { id: firstBlock.id, text: 'Autosaved text survives refresh', type: 'paragraph' },
+    ]);
+  });
+
   it('exports and imports core markdown block types with inline marks', () => {
     const markdown = blocksToMarkdown([
       { id: 'h', type: 'heading1', text: 'Plan' },

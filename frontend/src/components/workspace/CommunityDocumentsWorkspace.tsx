@@ -144,6 +144,7 @@ import { DocumentLibrarySidebar as SplitDocumentLibrarySidebar } from './Documen
 
 const ROOT_DROP_ID = 'workspace-doc-root';
 const NANOS_PER_MILLI = BigInt(1_000_000);
+const PENDING_WORKSPACE_UPDATE_PREFIX = 'amnesty.workspace.pending-updates.v1';
 
 type SyncStatus = 'Loaded' | 'Unsaved changes' | 'Saving' | 'Persisted' | 'Save error' | 'Compacting' | 'Compacted' | 'Compact error' | 'Title saved';
 type SidebarSection = 'mine' | 'workspace' | 'shared';
@@ -221,6 +222,62 @@ function parseDocDragId(value: string): bigint | undefined {
   } catch {
     return undefined;
   }
+}
+
+function pendingWorkspaceUpdateKey(communityId: bigint, documentId: bigint, principal?: string): string {
+  return `${PENDING_WORKSPACE_UPDATE_PREFIX}:${principal ?? 'anonymous'}:${communityId.toString()}:${documentId.toString()}`;
+}
+
+function encodePendingUpdate(update: Uint8Array): string {
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let index = 0; index < update.length; index += chunkSize) {
+    binary += String.fromCharCode(...Array.from(update.subarray(index, index + chunkSize)));
+  }
+  return window.btoa(binary);
+}
+
+function decodePendingUpdate(value: string): Uint8Array {
+  const binary = window.atob(value);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return bytes;
+}
+
+function readPendingWorkspaceUpdates(communityId: bigint, documentId: bigint, principal?: string): Uint8Array[] {
+  if (typeof window === 'undefined') return [];
+  const key = pendingWorkspaceUpdateKey(communityId, documentId, principal);
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return [];
+    const encoded = JSON.parse(raw);
+    if (!Array.isArray(encoded)) return [];
+    return encoded.filter((value): value is string => typeof value === 'string').map(decodePendingUpdate);
+  } catch {
+    window.localStorage.removeItem(key);
+    return [];
+  }
+}
+
+function writePendingWorkspaceUpdates(communityId: bigint, documentId: bigint, principal: string | undefined, updates: Uint8Array[]): void {
+  if (typeof window === 'undefined') return;
+  const key = pendingWorkspaceUpdateKey(communityId, documentId, principal);
+  try {
+    if (updates.length === 0) {
+      window.localStorage.removeItem(key);
+      return;
+    }
+    window.localStorage.setItem(key, JSON.stringify(updates.map(encodePendingUpdate)));
+  } catch {
+    // If localStorage is full or unavailable, the normal canister autosave path still runs.
+  }
+}
+
+function clearPendingWorkspaceUpdates(communityId: bigint, documentId: bigint, principal?: string): void {
+  if (typeof window === 'undefined') return;
+  window.localStorage.removeItem(pendingWorkspaceUpdateKey(communityId, documentId, principal));
 }
 
 function sortMembers(members: CommunityMember[] | undefined): CommunityMember[] {
@@ -366,6 +423,7 @@ export default function CommunityDocumentsWorkspace({
   const undoManagerRef = useRef<Y.UndoManager>();
   const pendingUpdatesRef = useRef<Uint8Array[]>([]);
   const flushTimerRef = useRef<number>();
+  const flushPendingUpdatesRef = useRef<() => Promise<void>>(async () => undefined);
   const focusNonceRef = useRef(0);
   const openedInitialDocRef = useRef<string>();
   const openedPinnedDocRef = useRef<string>();
@@ -433,6 +491,7 @@ export default function CommunityDocumentsWorkspace({
     }
 
     const updates = pendingUpdatesRef.current.splice(0);
+    writePendingWorkspaceUpdates(communityId, payload.id, principal, [...updates, ...pendingUpdatesRef.current]);
     const merged = mergeUpdates(updates);
     setSyncStatus('Saving');
     try {
@@ -443,25 +502,43 @@ export default function CommunityDocumentsWorkspace({
         updates: [...payload.updates, merged],
       };
       selectedDocRef.current = updatedPayload;
+      if (pendingUpdatesRef.current.length === 0) {
+        clearPendingWorkspaceUpdates(communityId, payload.id, principal);
+      } else {
+        writePendingWorkspaceUpdates(communityId, payload.id, principal, pendingUpdatesRef.current);
+      }
       setSyncStatus('Persisted');
     } catch (error) {
       pendingUpdatesRef.current = [...updates, ...pendingUpdatesRef.current];
+      writePendingWorkspaceUpdates(communityId, payload.id, principal, pendingUpdatesRef.current);
       setSyncStatus('Save error');
       setMessage(error instanceof Error ? error.message : String(error));
     }
-  }, [communityId]);
+  }, [communityId, principal]);
+
+  useEffect(() => {
+    flushPendingUpdatesRef.current = flushPendingUpdates;
+  }, [flushPendingUpdates]);
 
   const queueUpdate = useCallback((update: Uint8Array) => {
     pendingUpdatesRef.current.push(update);
+    const payload = selectedDocRef.current;
+    if (payload) {
+      writePendingWorkspaceUpdates(communityId, payload.id, principal, pendingUpdatesRef.current);
+    }
     setSyncStatus('Unsaved changes');
     if (flushTimerRef.current) window.clearTimeout(flushTimerRef.current);
     flushTimerRef.current = window.setTimeout(() => {
       void flushPendingUpdates();
     }, 800);
-  }, [flushPendingUpdates]);
+  }, [communityId, flushPendingUpdates, principal]);
 
   const hydrateDocument = useCallback((payload: CommunityDocumentPayload) => {
     if (flushTimerRef.current) window.clearTimeout(flushTimerRef.current);
+    const currentPayload = selectedDocRef.current;
+    if (currentPayload && pendingUpdatesRef.current.length > 0) {
+      writePendingWorkspaceUpdates(communityId, currentPayload.id, principal, pendingUpdatesRef.current);
+    }
     pendingUpdatesRef.current = [];
     undoManagerRef.current?.destroy();
     undoManagerRef.current = undefined;
@@ -469,10 +546,14 @@ export default function CommunityDocumentsWorkspace({
     yDocRef.current?.destroy();
 
     const doc = new Y.Doc();
+    const recoveredUpdates = readPendingWorkspaceUpdates(communityId, payload.id, principal);
     applyPersistedState(doc, payload.snapshot ? [payload.snapshot] : [], payload.updates);
-    removeResolvedCommentMarks(doc);
-    ensureInitialBlock(doc);
+    if (recoveredUpdates.length > 0) {
+      applyPersistedState(doc, [], recoveredUpdates);
+    }
 
+    yDocRef.current = doc;
+    selectedDocRef.current = payload;
     doc.on('update', (update, origin) => {
       setBlocks(readBlocks(doc));
       setComments(readComments(doc));
@@ -482,8 +563,9 @@ export default function CommunityDocumentsWorkspace({
       }
     });
 
-    yDocRef.current = doc;
-    selectedDocRef.current = payload;
+    removeResolvedCommentMarks(doc);
+    ensureInitialBlock(doc);
+
     const undoManager = new Y.UndoManager([getBlocksArray(doc), getCommentsArray(doc)], {
       trackedOrigins: new Set(['local']),
     });
@@ -496,9 +578,20 @@ export default function CommunityDocumentsWorkspace({
     const nextBlocks = readBlocks(doc);
     setBlocks(nextBlocks);
     setComments(readComments(doc));
-    setSyncStatus('Loaded');
+    if (recoveredUpdates.length > 0) {
+      pendingUpdatesRef.current = [...recoveredUpdates, ...pendingUpdatesRef.current];
+      writePendingWorkspaceUpdates(communityId, payload.id, principal, pendingUpdatesRef.current);
+    }
+    if (pendingUpdatesRef.current.length > 0) {
+      setSyncStatus('Unsaved changes');
+      window.setTimeout(() => {
+        void flushPendingUpdatesRef.current();
+      }, 0);
+    } else {
+      setSyncStatus('Loaded');
+    }
     requestBlockFocus(nextBlocks[0]?.id);
-  }, [queueUpdate, requestBlockFocus, updateUndoAvailability]);
+  }, [communityId, principal, queueUpdate, requestBlockFocus, updateUndoAvailability]);
 
   useEffect(() => {
     setPinnedDocumentId(readPinnedId('workspace-doc', principal));
@@ -557,7 +650,18 @@ export default function CommunityDocumentsWorkspace({
   }, [pinnedDocumentId, principal, selectedDocument, selectedDocumentId]);
 
   useEffect(() => {
+    const flushBeforeLeaving = () => {
+      if (pendingUpdatesRef.current.length > 0) void flushPendingUpdatesRef.current();
+    };
+    const flushWhenHidden = () => {
+      if (document.visibilityState === 'hidden') flushBeforeLeaving();
+    };
+    window.addEventListener('pagehide', flushBeforeLeaving);
+    document.addEventListener('visibilitychange', flushWhenHidden);
     return () => {
+      flushBeforeLeaving();
+      window.removeEventListener('pagehide', flushBeforeLeaving);
+      document.removeEventListener('visibilitychange', flushWhenHidden);
       if (flushTimerRef.current) window.clearTimeout(flushTimerRef.current);
       undoManagerRef.current?.destroy();
       yDocRef.current?.destroy();

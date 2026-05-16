@@ -81,7 +81,185 @@
       "statement": "Sauti ya jumuiya, uwajibikaji unaoonekana, na hatua za pamoja ziko mahali pamoja.",
       "visibilityBody": "Soma nafasi za jumuiya, elewa kaupapa ya karibu, na uone ni wapi unaweza kusaidia kupanga mapendekezo, kampeni na nguvu ya watu.",
       "visibilityCallout": "Tazama jumuiya kwa uwazi. Shiriki ambapo unaaminika na jukumu.",
-      "visibilityTitle": "Sauti ya jumuiya inapoonekana, kitendo kinaweza kusonga kwa kasi zaidi."
+      "visibilityTitle": "Sauti ya jumuiya inapoonekana, kitendo kinaweza kusonga kwa kasi zaidi.",
+      "redesign": {
+        "header": {
+          "homeLabel": "Nyumbani Amnesty DAO",
+          "navLabel": "Urambazaji wa ukurasa wa mwanzo",
+          "mission": "Dhamira",
+          "platform": "Jukwaa",
+          "faq": "Maswali"
+        },
+        "actions": {
+          "joinDao": "Jiunge na DAO",
+          "joinMovement": "Jiunge na harakati",
+          "explorePlatform": "Chunguza jukwaa",
+          "openingSignIn": "Inafungua kuingia..."
+        },
+        "hero": {
+          "collageLabel": "Jumuiya za haki za binadamu zinajipanga pamoja",
+          "altCouncil": "Community members planning around a table",
+          "altMarch": "Human rights march holding a yellow banner",
+          "altMegaphone": "Human rights advocate speaking through a megaphone",
+          "altDignity": "Protester holding a dignity freedom justice sign",
+          "altWorkspace": "Community team working together on laptops and papers",
+          "calloutTitle": "Kwa haki za binadamu kila mahali.",
+          "calloutBody": "Sauti za ndani. Athari ya kimataifa.",
+          "titleLine1": "Jumuiya",
+          "titleLine2": "huimarisha haki za binadamu.",
+          "body": "Amnesty International DAO huwezesha jumuiya kila mahali kupanga, kuratibu, na kuchukua hatua kwa ajili ya haki za binadamu, hasa mahali panapohitaji msaada zaidi.",
+          "proofRemote": "Saidia shughuli katika maeneo ya mbali",
+          "proofPresence": "Chukua hatua katika nchi zenye uwepo mdogo au bila uwepo wa Amnesty",
+          "proofResist": "Pinga ukandamizaji na uendeleze kazi ya haki za binadamu",
+          "strapline": "Wazi. Iliyogatuliwa. Inaendeshwa na watu."
+        },
+        "stats": {
+          "label": "Muhtasari wa uwezo wa jukwaa",
+          "networkTitle": "Jukwaa la hatua zinazoongozwa na jamii.",
+          "networkBody": "Anza na eneo la kazi la pamoja, ratibu hatua, fanya maamuzi, na kusanya msaada pamoja.",
+          "communities": "Jumuiya",
+          "members": "Wanachama",
+          "countries": "Nchi",
+          "sinceLaunch": "Tangu uzinduzi",
+          "highlights": {
+            "workspace": {
+              "title": "Maeneo ya kazi ya jamii",
+              "body": "Nyumba ya pamoja kwa hati, viungo, na kupanga hatua."
+            },
+            "boards": {
+              "title": "Upangaji wa kanban",
+              "body": "Fuatilia kazi, vizuizi, na hatua zinazofuata bila kupoteza muktadha."
+            },
+            "calendar": {
+              "title": "Kalenda za pamoja",
+              "body": "Ratibu mikutano, matukio, na ratiba za kampeni."
+            },
+            "campaigns": {
+              "title": "Kurasa za kampeni",
+              "body": "Kusanya msaada kwa kurasa za umma na uwajibikaji wa jamii."
+            }
+          }
+        },
+        "platform": {
+          "kicker": "Platform",
+          "title": "Everything your community needs to work together",
+          "note": "Built for communities. Designed for impact.",
+          "cards": {
+            "documentsTitle": "Shared documents",
+            "documentsBody": "Collaborate in real-time on Notion-like documents. Share knowledge, research, and resources.",
+            "boardsTitle": "Kanban boards",
+            "boardsBody": "Plan, organize, and track projects together with powerful boards and task management.",
+            "calendarsTitle": "Shared calendars",
+            "calendarsBody": "Coordinate events, meetings, and actions with a shared calendar your community can rely on.",
+            "proposalsTitle": "Proposals & voting",
+            "proposalsBody": "Make decisions together through transparent, on-chain proposals and community voting.",
+            "fundraisingTitle": "Fundraising",
+            "fundraisingBody": "Raise funds for urgent human rights work through community-driven campaigns.",
+            "languageTitle": "Multi-language support",
+            "languageBody": "Work in your language. Our platform supports multiple languages for global communities."
+          }
+        },
+        "languages": {
+          "kicker": "Lugha",
+          "title": "Lugha nyingi, ufikiaji wa kimataifa",
+          "body": "Wasiliana na shirikiana katika lugha ambazo jumuiya yako huzungumza.",
+          "englishName": "English",
+          "englishLabel": "Kiingereza",
+          "arabicName": "العربية",
+          "arabicLabel": "Kiarabu",
+          "frenchName": "Français",
+          "frenchLabel": "Kifaransa",
+          "russianName": "Русский",
+          "russianLabel": "Kirusi",
+          "chineseName": "中文",
+          "chineseLabel": "Kichina cha Mandarin",
+          "burmeseName": "မြန်မာစာ",
+          "burmeseLabel": "Kiburma",
+          "persianName": "فارسی",
+          "persianLabel": "Kiajemi (Farsi)",
+          "moreName": "+ Zaidi zinakuja",
+          "moreLabel": "",
+          "swahiliName": "Kiswahili",
+          "swahiliLabel": "Kiswahili",
+          "amharicName": "አማርኛ",
+          "amharicLabel": "Kiamhari",
+          "koreanName": "한국어",
+          "koreanLabel": "Kikorea"
+        },
+        "onChain": {
+          "kicker": "On-chain & decentralized",
+          "title": "Resilient. Secure. Always on.",
+          "body": "Amnesty International DAO runs on a public blockchain, a global commons. No central servers. No single point of failure. No shutdowns.",
+          "checkSecurity": "Strong cryptographic security",
+          "checkReplication": "Automated replication across decentralized nodes worldwide",
+          "checkAlwaysOn": "Runs 24/7 with no interruptions since launch",
+          "checkJurisdiction": "Not controlled by any single entity or jurisdiction",
+          "mapAlt": "Network map showing global decentralized nodes"
+        },
+        "faq": {
+          "kicker": "Maswali yanayoulizwa mara kwa mara",
+          "title": "Maswali yako, yamejibiwa",
+          "contactPrefix": "Bado una maswali?",
+          "contactLink": "Wasiliana nasi",
+          "items": {
+            "what": {
+              "question": "What is Amnesty International DAO?",
+              "answer": "A community coordination platform for people organizing human rights work with shared tools, transparent governance, and decentralized resilience."
+            },
+            "who": {
+              "question": "Who can join?",
+              "answer": "People and groups who want to coordinate, support, and participate in community-led human rights action."
+            },
+            "decisions": {
+              "question": "How are decisions made?",
+              "answer": "Communities can use proposals, discussions, and voting windows to make decisions visibly and accountably."
+            },
+            "affiliation": {
+              "question": "Is this affiliated with official Amnesty International offices?",
+              "answer": "This concept uses Amnesty-inspired branding and should be governed by the project’s official affiliation and trademark decisions before public launch."
+            },
+            "data": {
+              "question": "Is my data safe?",
+              "answer": "The architecture is designed around decentralization, access control, and resilience rather than a single central server."
+            },
+            "funded": {
+              "question": "How is this funded?",
+              "answer": "Communities can coordinate fundraising campaigns and track support transparently."
+            },
+            "different": {
+              "question": "What makes this different from other platforms?",
+              "answer": "It combines documents, boards, calendars, proposals, fundraising, and localization in one community-scoped workspace."
+            },
+            "started": {
+              "question": "How do I get started?",
+              "answer": "Join the DAO, create or enter a community, then start coordinating work with the shared tools."
+            }
+          }
+        },
+        "cta": {
+          "title": "Haki za binadamu zinahitaji sisi sote.",
+          "body": "Jiunge na jumuiya duniani kote zinazojenga mustakabali wenye haki na usawa zaidi."
+        },
+        "footer": {
+          "intro": "Nguvu ya watu huleta mabadiliko. Jukwaa hili ni la chanzo huria na linaongozwa na jumuiya.",
+          "socialLabel": "Social links",
+          "email": "Barua pepe",
+          "explore": "Chunguza",
+          "resources": "Rasilimali",
+          "documentation": "Documentation",
+          "communityGuide": "Community guide",
+          "security": "Security",
+          "apiComingSoon": "API coming soon",
+          "legal": "Kisheria",
+          "privacy": "Privacy policy",
+          "terms": "Terms of use",
+          "conduct": "Code of conduct",
+          "networkStatus": "Hali ya mtandao",
+          "systemsOperational": "Mifumo yote inafanya kazi",
+          "viewOnChainStatus": "Tazama hali ya on-chain",
+          "copyright": "© Amnesty International DAO. Jumuiya ya kimataifa kwa haki za binadamu."
+        }
+      }
     },
     "nav": {
       "admin": "Msimamizi",

@@ -112,6 +112,7 @@ export default function CommunityProposalsPage({ communityId }: CommunityProposa
           isOpen={showCreateProposal}
           onClose={() => setShowCreateProposal(false)}
           communityId={communityId}
+          proposals={proposals ?? []}
         />
       )}
     </>

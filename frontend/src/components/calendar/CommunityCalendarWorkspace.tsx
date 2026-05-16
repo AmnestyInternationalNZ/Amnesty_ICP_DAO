@@ -335,7 +335,10 @@ export default function CommunityCalendarWorkspace({
             {t('calendar.fields.title')}
             <input
               disabled={!canEditSelected || saving}
-              onChange={(event) => setForm((current) => ({ ...current, title: event.currentTarget.value }))}
+              onChange={(event) => {
+                const { value } = event.currentTarget;
+                setForm((current) => ({ ...current, title: value }));
+              }}
               placeholder={t('calendar.fields.meetingTitlePlaceholder')}
               value={form.title}
             />
@@ -346,7 +349,10 @@ export default function CommunityCalendarWorkspace({
               {t('calendar.fields.start')}
               <input
                 disabled={!canEditSelected || saving}
-                onChange={(event) => setForm((current) => ({ ...current, startLocal: event.currentTarget.value }))}
+                onChange={(event) => {
+                  const { value } = event.currentTarget;
+                  setForm((current) => ({ ...current, startLocal: value }));
+                }}
                 type="datetime-local"
                 value={form.startLocal}
               />
@@ -355,7 +361,10 @@ export default function CommunityCalendarWorkspace({
               {t('calendar.fields.end')}
               <input
                 disabled={!canEditSelected || saving}
-                onChange={(event) => setForm((current) => ({ ...current, endLocal: event.currentTarget.value }))}
+                onChange={(event) => {
+                  const { value } = event.currentTarget;
+                  setForm((current) => ({ ...current, endLocal: value }));
+                }}
                 type="datetime-local"
                 value={form.endLocal}
               />
@@ -366,7 +375,10 @@ export default function CommunityCalendarWorkspace({
             <input
               checked={form.allDay}
               disabled={!canEditSelected || saving}
-              onChange={(event) => setForm((current) => ({ ...current, allDay: event.currentTarget.checked }))}
+              onChange={(event) => {
+                const { checked } = event.currentTarget;
+                setForm((current) => ({ ...current, allDay: checked }));
+              }}
               type="checkbox"
             />
             {t('calendar.fields.allDay')}
@@ -376,7 +388,10 @@ export default function CommunityCalendarWorkspace({
             {t('calendar.fields.location')}
             <input
               disabled={!canEditSelected || saving}
-              onChange={(event) => setForm((current) => ({ ...current, location: event.currentTarget.value }))}
+              onChange={(event) => {
+                const { value } = event.currentTarget;
+                setForm((current) => ({ ...current, location: value }));
+              }}
               placeholder={t('calendar.fields.locationPlaceholder')}
               value={form.location}
             />
@@ -386,7 +401,10 @@ export default function CommunityCalendarWorkspace({
             {t('calendar.fields.notes')}
             <textarea
               disabled={!canEditSelected || saving}
-              onChange={(event) => setForm((current) => ({ ...current, description: event.currentTarget.value }))}
+              onChange={(event) => {
+                const { value } = event.currentTarget;
+                setForm((current) => ({ ...current, description: value }));
+              }}
               placeholder={t('calendar.fields.notesPlaceholder')}
               rows={4}
               value={form.description}

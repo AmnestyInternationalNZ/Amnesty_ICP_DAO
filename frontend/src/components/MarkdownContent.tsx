@@ -97,6 +97,37 @@ function checklistLine(line: string) {
   };
 }
 
+type TableAlignment = 'left' | 'center' | 'right' | undefined;
+
+function splitTableRow(line: string): string[] {
+  return line
+    .trim()
+    .replace(/^\|/, '')
+    .replace(/\|$/, '')
+    .split('|')
+    .map((cell) => cell.trim());
+}
+
+function isTableRow(line: string): boolean {
+  const trimmed = line.trim();
+  return trimmed.includes('|') && splitTableRow(trimmed).length > 1;
+}
+
+function tableDividerAlignment(cell: string): TableAlignment | null {
+  const normalized = cell.replace(/\s+/g, '');
+  if (!/^:?-{3,}:?$/.test(normalized)) return null;
+  if (normalized.startsWith(':') && normalized.endsWith(':')) return 'center';
+  if (normalized.endsWith(':')) return 'right';
+  return 'left';
+}
+
+function tableDividerAlignments(line: string): TableAlignment[] | null {
+  if (!isTableRow(line)) return null;
+  const alignments = splitTableRow(line).map(tableDividerAlignment);
+  if (alignments.some((alignment) => alignment === null)) return null;
+  return alignments as TableAlignment[];
+}
+
 export default function MarkdownContent({
   checklistItemClassName = 'markdown-checklist-item',
   className = 'markdown-content',
@@ -145,7 +176,8 @@ export default function MarkdownContent({
     }
   }
 
-  for (const line of lines) {
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
+    const line = lines[lineIndex];
     const trimmed = line.trim();
 
     if (detailsSummary !== null && trimmed !== '</details>') {
@@ -177,6 +209,48 @@ export default function MarkdownContent({
       flushLists();
       flushQuote();
       blocks.push(<hr key={`hr-${blocks.length}`} />);
+      continue;
+    }
+
+    const nextLine = lines[lineIndex + 1];
+    const tableAlignments = nextLine === undefined ? null : tableDividerAlignments(nextLine);
+    if (isTableRow(line) && tableAlignments) {
+      flushLists();
+      flushQuote();
+      const headers = splitTableRow(line);
+      const rows: string[][] = [];
+      lineIndex += 2;
+      while (lineIndex < lines.length && lines[lineIndex].trim() && isTableRow(lines[lineIndex])) {
+        rows.push(splitTableRow(lines[lineIndex]));
+        lineIndex += 1;
+      }
+      lineIndex -= 1;
+      blocks.push(
+        <div className="markdown-table-scroll" key={`table-${blocks.length}`}>
+          <table>
+            <thead>
+              <tr>
+                {headers.map((header, cellIndex) => (
+                  <th key={`th-${cellIndex}`} style={{ textAlign: tableAlignments[cellIndex] ?? 'left' }}>
+                    {renderInline(header)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, rowIndex) => (
+                <tr key={`tr-${rowIndex}`}>
+                  {headers.map((_, cellIndex) => (
+                    <td key={`td-${rowIndex}-${cellIndex}`} style={{ textAlign: tableAlignments[cellIndex] ?? 'left' }}>
+                      {renderInline(row[cellIndex] ?? '')}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>,
+      );
       continue;
     }
 

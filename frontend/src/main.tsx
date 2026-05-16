@@ -6,7 +6,16 @@ import App from './App';
 import { i18n } from './i18n';
 import './index.css';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: false,
+            refetchOnReconnect: false,
+            refetchOnWindowFocus: false,
+            staleTime: 10_000
+        }
+    }
+});
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>

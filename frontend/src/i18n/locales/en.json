@@ -81,7 +81,185 @@
       "statement": "Community voice, visible accountability, and collective action belong in the same place.",
       "visibilityBody": "Read community spaces, understand the local kaupapa, and see where you can help organise proposals, campaigns, and people power.",
       "visibilityCallout": "View communities openly. Take part where you are trusted with a role.",
-      "visibilityTitle": "When community voice becomes visible, action can move faster."
+      "visibilityTitle": "When community voice becomes visible, action can move faster.",
+      "redesign": {
+        "header": {
+          "homeLabel": "Amnesty DAO home",
+          "navLabel": "Landing page navigation",
+          "mission": "Mission",
+          "platform": "Platform",
+          "faq": "FAQ"
+        },
+        "actions": {
+          "joinDao": "Join the DAO",
+          "joinMovement": "Join the movement",
+          "explorePlatform": "Explore the platform",
+          "openingSignIn": "Opening sign in..."
+        },
+        "hero": {
+          "collageLabel": "Human rights communities organizing together",
+          "altCouncil": "Community members planning around a table",
+          "altMarch": "Human rights march holding a yellow banner",
+          "altMegaphone": "Human rights advocate speaking through a megaphone",
+          "altDignity": "Protester holding a dignity freedom justice sign",
+          "altWorkspace": "Community team working together on laptops and papers",
+          "calloutTitle": "For human rights in every place.",
+          "calloutBody": "Local voices. Global impact.",
+          "titleLine1": "Communities",
+          "titleLine2": "power human rights.",
+          "body": "The Amnesty International DAO enables communities everywhere to organize, coordinate, and take action for human rights, especially in places where support is needed most.",
+          "proofRemote": "Support operations in remote areas",
+          "proofPresence": "Act in countries with limited or no Amnesty presence",
+          "proofResist": "Resist repression and keep human rights work alive",
+          "strapline": "Open. Decentralized. People-powered."
+        },
+        "stats": {
+          "label": "Platform capabilities summary",
+          "networkTitle": "A platform for community-led action.",
+          "networkBody": "Start with a shared workspace, coordinate action, make decisions, and raise support together.",
+          "communities": "Communities",
+          "members": "Members",
+          "countries": "Countries",
+          "sinceLaunch": "Since launch",
+          "highlights": {
+            "workspace": {
+              "title": "Community workspaces",
+              "body": "A shared home for documents, links, and action planning."
+            },
+            "boards": {
+              "title": "Kanban planning",
+              "body": "Track work, blockers, and next steps without losing context."
+            },
+            "calendar": {
+              "title": "Shared calendars",
+              "body": "Coordinate meetings, events, and campaign timelines."
+            },
+            "campaigns": {
+              "title": "Campaign pages",
+              "body": "Raise support with public pages and community accountability."
+            }
+          }
+        },
+        "platform": {
+          "kicker": "Platform",
+          "title": "Everything your community needs to work together",
+          "note": "Built for communities. Designed for impact.",
+          "cards": {
+            "documentsTitle": "Shared documents",
+            "documentsBody": "Collaborate in real-time on Notion-like documents. Share knowledge, research, and resources.",
+            "boardsTitle": "Kanban boards",
+            "boardsBody": "Plan, organize, and track projects together with powerful boards and task management.",
+            "calendarsTitle": "Shared calendars",
+            "calendarsBody": "Coordinate events, meetings, and actions with a shared calendar your community can rely on.",
+            "proposalsTitle": "Proposals & voting",
+            "proposalsBody": "Make decisions together through transparent, on-chain proposals and community voting.",
+            "fundraisingTitle": "Fundraising",
+            "fundraisingBody": "Raise funds for urgent human rights work through community-driven campaigns.",
+            "languageTitle": "Multi-language support",
+            "languageBody": "Work in your language. Our platform supports multiple languages for global communities."
+          }
+        },
+        "languages": {
+          "kicker": "Languages",
+          "title": "Multiple languages, global reach",
+          "body": "Communicate and collaborate in the languages your community speaks.",
+          "englishName": "English",
+          "englishLabel": "English",
+          "arabicName": "العربية",
+          "arabicLabel": "Arabic",
+          "frenchName": "Français",
+          "frenchLabel": "French",
+          "russianName": "Русский",
+          "russianLabel": "Russian",
+          "chineseName": "中文",
+          "chineseLabel": "Mandarin Chinese",
+          "burmeseName": "မြန်မာစာ",
+          "burmeseLabel": "Burmese",
+          "persianName": "فارسی",
+          "persianLabel": "Persian (Farsi)",
+          "moreName": "+ More coming",
+          "moreLabel": "",
+          "swahiliName": "Kiswahili",
+          "swahiliLabel": "Swahili",
+          "amharicName": "አማርኛ",
+          "amharicLabel": "Amharic",
+          "koreanName": "한국어",
+          "koreanLabel": "Korean"
+        },
+        "onChain": {
+          "kicker": "On-chain & decentralized",
+          "title": "Resilient. Secure. Always on.",
+          "body": "Amnesty International DAO runs on a public blockchain, a global commons. No central servers. No single point of failure. No shutdowns.",
+          "checkSecurity": "Strong cryptographic security",
+          "checkReplication": "Automated replication across decentralized nodes worldwide",
+          "checkAlwaysOn": "Runs 24/7 with no interruptions since launch",
+          "checkJurisdiction": "Not controlled by any single entity or jurisdiction",
+          "mapAlt": "Network map showing global decentralized nodes"
+        },
+        "faq": {
+          "kicker": "Frequently asked questions",
+          "title": "Your questions, answered",
+          "contactPrefix": "Still have questions?",
+          "contactLink": "Contact us",
+          "items": {
+            "what": {
+              "question": "What is Amnesty International DAO?",
+              "answer": "A community coordination platform for people organizing human rights work with shared tools, transparent governance, and decentralized resilience."
+            },
+            "who": {
+              "question": "Who can join?",
+              "answer": "People and groups who want to coordinate, support, and participate in community-led human rights action."
+            },
+            "decisions": {
+              "question": "How are decisions made?",
+              "answer": "Communities can use proposals, discussions, and voting windows to make decisions visibly and accountably."
+            },
+            "affiliation": {
+              "question": "Is this affiliated with official Amnesty International offices?",
+              "answer": "This concept uses Amnesty-inspired branding and should be governed by the project’s official affiliation and trademark decisions before public launch."
+            },
+            "data": {
+              "question": "Is my data safe?",
+              "answer": "The architecture is designed around decentralization, access control, and resilience rather than a single central server."
+            },
+            "funded": {
+              "question": "How is this funded?",
+              "answer": "Communities can coordinate fundraising campaigns and track support transparently."
+            },
+            "different": {
+              "question": "What makes this different from other platforms?",
+              "answer": "It combines documents, boards, calendars, proposals, fundraising, and localization in one community-scoped workspace."
+            },
+            "started": {
+              "question": "How do I get started?",
+              "answer": "Join the DAO, create or enter a community, then start coordinating work with the shared tools."
+            }
+          }
+        },
+        "cta": {
+          "title": "Human rights need all of us.",
+          "body": "Join communities around the world building a more just and equal future."
+        },
+        "footer": {
+          "intro": "People power change. This platform is open source and community governed.",
+          "socialLabel": "Social links",
+          "email": "Email",
+          "explore": "Explore",
+          "resources": "Resources",
+          "documentation": "Documentation",
+          "communityGuide": "Community guide",
+          "security": "Security",
+          "apiComingSoon": "API coming soon",
+          "legal": "Legal",
+          "privacy": "Privacy policy",
+          "terms": "Terms of use",
+          "conduct": "Code of conduct",
+          "networkStatus": "Network status",
+          "systemsOperational": "All systems operational",
+          "viewOnChainStatus": "View on-chain status",
+          "copyright": "© Amnesty International DAO. A global community for human rights."
+        }
+      }
     },
     "nav": {
       "admin": "Admin",

@@ -81,7 +81,185 @@
       "statement": "La voix de la communauté, la responsabilité visible et l’action collective appartiennent au même endroit.",
       "visibilityBody": "Lisez les espaces communautaires, comprenez le kaupapa local et voyez où vous pouvez aider à organiser des propositions, des campagnes et le pouvoir populaire.",
       "visibilityCallout": "Visualisez ouvertement les communautés. Participez là où on vous confie un rôle.",
-      "visibilityTitle": "Lorsque la voix de la communauté devient visible, l’action peut aller plus vite."
+      "visibilityTitle": "Lorsque la voix de la communauté devient visible, l’action peut aller plus vite.",
+      "redesign": {
+        "header": {
+          "homeLabel": "Accueil Amnesty DAO",
+          "navLabel": "Navigation de la page d’accueil",
+          "mission": "Mission",
+          "platform": "Plateforme",
+          "faq": "FAQ"
+        },
+        "actions": {
+          "joinDao": "Rejoindre le DAO",
+          "joinMovement": "Rejoindre le mouvement",
+          "explorePlatform": "Explorer la plateforme",
+          "openingSignIn": "Ouverture de la connexion..."
+        },
+        "hero": {
+          "collageLabel": "Communautés de défense des droits humains qui s’organisent ensemble",
+          "altCouncil": "Community members planning around a table",
+          "altMarch": "Human rights march holding a yellow banner",
+          "altMegaphone": "Human rights advocate speaking through a megaphone",
+          "altDignity": "Protester holding a dignity freedom justice sign",
+          "altWorkspace": "Community team working together on laptops and papers",
+          "calloutTitle": "Pour les droits humains partout.",
+          "calloutBody": "Voix locales. Impact mondial.",
+          "titleLine1": "Les communautés",
+          "titleLine2": "font vivre les droits humains.",
+          "body": "Amnesty International DAO permet aux communautés du monde entier de s’organiser, de se coordonner et d’agir pour les droits humains, surtout là où le soutien est le plus nécessaire.",
+          "proofRemote": "Soutenir les actions dans les zones reculées",
+          "proofPresence": "Agir dans les pays avec peu ou pas de présence Amnesty",
+          "proofResist": "Résister à la répression et maintenir le travail des droits humains en vie",
+          "strapline": "Ouvert. Décentralisé. Porté par les personnes."
+        },
+        "stats": {
+          "label": "Résumé des capacités de la plateforme",
+          "networkTitle": "Une plateforme pour l’action communautaire.",
+          "networkBody": "Commencez par un espace partagé, coordonnez l’action, prenez des décisions et mobilisez du soutien ensemble.",
+          "communities": "Communautés",
+          "members": "Membres",
+          "countries": "Pays",
+          "sinceLaunch": "Depuis le lancement",
+          "highlights": {
+            "workspace": {
+              "title": "Espaces communautaires",
+              "body": "Un lieu commun pour les documents, les liens et la planification."
+            },
+            "boards": {
+              "title": "Planification kanban",
+              "body": "Suivez le travail, les blocages et les prochaines étapes sans perdre le contexte."
+            },
+            "calendar": {
+              "title": "Calendriers partagés",
+              "body": "Coordonnez réunions, événements et calendriers de campagne."
+            },
+            "campaigns": {
+              "title": "Pages de campagne",
+              "body": "Mobilisez du soutien avec des pages publiques et une responsabilité collective."
+            }
+          }
+        },
+        "platform": {
+          "kicker": "Plateforme",
+          "title": "Tout ce dont votre communauté a besoin pour travailler ensemble",
+          "note": "Conçu pour les communautés. Pensé pour l’impact.",
+          "cards": {
+            "documentsTitle": "Documents partagés",
+            "documentsBody": "Collaborez en temps réel sur des documents façon Notion. Partagez connaissances, recherches et ressources.",
+            "boardsTitle": "Tableaux Kanban",
+            "boardsBody": "Planifiez, organisez et suivez les projets ensemble avec des tableaux puissants.",
+            "calendarsTitle": "Calendriers partagés",
+            "calendarsBody": "Coordonnez événements, réunions et actions avec un calendrier partagé fiable.",
+            "proposalsTitle": "Propositions et vote",
+            "proposalsBody": "Prenez des décisions ensemble grâce à des propositions transparentes sur chaîne et au vote communautaire.",
+            "fundraisingTitle": "Collecte de fonds",
+            "fundraisingBody": "Levez des fonds pour un travail urgent en faveur des droits humains grâce à des campagnes communautaires.",
+            "languageTitle": "Support multilingue",
+            "languageBody": "Travaillez dans votre langue. Notre plateforme prend en charge plusieurs langues pour des communautés mondiales."
+          }
+        },
+        "languages": {
+          "kicker": "Langues",
+          "title": "Plusieurs langues, une portée mondiale",
+          "body": "Communiquez et collaborez dans les langues que parle votre communauté.",
+          "englishName": "English",
+          "englishLabel": "Anglais",
+          "arabicName": "العربية",
+          "arabicLabel": "Arabe",
+          "frenchName": "Français",
+          "frenchLabel": "Français",
+          "russianName": "Русский",
+          "russianLabel": "Russe",
+          "chineseName": "中文",
+          "chineseLabel": "Chinois mandarin",
+          "burmeseName": "မြန်မာစာ",
+          "burmeseLabel": "Birman",
+          "persianName": "فارسی",
+          "persianLabel": "Persan (farsi)",
+          "moreName": "+ D’autres bientôt",
+          "moreLabel": "",
+          "swahiliName": "Kiswahili",
+          "swahiliLabel": "Swahili",
+          "amharicName": "አማርኛ",
+          "amharicLabel": "Amharique",
+          "koreanName": "한국어",
+          "koreanLabel": "Coréen"
+        },
+        "onChain": {
+          "kicker": "Sur chaîne et décentralisé",
+          "title": "Résilient. Sécurisé. Toujours actif.",
+          "body": "Amnesty International DAO fonctionne sur une blockchain publique, un bien commun mondial. Pas de serveurs centraux. Pas de point de défaillance unique. Pas d’arrêt.",
+          "checkSecurity": "Sécurité cryptographique forte",
+          "checkReplication": "Réplication automatisée sur des nœuds décentralisés dans le monde entier",
+          "checkAlwaysOn": "Fonctionne 24/7 sans interruption depuis le lancement",
+          "checkJurisdiction": "N’est contrôlé par aucune entité ni juridiction unique",
+          "mapAlt": "Carte du réseau montrant des nœuds décentralisés mondiaux"
+        },
+        "faq": {
+          "kicker": "Questions fréquentes",
+          "title": "Vos questions, nos réponses",
+          "contactPrefix": "Encore des questions ?",
+          "contactLink": "Contactez-nous",
+          "items": {
+            "what": {
+              "question": "Qu’est-ce que Amnesty International DAO ?",
+              "answer": "Une plateforme de coordination communautaire pour organiser le travail des droits humains avec des outils partagés, une gouvernance transparente et une résilience décentralisée."
+            },
+            "who": {
+              "question": "Qui peut rejoindre ?",
+              "answer": "Les personnes et groupes qui souhaitent coordonner, soutenir et participer à l’action communautaire pour les droits humains."
+            },
+            "decisions": {
+              "question": "Comment les décisions sont-elles prises ?",
+              "answer": "Les communautés peuvent utiliser des propositions, des discussions et des fenêtres de vote pour décider de manière visible et responsable."
+            },
+            "affiliation": {
+              "question": "Est-ce affilié aux bureaux officiels d’Amnesty International ?",
+              "answer": "Ce concept utilise une inspiration Amnesty et devra respecter les décisions officielles d’affiliation et de marque avant tout lancement public."
+            },
+            "data": {
+              "question": "Mes données sont-elles en sécurité ?",
+              "answer": "L’architecture privilégie la décentralisation, le contrôle d’accès et la résilience plutôt qu’un serveur central unique."
+            },
+            "funded": {
+              "question": "Comment est-ce financé ?",
+              "answer": "Les communautés peuvent coordonner des campagnes de collecte de fonds et suivre le soutien de manière transparente."
+            },
+            "different": {
+              "question": "Qu’est-ce qui le distingue des autres plateformes ?",
+              "answer": "Elle réunit documents, tableaux, calendriers, propositions, collecte de fonds et localisation dans un espace communautaire unique."
+            },
+            "started": {
+              "question": "Comment commencer ?",
+              "answer": "Rejoignez le DAO, créez ou rejoignez une communauté, puis commencez à coordonner le travail avec les outils partagés."
+            }
+          }
+        },
+        "cta": {
+          "title": "Les droits humains ont besoin de nous tous.",
+          "body": "Rejoignez des communautés du monde entier qui construisent un avenir plus juste et plus égal."
+        },
+        "footer": {
+          "intro": "Le pouvoir des personnes crée le changement. Cette plateforme est open source et gouvernée par la communauté.",
+          "socialLabel": "Liens sociaux",
+          "email": "E-mail",
+          "explore": "Explorer",
+          "resources": "Ressources",
+          "documentation": "Documentation",
+          "communityGuide": "Guide communautaire",
+          "security": "Sécurité",
+          "apiComingSoon": "API bientôt disponible",
+          "legal": "Mentions légales",
+          "privacy": "Politique de confidentialité",
+          "terms": "Conditions d’utilisation",
+          "conduct": "Code de conduite",
+          "networkStatus": "État du réseau",
+          "systemsOperational": "Tous les systèmes sont opérationnels",
+          "viewOnChainStatus": "Voir l’état sur chaîne",
+          "copyright": "© Amnesty International DAO. Une communauté mondiale pour les droits humains."
+        }
+      }
     },
     "nav": {
       "admin": "Administrateur",
