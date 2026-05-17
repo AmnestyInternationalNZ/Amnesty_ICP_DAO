@@ -6,6 +6,7 @@ import { CommunityRole, Proposal, ProposalState } from '../backend';
 import { formatNumber } from '../i18n/format';
 import { useLocalePreference } from '../i18n/preferences';
 import LoadingSpinner from './LoadingSpinner';
+import MarkdownContent from './MarkdownContent';
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -206,7 +207,7 @@ export default function ProposalCard({
               </span>
             )}
           </div>
-          <p className="mb-6 text-lg leading-8 text-[#38505d]">{proposal.description}</p>
+          <MarkdownContent className="proposal-markdown-content mb-6" text={proposal.description} />
           <div className="mb-4 flex items-center space-x-6 text-lg text-[#38505d]">
             <span className="font-bold amnesty-heading">{t('common.labels.by', { name: creatorName })}</span>
             <span className="font-bold">•</span>

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import type { CommunityEventPayload, CommunityMember, WorkspaceRole } from '../../backend';
 import { WorkspaceRole as WorkspaceRoleValue } from '../../backend';
 import {
+  type CalendarDisplayEvent,
   calendarEventUrl,
   canEditCalendarRole,
   canOwnCalendarRole,
@@ -19,6 +20,7 @@ import {
   publicEventUrl,
   readableDateTime,
   toDatetimeLocalValue,
+  utcNanosFromDate,
 } from '../../calendar/calendarApi';
 import {
   useArchiveCommunityEvent,
@@ -31,14 +33,19 @@ import {
   useSetCommunityEventShare,
   useUpdateCommunityEvent,
 } from '../../hooks/useQueries';
+import { useInternetIdentity } from '../../hooks/useInternetIdentity';
+import { getIntlLocale } from '../../i18n/types';
+import { useLocalePreference } from '../../i18n/preferences';
+import { calendarButtonText } from '../../calendar/calendarLocale';
 import { routePaths } from '../../routing/appRoutes';
 import LoadingSpinner from '../LoadingSpinner';
 import { EventCalendarWidget } from './EventCalendarWidget';
 
 type CalendarForm = ReturnType<typeof formFromEvent>;
 type CalendarFocus = { date: Date; view: string };
+const DRAFT_EVENT_ID = -1n;
 
-function sortEvents(events: CommunityEventPayload[]) {
+function sortEvents<T extends { startUtc: bigint }>(events: T[]): T[] {
   return [...events].sort((a, b) => Number(a.startUtc - b.startUtc));
 }
 
@@ -85,6 +92,9 @@ export default function CommunityCalendarWorkspace({
   onOpenEventRoute?: (eventId: bigint) => void;
 }) {
   const { t } = useTranslation();
+  const { identity } = useInternetIdentity();
+  const { locale } = useLocalePreference();
+  const intlLocale = getIntlLocale(locale);
   const listEvents = useListCommunityEvents(communityId);
   const eventDetail = useGetCommunityEvent(communityId, initialEventId ?? null);
   const { data: members = [] } = useListCommunityMembers(communityId);
@@ -97,6 +107,7 @@ export default function CommunityCalendarWorkspace({
 
   const [events, setEvents] = useState<CommunityEventPayload[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<bigint>();
+  const [showDraftEvent, setShowDraftEvent] = useState(false);
   const [form, setForm] = useState<CalendarForm>(() => formFromEvent(undefined, new Date()));
   const [calendarFocus, setCalendarFocus] = useState<CalendarFocus>();
   const [grantPrincipal, setGrantPrincipal] = useState('');
@@ -124,14 +135,46 @@ export default function CommunityCalendarWorkspace({
     () => events.find((event) => event.id === selectedEventId),
     [events, selectedEventId],
   );
+  const draftPreviewEvent = useMemo<CalendarDisplayEvent | null>(() => {
+    if (selectedEvent || !showDraftEvent) return null;
+    const start = new Date(form.startLocal);
+    const end = new Date(form.endLocal);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null;
+    const now = BigInt(Date.now()) * 1_000_000n;
+    return {
+      id: DRAFT_EVENT_ID,
+      access: [],
+      archived: false,
+      allDay: form.allDay,
+      communityId,
+      communityShare: form.workspaceRole,
+      createdAt: now,
+      description: form.description.trim() || null,
+      endUtc: utcNanosFromDate(end),
+      location: form.location.trim() || null,
+      owner: identity?.getPrincipal() ?? Principal.anonymous(),
+      publicToken: null,
+      role: WorkspaceRoleValue.owner,
+      startUtc: utcNanosFromDate(start),
+      temporary: true,
+      title: form.title.trim() || t('calendar.editor.planMeeting'),
+      updatedAt: now,
+    };
+  }, [communityId, form, identity, selectedEvent, showDraftEvent, t]);
   const visibleEvents = useMemo(() => sortEvents(events), [events]);
+  const calendarEvents = useMemo(
+    () => sortEvents(draftPreviewEvent ? [...events, draftPreviewEvent] : events),
+    [draftPreviewEvent, events],
+  );
+  const localizedCalendarButtons = useMemo(() => calendarButtonText(locale), [locale]);
   const canEditSelected = selectedEvent ? canEditCalendarRole(selectedEvent.role) : true;
   const canOwnSelected = selectedEvent ? canOwnCalendarRole(selectedEvent.role) : false;
   const canManageSelected = Boolean(selectedEvent && (canOwnSelected || canManageCommunityWorkspace));
   const isLoading = listEvents.isLoading || eventDetail.isLoading;
 
-  function openCreate(start = new Date(), end = defaultEventEnd(start), allDay = false) {
+  function openCreate(start = new Date(), end = defaultEventEnd(start), allDay = false, showPreview = false) {
     setSelectedEventId(undefined);
+    setShowDraftEvent(showPreview);
     setForm({
       ...formFromEvent(undefined, start),
       endLocal: toDatetimeLocalValue(end),
@@ -142,6 +185,7 @@ export default function CommunityCalendarWorkspace({
 
   function openExisting(event: CommunityEventPayload) {
     setSelectedEventId(event.id);
+    setShowDraftEvent(false);
     setForm(formFromEvent(event));
     setMessage(undefined);
   }
@@ -152,16 +196,21 @@ export default function CommunityCalendarWorkspace({
   }
 
   const handleDateClick = useCallback((info: EventCalendarDateInfo) => {
-    openCreate(info.date, defaultEventEnd(info.date), info.allDay);
+    openCreate(info.date, defaultEventEnd(info.date), info.allDay, true);
   }, []);
 
   const handleSelectRange = useCallback((info: EventCalendarSelectInfo) => {
-    openCreate(info.start, info.end, info.allDay);
+    openCreate(info.start, info.end, info.allDay, true);
   }, []);
 
   const handleEventClick = useCallback(
     (info: EventCalendarClickInfo) => {
       if (!info.event.id) return;
+      if (info.event.id === DRAFT_EVENT_ID.toString()) {
+        setSelectedEventId(undefined);
+        setShowDraftEvent(true);
+        return;
+      }
       const clicked = events.find((event) => event.id.toString() === info.event.id);
       if (!clicked) return;
       openExisting(clicked);
@@ -174,6 +223,18 @@ export default function CommunityCalendarWorkspace({
   const handleEventChange = useCallback(
     async (info: EventCalendarChangeInfo) => {
       if (!info.event.id) return;
+      if (info.event.id === DRAFT_EVENT_ID.toString()) {
+        const start = info.event.start instanceof Date ? info.event.start : info.event.start ? new Date(info.event.start) : new Date(form.startLocal);
+        const end = info.event.end instanceof Date ? info.event.end : info.event.end ? new Date(info.event.end) : defaultEventEnd(start);
+        setForm((current) => ({
+          ...current,
+          allDay: info.event.allDay ?? current.allDay,
+          endLocal: toDatetimeLocalValue(end),
+          startLocal: toDatetimeLocalValue(start),
+        }));
+        setMessage(undefined);
+        return;
+      }
       const existing = events.find((event) => event.id.toString() === info.event.id);
       if (!existing || !canEditCalendarRole(existing.role)) return;
       const input = eventInputFromMovedEvent(existing, info.event);
@@ -193,7 +254,7 @@ export default function CommunityCalendarWorkspace({
         setSaving(false);
       }
     },
-    [communityId, events, updateEvent],
+    [communityId, events, form.startLocal, updateEvent],
   );
 
   const handleEventDragStart = useCallback(() => {
@@ -221,6 +282,7 @@ export default function CommunityCalendarWorkspace({
           await setEventShare.mutateAsync({ communityId, eventId: id, role: form.workspaceRole });
         }
         setSelectedEventId(id);
+        setShowDraftEvent(false);
         onOpenEventRoute?.(id);
         setMessage(t('calendar.messages.created'));
       }
@@ -239,6 +301,7 @@ export default function CommunityCalendarWorkspace({
     try {
       await archiveEvent.mutateAsync({ communityId, eventId: selectedEvent.id });
       setSelectedEventId(undefined);
+      setShowDraftEvent(false);
       setForm(formFromEvent(undefined, new Date()));
       window.history.pushState({}, '', routePaths.calendar(communityId));
       await refreshEvents();
@@ -449,7 +512,7 @@ export default function CommunityCalendarWorkspace({
               </div>
               <div className="mini-row">
                 <span>{t('calendar.meta.start')}</span>
-                <strong>{readableDateTime(selectedEvent.startUtc)}</strong>
+                <strong>{readableDateTime(selectedEvent.startUtc, intlLocale)}</strong>
               </div>
               <div className="mini-row">
                 <span>{t('calendar.meta.visibility')}</span>
@@ -566,9 +629,11 @@ export default function CommunityCalendarWorkspace({
           ) : (
             <EventCalendarWidget
               canEdit={!saving}
-              events={visibleEvents}
+              events={calendarEvents}
               focusDate={calendarFocus?.date}
               focusView={calendarFocus?.view}
+              locale={intlLocale}
+              buttonText={localizedCalendarButtons}
               onDateClick={handleDateClick}
               onEventChange={handleEventChange}
               onEventClick={handleEventClick}

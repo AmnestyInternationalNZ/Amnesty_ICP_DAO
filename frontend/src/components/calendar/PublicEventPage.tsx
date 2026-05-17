@@ -6,14 +6,20 @@ import {
   formFromEvent,
   readableDateTime,
 } from '../../calendar/calendarApi';
+import { calendarButtonText } from '../../calendar/calendarLocale';
 import { useGetPublicCommunityEvent } from '../../hooks/useQueries';
+import { useLocalePreference } from '../../i18n/preferences';
+import { getIntlLocale } from '../../i18n/types';
 import LoadingSpinner from '../LoadingSpinner';
 import { EventCalendarWidget } from './EventCalendarWidget';
 
 export default function PublicEventPage({ token }: { token?: string }) {
   const { t } = useTranslation();
+  const { locale } = useLocalePreference();
+  const intlLocale = getIntlLocale(locale);
   const { data: event, error, isLoading } = useGetPublicCommunityEvent(token ?? null);
   const events = useMemo(() => (event ? [event] : []), [event]);
+  const localizedCalendarButtons = useMemo(() => calendarButtonText(locale), [locale]);
   const form = formFromEvent(event);
 
   if (!token || (!isLoading && !event)) {
@@ -89,7 +95,7 @@ export default function PublicEventPage({ token }: { token?: string }) {
             </div>
             <div className="mini-row">
               <span>{t('calendar.meta.start')}</span>
-              <strong>{readableDateTime(event.startUtc)}</strong>
+              <strong>{readableDateTime(event.startUtc, intlLocale)}</strong>
             </div>
             {event.location ? (
               <div className="mini-row">
@@ -117,6 +123,8 @@ export default function PublicEventPage({ token }: { token?: string }) {
             events={events}
             focusDate={dateFromUtcNanos(event.startUtc)}
             focusView="timeGridDay"
+            locale={intlLocale}
+            buttonText={localizedCalendarButtons}
             onDateClick={() => undefined}
             onEventChange={() => undefined}
             onEventClick={() => undefined}

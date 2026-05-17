@@ -130,24 +130,6 @@ export default function KanbanColumn({
         ) : null}
       </header>
 
-      <div className="kanban-card-list" ref={setDropRef}>
-        <SortableContext items={cards.map((card) => cardKey(card.id))} strategy={verticalListSortingStrategy}>
-          {cards.map((card) => (
-            <KanbanCard
-              canEdit={canEdit}
-              card={card}
-              communityId={communityId}
-              documents={documents}
-              events={events}
-              key={card.id.toString()}
-              memberOptions={memberOptions}
-              onDelete={onDeleteCard}
-              onUpdate={onUpdateCard}
-            />
-          ))}
-        </SortableContext>
-      </div>
-
       {canEdit ? (
         <div className="kanban-add-card">
           <input
@@ -165,6 +147,24 @@ export default function KanbanColumn({
           </button>
         </div>
       ) : null}
+
+      <div className="kanban-card-list" ref={setDropRef}>
+        <SortableContext items={cards.map((card) => cardKey(card.id))} strategy={verticalListSortingStrategy}>
+          {cards.map((card) => (
+            <KanbanCard
+              canEdit={canEdit}
+              card={card}
+              communityId={communityId}
+              documents={documents}
+              events={events}
+              key={card.id.toString()}
+              memberOptions={memberOptions}
+              onDelete={onDeleteCard}
+              onUpdate={onUpdateCard}
+            />
+          ))}
+        </SortableContext>
+      </div>
     </section>
   );
 }

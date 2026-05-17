@@ -10,30 +10,35 @@ import type {
 } from '@event-calendar/core';
 import { useEffect, useMemo, useRef } from 'react';
 import { eventToCalendarItem } from '../../calendar/calendarApi';
-import type { CommunityEventPayload } from '../../backend';
+import type { CalendarDisplayEvent } from '../../calendar/calendarApi';
+import { firstDayForIntlLocale, type CalendarButtonText } from '../../calendar/calendarLocale';
 
 export function EventCalendarWidget({
   canEdit,
   events,
   focusDate,
   focusView,
+  locale,
   onDateClick,
   onEventChange,
   onEventClick,
   onEventDragStart,
   onEventDragStop,
   onSelectRange,
+  buttonText,
 }: {
   canEdit: boolean;
-  events: CommunityEventPayload[];
+  events: CalendarDisplayEvent[];
   focusDate?: Date;
   focusView?: string;
+  locale: string;
   onDateClick: (info: EventCalendarDateInfo) => void;
   onEventChange: (info: EventCalendarChangeInfo) => void;
   onEventClick: (info: EventCalendarClickInfo) => void;
   onEventDragStart?: (info: EventCalendarClickInfo) => void;
   onEventDragStop?: (info: EventCalendarClickInfo) => void;
   onSelectRange: (info: EventCalendarSelectInfo) => void;
+  buttonText: CalendarButtonText;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<EventCalendarInstance>();
@@ -43,7 +48,7 @@ export function EventCalendarWidget({
   useEffect(() => {
     if (!hostRef.current || calendarRef.current) return;
 
-    const options: EventCalendarOptions = {
+    const options = {
       view: focusView ?? 'timeGridWeek',
       date: focusDate,
       timeZone: 'local',
@@ -52,6 +57,8 @@ export function EventCalendarWidget({
       editable: canEdit,
       selectable: canEdit,
       events: calendarEvents,
+      firstDay: firstDayForIntlLocale(locale),
+      locale,
       scrollTime: '08:00:00',
       slotDuration: '00:30:00',
       headerToolbar: {
@@ -60,11 +67,11 @@ export function EventCalendarWidget({
         end: 'today dayGridMonth,timeGridWeek,timeGridDay,listWeek prev,next',
       },
       buttonText: {
-        today: 'Today',
-        dayGridMonth: 'Month',
-        timeGridWeek: 'Week',
-        timeGridDay: 'Day',
-        listWeek: 'List',
+        today: buttonText.today,
+        dayGridMonth: buttonText.dayGridMonth,
+        timeGridWeek: buttonText.timeGridWeek,
+        timeGridDay: buttonText.timeGridDay,
+        listWeek: buttonText.listWeek,
       },
       dateClick: onDateClick,
       eventClick: onEventClick,
@@ -75,7 +82,7 @@ export function EventCalendarWidget({
       eventResizeStop: onEventDragStop,
       eventResize: onEventChange,
       select: onSelectRange,
-    };
+    } as EventCalendarOptions;
 
     calendarRef.current = createCalendar(hostRef.current, [DayGrid, TimeGrid, List, Interaction], options);
 
@@ -89,6 +96,12 @@ export function EventCalendarWidget({
   useEffect(() => {
     calendarRef.current?.setOption('events', calendarEvents);
   }, [calendarEvents]);
+
+  useEffect(() => {
+    calendarRef.current?.setOption('locale', locale);
+    calendarRef.current?.setOption('firstDay', firstDayForIntlLocale(locale));
+    calendarRef.current?.setOption('buttonText', buttonText);
+  }, [buttonText, locale]);
 
   useEffect(() => {
     if (!calendarRef.current || focusTime === undefined) return;

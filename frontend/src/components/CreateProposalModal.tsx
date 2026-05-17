@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Proposal, ProposalOverrides, ProposalState } from '../backend';
 import { useCreateProposal } from '../hooks/useQueries';
 import LoadingSpinner from './LoadingSpinner';
+import MarkdownContent from './MarkdownContent';
 
 interface CreateProposalModalProps {
   isOpen: boolean;
@@ -61,6 +62,8 @@ function ProposalSidebarSection({
   );
 }
 
+type MarkdownCommand = 'bold' | 'italic' | 'link' | 'list' | 'quote' | 'heading';
+
 export default function CreateProposalModal({
   isOpen,
   onClose,
@@ -70,11 +73,13 @@ export default function CreateProposalModal({
   const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [descriptionMode, setDescriptionMode] = useState<'edit' | 'preview'>('edit');
   const [sidebarSearch, setSidebarSearch] = useState('');
   const [useCustomSettings, setUseCustomSettings] = useState(false);
   const [votingWindowDays, setVotingWindowDays] = useState(3);
   const [quorum, setQuorum] = useState(1);
   const [passThreshold, setPassThreshold] = useState(50);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const createProposal = useCreateProposal();
 
   const filteredProposals = useMemo(() => {
@@ -109,6 +114,7 @@ export default function CreateProposalModal({
 
         setTitle('');
         setDescription('');
+        setDescriptionMode('edit');
         setSidebarSearch('');
         setUseCustomSettings(false);
         setVotingWindowDays(3);
@@ -125,6 +131,7 @@ export default function CreateProposalModal({
     if (!createProposal.isPending) {
       setTitle('');
       setDescription('');
+      setDescriptionMode('edit');
       setSidebarSearch('');
       setUseCustomSettings(false);
       setVotingWindowDays(3);
@@ -135,6 +142,46 @@ export default function CreateProposalModal({
   };
 
   if (!isOpen) return null;
+
+  function replaceSelectedDescriptionText(command: MarkdownCommand) {
+    const textarea = descriptionRef.current;
+    if (!textarea || createProposal.isPending) return;
+
+    const selectionStart = textarea.selectionStart;
+    const selectionEnd = textarea.selectionEnd;
+    const selectedText = description.slice(selectionStart, selectionEnd);
+    let replacement = selectedText;
+
+    if (command === 'bold') {
+      replacement = `**${selectedText || 'bold text'}**`;
+    } else if (command === 'italic') {
+      replacement = `*${selectedText || 'italic text'}*`;
+    } else if (command === 'link') {
+      replacement = `[${selectedText || 'link text'}](https://example.org)`;
+    } else if (command === 'list') {
+      const text = selectedText || 'List item';
+      replacement = text
+        .split(/\r?\n/)
+        .map((line) => `- ${line.replace(/^[-*]\s+/, '')}`)
+        .join('\n');
+    } else if (command === 'quote') {
+      const text = selectedText || 'Quote';
+      replacement = text
+        .split(/\r?\n/)
+        .map((line) => `> ${line.replace(/^>\s?/, '')}`)
+        .join('\n');
+    } else if (command === 'heading') {
+      replacement = `## ${selectedText || 'Heading'}`;
+    }
+
+    const nextDescription = `${description.slice(0, selectionStart)}${replacement}${description.slice(selectionEnd)}`;
+    setDescription(nextDescription);
+    setDescriptionMode('edit');
+    requestAnimationFrame(() => {
+      textarea.focus();
+      textarea.setSelectionRange(selectionStart, selectionStart + replacement.length);
+    });
+  }
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-amnesty-paper text-amnesty-ink">
@@ -247,17 +294,55 @@ export default function CreateProposalModal({
                       defaultValue: 'Describe your proposal in detail. What are you proposing? Why should the community support it?',
                     })}
                   </p>
-                  <textarea
-                    id="proposal-description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    rows={9}
-                    className="input-field rounded-[0.35rem] text-lg leading-7"
-                    placeholder={t('proposals.create.descriptionPlaceholder')}
-                    required
-                    disabled={createProposal.isPending}
-                    maxLength={1000}
-                  />
+                  <div className="proposal-markdown-editor">
+                    <div className="proposal-markdown-toolbar" aria-label="Markdown formatting tools">
+                      <button type="button" onClick={() => replaceSelectedDescriptionText('heading')} disabled={createProposal.isPending || descriptionMode === 'preview'}>Heading</button>
+                      <button type="button" onClick={() => replaceSelectedDescriptionText('bold')} disabled={createProposal.isPending || descriptionMode === 'preview'}>B</button>
+                      <button type="button" onClick={() => replaceSelectedDescriptionText('italic')} disabled={createProposal.isPending || descriptionMode === 'preview'}><em>I</em></button>
+                      <button type="button" onClick={() => replaceSelectedDescriptionText('link')} disabled={createProposal.isPending || descriptionMode === 'preview'}>Link</button>
+                      <button type="button" onClick={() => replaceSelectedDescriptionText('list')} disabled={createProposal.isPending || descriptionMode === 'preview'}>List</button>
+                      <button type="button" onClick={() => replaceSelectedDescriptionText('quote')} disabled={createProposal.isPending || descriptionMode === 'preview'}>Quote</button>
+                      <span />
+                      <button
+                        type="button"
+                        className={descriptionMode === 'edit' ? 'selected' : ''}
+                        onClick={() => setDescriptionMode('edit')}
+                        disabled={createProposal.isPending}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        className={descriptionMode === 'preview' ? 'selected' : ''}
+                        onClick={() => setDescriptionMode('preview')}
+                        disabled={!description.trim()}
+                      >
+                        Preview
+                      </button>
+                    </div>
+                    {descriptionMode === 'preview' ? (
+                      <div className="proposal-markdown-preview">
+                        {description.trim() ? (
+                          <MarkdownContent className="proposal-markdown-content" text={description} />
+                        ) : (
+                          <p>{t('proposals.create.descriptionPlaceholder')}</p>
+                        )}
+                      </div>
+                    ) : (
+                      <textarea
+                        id="proposal-description"
+                        ref={descriptionRef}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={9}
+                        className="input-field rounded-[0.35rem] text-lg leading-7"
+                        placeholder={t('proposals.create.descriptionPlaceholder')}
+                        required
+                        disabled={createProposal.isPending}
+                        maxLength={1000}
+                      />
+                    )}
+                  </div>
                   <p className="mt-2 text-sm font-bold text-amnesty-gray-600">
                     {t('common.labels.characters', { count: description.length, max: 1000 })}
                   </p>

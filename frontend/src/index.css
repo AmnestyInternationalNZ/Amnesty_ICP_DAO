@@ -2358,6 +2358,7 @@
   flex: 1;
   flex-direction: column;
   gap: 10px;
+  margin-top: 12px;
   min-height: 12rem;
 }
 
@@ -2430,7 +2431,10 @@
 .kanban-add-card {
   display: grid;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 0;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .kanban-add-card input,
@@ -3008,6 +3012,11 @@
   box-shadow: 0 8px 18px rgba(4, 31, 45, 0.18);
   cursor: pointer;
   font-weight: 700;
+}
+
+.event-calendar-host .calendar-draft-event {
+  border: 2px dashed var(--black);
+  color: var(--black);
 }
 
 .public-calendar-shell {
@@ -3772,6 +3781,7 @@
 
 .markdown-content table,
 .kanban-markdown table,
+.proposal-markdown-content table,
 .fundraising-markdown-content table {
   border: 1px solid var(--line, #d9dedf);
   border-collapse: collapse;
@@ -3784,6 +3794,8 @@
 .markdown-content td,
 .kanban-markdown th,
 .kanban-markdown td,
+.proposal-markdown-content th,
+.proposal-markdown-content td,
 .fundraising-markdown-content th,
 .fundraising-markdown-content td {
   border: 1px solid var(--line, #d9dedf);
@@ -3793,6 +3805,7 @@
 
 .markdown-content th,
 .kanban-markdown th,
+.proposal-markdown-content th,
 .fundraising-markdown-content th {
   background: rgba(255, 237, 0, 0.18);
   color: var(--amnesty-ink);
@@ -3807,6 +3820,97 @@
   color: #c51f1f;
   font-size: 13px;
   margin: 0;
+}
+
+.proposal-markdown-editor {
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  overflow: hidden;
+}
+
+.proposal-markdown-toolbar {
+  align-items: center;
+  background: #fbfbf7;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 0;
+  grid-template-columns: repeat(6, auto) minmax(0, 1fr) repeat(2, auto);
+}
+
+.proposal-markdown-toolbar button {
+  border-right: 1px solid var(--line);
+  color: var(--black);
+  font-size: 14px;
+  font-weight: 800;
+  min-height: 42px;
+  padding: 0 14px;
+}
+
+.proposal-markdown-toolbar button:last-child {
+  border-right: 0;
+}
+
+.proposal-markdown-toolbar button:hover:not(:disabled),
+.proposal-markdown-toolbar button.selected {
+  background: var(--amnesty-yellow);
+}
+
+.proposal-markdown-toolbar button:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.proposal-markdown-editor textarea {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.proposal-markdown-preview {
+  background: var(--white);
+  min-height: 15.5rem;
+  padding: 18px;
+}
+
+.proposal-markdown-content {
+  color: #38505d;
+  display: grid;
+  font-size: 18px;
+  gap: 0.9rem;
+  line-height: 1.75;
+}
+
+.proposal-markdown-content h2,
+.proposal-markdown-content h3,
+.proposal-markdown-content h4 {
+  color: var(--amnesty-ink);
+  font-family: 'Amnesty Trade Gothic Condensed', 'Arial Narrow', Arial, sans-serif;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.proposal-markdown-content h2 {
+  font-size: 2rem;
+}
+
+.proposal-markdown-content h3 {
+  font-size: 1.65rem;
+}
+
+.proposal-markdown-content h4 {
+  font-size: 1.35rem;
+}
+
+.proposal-markdown-content ul,
+.proposal-markdown-content ol {
+  padding-left: 1.4rem;
+}
+
+.proposal-markdown-content blockquote {
+  border-left: 4px solid var(--amnesty-yellow);
+  color: var(--amnesty-ink);
+  font-weight: 700;
+  padding-left: 1rem;
 }
 
 .muted {

@@ -240,7 +240,16 @@ export default function CommunityBoardsWorkspace({
       dueDateUtc: null,
     };
     try {
-      await addCard.mutateAsync({ communityId, boardId: selectedBoardId, columnId, input });
+      const card = await addCard.mutateAsync({ communityId, boardId: selectedBoardId, columnId, input });
+      await moveCard.mutateAsync({
+        communityId,
+        boardId: selectedBoardId,
+        cardId: card.id,
+        toColumnId: columnId,
+        toIndex: 0n,
+      });
+      await refetchSelectedBoard();
+      await refetchBoards();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     }

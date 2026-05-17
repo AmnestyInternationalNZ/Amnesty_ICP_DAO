@@ -1282,7 +1282,7 @@ module {
             board.columns,
             func(column) {
                 if (column.id == columnId) {
-                    { column with cardIds = Array.append(column.cardIds, [card.id]) };
+                    { column with cardIds = Array.append([card.id], column.cardIds) };
                 } else {
                     column;
                 };

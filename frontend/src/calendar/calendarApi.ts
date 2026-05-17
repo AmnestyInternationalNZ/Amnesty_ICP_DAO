@@ -5,6 +5,10 @@ import { routePaths } from '../routing/appRoutes';
 export const NANOS_PER_MILLI = BigInt(1_000_000);
 const ONE_HOUR_MS = 60 * 60 * 1000;
 
+export type CalendarDisplayEvent = CommunityEventPayload & {
+  temporary?: boolean;
+};
+
 export function optionalText(value: string): string | null {
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
@@ -35,28 +39,32 @@ export function fromDatetimeLocalValue(value: string): Date {
   return new Date(value);
 }
 
-export function readableDateTime(value: bigint): string {
-  return new Intl.DateTimeFormat(undefined, {
+export function readableDateTime(value: bigint, locale?: string): string {
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(dateFromUtcNanos(value));
 }
 
-export function eventWorkspaceVisible(event: CommunityEventPayload): boolean {
+export function eventWorkspaceVisible(event: CommunityEventPayload | CalendarDisplayEvent): boolean {
   return event.communityShare !== null;
 }
 
-export function eventToCalendarItem(event: CommunityEventPayload) {
+export function eventToCalendarItem(event: CalendarDisplayEvent) {
+  const temporary = Boolean(event.temporary);
   return {
     id: event.id.toString(),
     title: event.title,
     start: dateFromUtcNanos(event.startUtc),
     end: dateFromUtcNanos(event.endUtc),
     allDay: event.allDay,
-    backgroundColor: eventWorkspaceVisible(event) ? '#111111' : undefined,
+    backgroundColor: temporary ? '#ffec00' : eventWorkspaceVisible(event) ? '#111111' : undefined,
+    borderColor: temporary ? '#111111' : undefined,
+    className: temporary ? 'calendar-draft-event' : undefined,
     extendedProps: {
       eventId: event.id.toString(),
       role: event.role,
+      temporary,
       workspaceVisible: eventWorkspaceVisible(event),
     },
   };
