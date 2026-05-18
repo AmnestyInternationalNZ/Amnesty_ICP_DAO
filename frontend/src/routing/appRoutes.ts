@@ -4,6 +4,8 @@ export interface ParsedAppRoute {
   page: AppPage;
   communityId: bigint | null;
   documentId?: bigint;
+  proposalId?: bigint;
+  proposalCreate?: boolean;
   campaignId?: bigint;
   campaignCreate?: boolean;
   boardId?: bigint;
@@ -43,6 +45,9 @@ export const routePaths = {
   admin: () => '/admin',
   community: (communityId: bigint) => `/communities/${communityId.toString()}`,
   proposals: (communityId: bigint) => `/communities/${communityId.toString()}/proposals`,
+  newProposal: (communityId: bigint) => `/communities/${communityId.toString()}/proposals/new`,
+  proposal: (communityId: bigint, proposalId: bigint) =>
+    `/communities/${communityId.toString()}/proposals/${proposalId.toString()}`,
   fundraise: (communityId: bigint) => `/communities/${communityId.toString()}/fundraise`,
   newCampaign: (communityId: bigint) => `/communities/${communityId.toString()}/fundraise/new`,
   campaign: (communityId: bigint, campaignId: bigint) =>
@@ -90,7 +95,15 @@ export function parseAppPath(pathname: string, legacyCommunityId: bigint | null 
   const communityId = parseBigIntSegment(segments[1]);
   if (communityId === undefined) return { page: 'hub', communityId: null };
   if (segments.length === 2) return { page: 'community', communityId };
-  if (segments[2] === 'proposals') return { page: 'proposals', communityId };
+  if (segments[2] === 'proposals') {
+    if (segments[3] === 'new') return { page: 'proposals', communityId, proposalCreate: true };
+    const proposalId = segments[3] === 'proposal'
+      ? parseBigIntSegment(segments[4])
+      : parseBigIntSegment(segments[3]);
+    return proposalId === undefined
+      ? { page: 'proposals', communityId }
+      : { page: 'proposals', communityId, proposalId };
+  }
   if (segments[2] === 'fundraise' || segments[2] === 'campaigns') {
     if (segments[3] === 'new') return { page: 'fundraise', communityId, campaignCreate: true };
     const campaignId = segments[3] === 'campaigns' || segments[3] === 'campaign'

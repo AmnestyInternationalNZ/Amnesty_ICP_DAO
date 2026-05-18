@@ -144,6 +144,7 @@ describe('kanban rendering', () => {
     expect(html).toContain('Pinned');
     expect(html).toContain('Share');
     expect(html).toContain('To do');
+    expect(html).toContain('kanban-column-card-drop-zone');
   });
 
   it('hides owner-only board controls in viewer/read-only rendering', () => {

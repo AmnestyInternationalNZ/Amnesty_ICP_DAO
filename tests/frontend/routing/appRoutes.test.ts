@@ -68,6 +68,22 @@ describe('app routes', () => {
     });
   });
 
+  it('builds and parses community-scoped proposal routes', () => {
+    expect(routePaths.proposals(8n)).toBe('/communities/8/proposals');
+    expect(routePaths.newProposal(8n)).toBe('/communities/8/proposals/new');
+    expect(routePaths.proposal(8n, 21n)).toBe('/communities/8/proposals/21');
+    expect(parseAppPath('/communities/8/proposals/new')).toMatchObject({
+      page: 'proposals',
+      communityId: 8n,
+      proposalCreate: true,
+    });
+    expect(parseAppPath('/communities/8/proposals/21')).toMatchObject({
+      page: 'proposals',
+      communityId: 8n,
+      proposalId: 21n,
+    });
+  });
+
   it('builds and parses public read-only campaign routes', () => {
     expect(routePaths.publicCampaign('campaign-token')).toBe('/campaigns/public/campaign-token');
     expect(parseAppPath('/campaigns/public/campaign-token')).toMatchObject({

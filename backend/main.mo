@@ -135,6 +135,7 @@ persistent actor {
         mediaUrl : ?Text;
         creatorName : Text;
         creatorContact : ?Text;
+        currency : Text;
         goalAmount : Nat;
         deadlineNs : Int;
         visibility : CampaignVisibility;
@@ -185,6 +186,7 @@ persistent actor {
         creatorName : Text;
         creatorContact : ?Text;
         communityId : Nat;
+        currency : Text;
         goalAmount : Nat;
         deadlineNs : Int;
         state : CampaignState;
@@ -215,6 +217,7 @@ persistent actor {
     var contributionsByCampaign = natMap.empty<[Contribution]>();
     var campaignUpdates = natMap.empty<CampaignUpdate>();
     var campaignMetadataByCampaign = natMap.empty<CampaignMetadata>();
+    var campaignCurrencyByCampaign = natMap.empty<Text>();
     var campaignPublicLinks : [CampaignPublicLink] = [];
     var nextUpdateId : Nat = 0;
 
@@ -228,6 +231,8 @@ persistent actor {
     let MAX_CAMPAIGN_CREATOR_SIZE : Nat = 240;
     let MIN_PUBLIC_TOKEN_SIZE : Nat = 32;
     let MAX_PUBLIC_TOKEN_SIZE : Nat = 160;
+    let DEFAULT_CAMPAIGN_CURRENCY : Text = "NZD";
+    let SUPPORTED_CAMPAIGN_CURRENCIES : [Text] = ["NZD", "USD", "EUR", "GBP", "AUD", "CAD", "JPY"];
 
     func requireAuthenticated(caller : Principal) {
         Membership.requireAuthenticated(caller);
@@ -475,6 +480,13 @@ persistent actor {
         };
     };
 
+    func getCampaignCurrency(campaignId : Nat) : Text {
+        switch (natMap.get(campaignCurrencyByCampaign, campaignId)) {
+            case (?currency) currency;
+            case null DEFAULT_CAMPAIGN_CURRENCY;
+        };
+    };
+
     func validateRequiredText(value : Text, maxSize : Nat, fieldLabel : Text) {
         let size = Text.size(value);
         if (size == 0 or size > maxSize) {
@@ -512,6 +524,17 @@ persistent actor {
         };
     };
 
+    func validateCampaignCurrency(currency : Text) {
+        let supported = Array.find<Text>(
+            SUPPORTED_CAMPAIGN_CURRENCIES,
+            func(candidate) { candidate == currency },
+        );
+        switch (supported) {
+            case null Debug.trap("Unsupported campaign currency");
+            case (?_) {};
+        };
+    };
+
     func validateCampaignInput(input : FundraisingCampaignInput) {
         validateRequiredText(input.title, MAX_CAMPAIGN_TITLE_SIZE, "Campaign title");
         validateRequiredText(input.shortDescription, MAX_CAMPAIGN_SHORT_DESCRIPTION_SIZE, "Campaign short description");
@@ -521,6 +544,7 @@ persistent actor {
         validateOptionalText(?input.impact, MAX_CAMPAIGN_METADATA_SIZE, "Campaign impact");
         validateOptionalText(input.creatorContact, MAX_CAMPAIGN_CREATOR_SIZE, "Campaign creator contact");
         validateMediaUrl(input.mediaUrl);
+        validateCampaignCurrency(input.currency);
         if (input.goalAmount == 0) {
             Debug.trap("Campaign goal amount must be greater than zero");
         };
@@ -611,6 +635,7 @@ persistent actor {
             creatorName = metadata.creatorName;
             creatorContact = metadata.creatorContact;
             communityId = campaign.communityId;
+            currency = getCampaignCurrency(campaign.id);
             goalAmount = campaign.goalAmount;
             deadlineNs = campaign.deadlineNs;
             state = campaign.state;
@@ -1083,6 +1108,7 @@ persistent actor {
 
         campaigns := natMap.put(campaigns, campaignId, campaign);
         campaignMetadataByCampaign := natMap.put(campaignMetadataByCampaign, campaignId, metadata);
+        campaignCurrencyByCampaign := natMap.put(campaignCurrencyByCampaign, campaignId, input.currency);
         contributionsByCampaign := natMap.put(contributionsByCampaign, campaignId, []);
         nextCampaignId += 1;
         campaignId;
@@ -1206,6 +1232,7 @@ persistent actor {
                 updatedNs = now;
             },
         );
+        campaignCurrencyByCampaign := natMap.put(campaignCurrencyByCampaign, campaignId, input.currency);
     };
 
     public shared ({ caller }) func archiveCampaign(communityId : Nat, campaignId : Nat) : async () {

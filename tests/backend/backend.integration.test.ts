@@ -302,6 +302,7 @@ describe('Amnesty backend regression baseline', () => {
       mediaUrl: ['https://example.org/campaign.jpg'] as [] | [string],
       creatorName: 'Campaign Creator',
       creatorContact: ['creator@example.org'] as [] | [string],
+      currency: 'USD',
       goalAmount: 15000n,
       deadlineNs: futureDeadlineNs,
       visibility: { community: null },
@@ -316,6 +317,7 @@ describe('Amnesty backend regression baseline', () => {
     const campaign = (await adminActor.getFundraisingCampaign(0n, campaignId))[0];
     expect(campaign.title).toBe('Protect education in Myanmar');
     expect(campaign.shortDescription).toBe('Help keep learning alive.');
+    expect(campaign.currency).toBe('USD');
     expect(campaign.contributions[0].contributorName).toBe('Admin Advocate');
     expect(campaign.updates[0].creatorName).toBe('Campaign Creator');
 
@@ -328,6 +330,7 @@ describe('Amnesty backend regression baseline', () => {
 
     const publicCampaign = (await anonymousActor.getPublicCampaign(token))[0];
     expect(publicCampaign.title).toBe('Protect education in Myanmar');
+    expect(publicCampaign.currency).toBe('USD');
     expect(publicCampaign.publicToken).toEqual([]);
     expect(publicCampaign.creator).toEqual([]);
     expect(publicCampaign.contributions[0].contributorName).toBe('Community supporter');

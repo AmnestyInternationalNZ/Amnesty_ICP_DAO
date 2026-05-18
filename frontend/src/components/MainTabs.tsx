@@ -46,6 +46,8 @@ export default function MainTabs() {
   const [activePage, setActivePage] = useState<AppPage>(() => readCurrentRoute().page);
   const [selectedCommunityId, setSelectedCommunityId] = useState<bigint | null>(() => readCurrentRoute().communityId);
   const [initialWorkspaceDocumentId, setInitialWorkspaceDocumentId] = useState<bigint | undefined>(() => readCurrentRoute().documentId);
+  const [initialProposalId, setInitialProposalId] = useState<bigint | undefined>(() => readCurrentRoute().proposalId);
+  const [initialProposalCreate, setInitialProposalCreate] = useState<boolean>(() => readCurrentRoute().proposalCreate ?? false);
   const [initialCampaignId, setInitialCampaignId] = useState<bigint | undefined>(() => readCurrentRoute().campaignId);
   const [initialCampaignCreate, setInitialCampaignCreate] = useState<boolean>(() => readCurrentRoute().campaignCreate ?? false);
   const [initialWorkspaceBoardId, setInitialWorkspaceBoardId] = useState<bigint | undefined>(() => readCurrentRoute().boardId);
@@ -61,7 +63,7 @@ export default function MainTabs() {
   const isLoadingShell = roleLoading || adminLoading || platformAdminsLoading;
   const roleLabel =
     platformRole === PlatformRole.platformAdmin ? t('common.roles.platformAdmin') : t('common.roles.viewer');
-  const isFullWidthPage = activePage === 'workspace' || activePage === 'boards' || activePage === 'calendar' || activePage === 'fundraise';
+  const isFullWidthPage = activePage === 'workspace' || activePage === 'boards' || activePage === 'calendar' || activePage === 'fundraise' || activePage === 'proposals';
 
   const applyRoute = (route: ParsedAppRoute) => {
     setActivePage(route.page);
@@ -71,6 +73,8 @@ export default function MainTabs() {
     } else if (route.page === 'hub') {
       setSelectedCommunityId(null);
     }
+    setInitialProposalId(route.page === 'proposals' ? route.proposalId : undefined);
+    setInitialProposalCreate(route.page === 'proposals' ? route.proposalCreate ?? false : false);
     setInitialCampaignId(route.page === 'fundraise' ? route.campaignId : undefined);
     setInitialCampaignCreate(route.page === 'fundraise' ? route.campaignCreate ?? false : false);
     setInitialWorkspaceDocumentId(route.page === 'workspace' ? route.documentId : undefined);
@@ -248,7 +252,20 @@ export default function MainTabs() {
             )}
 
             {activePage === 'proposals' && selectedCommunityId !== null && (
-              <CommunityProposalsPage communityId={selectedCommunityId} />
+              <CommunityProposalsPage
+                communityId={selectedCommunityId}
+                initialCreate={initialProposalCreate}
+                initialProposalId={initialProposalId}
+                onCreateProposalRoute={() => {
+                  setInitialProposalCreate(true);
+                  window.history.pushState({}, '', routePaths.newProposal(selectedCommunityId));
+                }}
+                onOpenProposalRoute={(proposalId) => {
+                  setInitialProposalCreate(false);
+                  setInitialProposalId(proposalId);
+                  window.history.pushState({}, '', routePaths.proposal(selectedCommunityId, proposalId));
+                }}
+              />
             )}
 
             {activePage === 'fundraise' && selectedCommunityId !== null && (

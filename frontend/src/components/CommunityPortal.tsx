@@ -216,12 +216,12 @@ export default function CommunityPortal({ communityId, onBack, onOpenFundraise }
                     </div>
                     <div className="min-w-[12rem]">
                       <strong className="block text-3xl text-amnesty-ink amnesty-heading">
-                        {formatCurrency(campaign.totalRaised, locale)}
+                        {formatCurrency(campaign.totalRaised, locale, campaign.currency)}
                       </strong>
                       <span className="text-sm text-[#5d6d77]">
                         {t('campaigns.card.progress', {
-                          raised: formatCurrency(campaign.totalRaised, locale),
-                          goal: formatCurrency(campaign.goalAmount, locale)
+                          raised: formatCurrency(campaign.totalRaised, locale, campaign.currency),
+                          goal: formatCurrency(campaign.goalAmount, locale, campaign.currency)
                         })}
                       </span>
                     </div>

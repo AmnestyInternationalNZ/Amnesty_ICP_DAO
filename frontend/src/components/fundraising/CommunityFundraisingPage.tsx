@@ -11,6 +11,7 @@ import {
   inputFromDraft,
   progressPercent,
   publicCampaignUrl,
+  SUPPORTED_FUNDRAISING_CURRENCIES,
   validateDraftStep,
   validateFullDraft,
   type FundraisingDraft,
@@ -201,7 +202,7 @@ export default function CommunityFundraisingPage({
               >
                 <span>{campaign.title}</span>
                 <small>
-                  {formatCurrency(campaign.totalRaised)} {tx(t, 'fundraising.sidebar.raised', 'raised')} · {formatNumber(progressPercent(campaign))}%
+                  {formatCurrency(campaign.totalRaised, undefined, campaign.currency)} {tx(t, 'fundraising.sidebar.raised', 'raised')} · {formatNumber(progressPercent(campaign))}%
                 </small>
               </button>
             ))
@@ -383,6 +384,15 @@ function CampaignWizard({
                 <Field label={tx(t, 'fundraising.fields.goal', 'Fundraising goal')} required>
                   <input min="1" type="number" value={draft.goalAmount} onChange={(event) => update('goalAmount', event.target.value)} />
                 </Field>
+                <Field label={tx(t, 'fundraising.fields.currency', 'Currency')} required>
+                  <select value={draft.currency} onChange={(event) => update('currency', event.target.value)}>
+                    {SUPPORTED_FUNDRAISING_CURRENCIES.map((currency) => (
+                      <option key={currency.code} value={currency.code}>
+                        {currency.code} · {currency.label}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
                 <Field label={tx(t, 'fundraising.fields.deadline', 'Campaign deadline')} required>
                   <input type="datetime-local" value={draft.deadlineLocal} onChange={(event) => update('deadlineLocal', event.target.value)} />
                 </Field>
@@ -506,8 +516,8 @@ function CampaignPreview({ draft }: { draft: FundraisingDraft }) {
         <span style={{ width: '0%' }} />
       </div>
       <div className="fundraising-preview-stats">
-        <span>{formatCurrency(0, locale)} {tx(t, 'fundraising.preview.raised', 'raised')}</span>
-        <span>{formatCurrency(goal, locale)} {tx(t, 'fundraising.preview.goal', 'goal')}</span>
+        <span>{formatCurrency(0, locale, draft.currency)} {tx(t, 'fundraising.preview.raised', 'raised')}</span>
+        <span>{formatCurrency(goal, locale, draft.currency)} {tx(t, 'fundraising.preview.goal', 'goal')}</span>
       </div>
       <button type="button" className="btn-primary rounded-full">{tx(t, 'fundraising.actions.donate', 'Donate')}</button>
       <small>{tx(t, 'fundraising.preview.createdBy', 'Campaign created by')} {draft.creatorName || tx(t, 'fundraising.common.you', 'You')}</small>
@@ -521,7 +531,8 @@ function ReviewList({ communityName, draft }: { communityName: string; draft: Fu
     <div className="fundraising-review-list">
       <div><span>Community</span><strong>{communityName}</strong></div>
       <div><span>Title</span><strong>{draft.title}</strong></div>
-      <div><span>Goal</span><strong>{formatCurrency(BigInt(Math.floor(Number(draft.goalAmount) || 0)), locale)}</strong></div>
+      <div><span>Currency</span><strong>{draft.currency}</strong></div>
+      <div><span>Goal</span><strong>{formatCurrency(BigInt(Math.floor(Number(draft.goalAmount) || 0)), locale, draft.currency)}</strong></div>
       <div><span>Deadline</span><strong>{formatDate(new Date(draft.deadlineLocal), locale)}</strong></div>
       <div><span>Visibility</span><strong>{draft.visibility === CampaignVisibility.publicCampaign ? 'Public' : 'Community'}</strong></div>
     </div>
@@ -738,7 +749,7 @@ function CampaignDetailView({
                 <div key={`${contribution.timestampNs.toString()}-${contribution.amount.toString()}`} className="fundraising-donation-row">
                   <span className="avatar-dot">{principalInitial(contribution.contributorName)}</span>
                   <strong>{contribution.contributorName}</strong>
-                  <span>{formatCurrency(contribution.amount, locale)}</span>
+                  <span>{formatCurrency(contribution.amount, locale, campaign.currency)}</span>
                   <small>{formatDateTime(Number(contribution.timestampNs / 1_000_000n), locale)}</small>
                 </div>
               ))}
@@ -793,13 +804,13 @@ function CampaignDetailView({
 
         <aside className="fundraising-right-rail">
           <section className="fundraising-progress-card">
-            <h2>{formatCurrency(campaign.totalRaised, locale)}</h2>
-            <p>{tx(t, 'fundraising.progress.raisedOf', 'raised of')} {formatCurrency(campaign.goalAmount, locale)} {tx(t, 'fundraising.progress.goal', 'goal')}</p>
+            <h2>{formatCurrency(campaign.totalRaised, locale, campaign.currency)}</h2>
+            <p>{tx(t, 'fundraising.progress.raisedOf', 'raised of')} {formatCurrency(campaign.goalAmount, locale, campaign.currency)} {tx(t, 'fundraising.progress.goal', 'goal')}</p>
             <div className="fundraising-progress-bar"><span style={{ width: `${progress}%` }} /></div>
             <div className="fundraising-stat-grid">
               <span><strong>{formatNumber(campaign.contributions.length, locale)}</strong>{tx(t, 'fundraising.progress.donations', 'donations')}</span>
               <span><strong>{formatNumber(daysLeft(campaign.deadlineNs), locale)}</strong>{tx(t, 'fundraising.progress.daysLeft', 'days left')}</span>
-              <span><strong>{formatCurrency(campaign.goalAmount, locale)}</strong>{tx(t, 'fundraising.progress.goal', 'goal')}</span>
+              <span><strong>{formatCurrency(campaign.goalAmount, locale, campaign.currency)}</strong>{tx(t, 'fundraising.progress.goal', 'goal')}</span>
             </div>
             <div className="fundraising-donate-row">
               <input disabled={!canDonate} type="number" min="1" value={donationAmount} onChange={(event) => setDonationAmount(event.target.value)} />
@@ -819,7 +830,7 @@ function CampaignDetailView({
               <div key={`${contribution.timestampNs.toString()}-${contribution.contributorName}`} className="fundraising-mini-donation">
                 <span className="avatar-dot">{principalInitial(contribution.contributorName)}</span>
                 <strong>{contribution.contributorName}</strong>
-                <span>{formatCurrency(contribution.amount, locale)}</span>
+                <span>{formatCurrency(contribution.amount, locale, campaign.currency)}</span>
               </div>
             ))}
             {campaign.contributions.length === 0 ? <p className="fundraising-muted">{tx(t, 'fundraising.donations.noneRecent', 'No donations yet.')}</p> : null}
@@ -873,6 +884,15 @@ function EditFields({ draft, onChange }: { draft: FundraisingDraft; onChange: (d
       </Field>
       <Field label="Goal" required>
         <input type="number" min="1" value={draft.goalAmount} onChange={(event) => update('goalAmount', event.target.value)} />
+      </Field>
+      <Field label="Currency" required>
+        <select value={draft.currency} onChange={(event) => update('currency', event.target.value)}>
+          {SUPPORTED_FUNDRAISING_CURRENCIES.map((currency) => (
+            <option key={currency.code} value={currency.code}>
+              {currency.code} · {currency.label}
+            </option>
+          ))}
+        </select>
       </Field>
       <Field label="Deadline" required>
         <input type="datetime-local" value={draft.deadlineLocal} onChange={(event) => update('deadlineLocal', event.target.value)} />

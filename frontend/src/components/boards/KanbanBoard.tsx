@@ -1,9 +1,11 @@
 import React, { useEffect, useId, useMemo, useState } from 'react';
 import {
   closestCenter,
+  type CollisionDetection,
   DndContext,
   DragOverlay,
   KeyboardSensor,
+  pointerWithin,
   PointerSensor,
   useSensor,
   useSensors,
@@ -64,6 +66,35 @@ function dragKind(event: DragEndEvent): 'card' | 'column' | undefined {
   const kind = event.active.data.current?.kind;
   return kind === 'card' || kind === 'column' ? kind : undefined;
 }
+
+export const kanbanCollisionDetection: CollisionDetection = (args) => {
+  const pointerCollisions = pointerWithin(args);
+  if (pointerCollisions.length === 0) {
+    return closestCenter(args);
+  }
+
+  const activeKind = args.active.data.current?.kind;
+  if (activeKind === 'card') {
+    const cardCollisions = pointerCollisions.filter((collision) => parseCardKey(String(collision.id)) !== undefined);
+    if (cardCollisions.length > 0) return cardCollisions;
+
+    const columnDropCollisions = pointerCollisions.filter((collision) => parseColumnDropKey(String(collision.id)) !== undefined);
+    if (columnDropCollisions.length > 0) return columnDropCollisions;
+
+    const columnCollisions = pointerCollisions.filter((collision) => parseColumnKey(String(collision.id)) !== undefined);
+    if (columnCollisions.length > 0) return columnCollisions;
+  }
+
+  if (activeKind === 'column') {
+    const columnCollisions = pointerCollisions.filter((collision) => parseColumnKey(String(collision.id)) !== undefined);
+    if (columnCollisions.length > 0) return columnCollisions;
+
+    const columnDropCollisions = pointerCollisions.filter((collision) => parseColumnDropKey(String(collision.id)) !== undefined);
+    if (columnDropCollisions.length > 0) return columnDropCollisions;
+  }
+
+  return pointerCollisions;
+};
 
 export function moveCardInBoard(board: CommunityBoardPayload, cardId: bigint, toColumnId: bigint, toIndex: number): CommunityBoardPayload {
   let fromColumnId: bigint | undefined;
@@ -442,7 +473,7 @@ export default function KanbanBoard({
 
       {message ? <p className="notice document-notice">{message}</p> : null}
 
-      <DndContext collisionDetection={closestCenter} onDragCancel={() => setActiveDragId(undefined)} onDragEnd={handleDragEnd} onDragStart={handleDragStart} sensors={sensors}>
+      <DndContext collisionDetection={kanbanCollisionDetection} onDragCancel={() => setActiveDragId(undefined)} onDragEnd={handleDragEnd} onDragStart={handleDragStart} sensors={sensors}>
         <SortableContext items={columnItems} strategy={horizontalListSortingStrategy}>
           <div aria-label={t('boards.board.columns')} className="kanban-columns">
             {board.columns.map((column) => (

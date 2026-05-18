@@ -126,6 +126,7 @@ export interface FundraisingCampaignInput {
     mediaUrl: string | null;
     creatorName: string;
     creatorContact: string | null;
+    currency: string;
     goalAmount: bigint;
     deadlineNs: bigint;
     visibility: CampaignVisibility;
@@ -145,6 +146,7 @@ export interface FundraisingCampaignPayload {
     creator: Principal | null;
     creatorName: string;
     creatorContact: string | null;
+    currency: string;
     communityId: bigint;
     goalAmount: bigint;
     deadlineNs: bigint;
@@ -365,6 +367,7 @@ function toFundraisingCampaignInput(value: FundraisingCampaignInput): CandidFund
         mediaUrl: toOptional(value.mediaUrl ?? undefined),
         creatorName: value.creatorName,
         creatorContact: toOptional(value.creatorContact ?? undefined),
+        currency: value.currency,
         goalAmount: value.goalAmount,
         deadlineNs: value.deadlineNs,
         visibility: toCampaignVisibility(value.visibility)
@@ -383,6 +386,7 @@ function fromFundraisingCampaignPayload(value: CandidFundraisingCampaignPayload)
         creator: fromOptional(value.creator, (creator) => creator),
         creatorName: value.creatorName,
         creatorContact: fromOptional(value.creatorContact, (contact) => contact),
+        currency: value.currency,
         communityId: value.communityId,
         goalAmount: value.goalAmount,
         deadlineNs: value.deadlineNs,

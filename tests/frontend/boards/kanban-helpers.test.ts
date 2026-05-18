@@ -79,6 +79,16 @@ describe('kanban helpers', () => {
     expect(findCardLocation(moved, 11n)).toEqual({ columnId: 2n, index: 1 });
   });
 
+  it('moves cards into empty columns', () => {
+    const source = board();
+    const moved = moveCardInBoard(source, 11n, 3n, 0);
+
+    expect(source.columns[2].cardIds).toEqual([]);
+    expect(moved.columns[0].cardIds).toEqual([10n]);
+    expect(moved.columns[2].cardIds).toEqual([11n]);
+    expect(findCardLocation(moved, 11n)).toEqual({ columnId: 3n, index: 0 });
+  });
+
   it('preserves UKU same-column downward card ordering after target index adjustment', () => {
     const source = board();
     source.columns[0].cardIds = [10n, 11n, 12n];

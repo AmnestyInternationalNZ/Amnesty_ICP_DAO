@@ -116,6 +116,7 @@ type FundraisingCampaignPayload =
    creator: opt principal;
    creatorContact: opt text;
    creatorName: text;
+   currency: text;
    deadlineNs: int;
    fundsUse: text;
    goalAmount: nat;
@@ -136,6 +137,7 @@ type FundraisingCampaignInput =
  record {
    creatorContact: opt text;
    creatorName: text;
+   currency: text;
    deadlineNs: int;
    fundsUse: text;
    goalAmount: nat;

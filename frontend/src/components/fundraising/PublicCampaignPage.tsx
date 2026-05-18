@@ -100,13 +100,13 @@ export default function PublicCampaignPage({ token }: { token: string }) {
 
             <aside className="public-fundraising-rail">
               <section className="fundraising-progress-card">
-                <h2>{formatCurrency(campaign.totalRaised, locale)}</h2>
-                <p>{tx(t, 'fundraising.progress.raisedOf', 'raised of')} {formatCurrency(campaign.goalAmount, locale)} {tx(t, 'fundraising.progress.goal', 'goal')}</p>
+                <h2>{formatCurrency(campaign.totalRaised, locale, campaign.currency)}</h2>
+                <p>{tx(t, 'fundraising.progress.raisedOf', 'raised of')} {formatCurrency(campaign.goalAmount, locale, campaign.currency)} {tx(t, 'fundraising.progress.goal', 'goal')}</p>
                 <div className="fundraising-progress-bar"><span style={{ width: `${progressPercent(campaign)}%` }} /></div>
                 <div className="fundraising-stat-grid">
                   <span><strong>{formatNumber(campaign.contributions.length, locale)}</strong>{tx(t, 'fundraising.progress.donations', 'donations')}</span>
                   <span><strong>{formatNumber(daysLeft(campaign.deadlineNs), locale)}</strong>{tx(t, 'fundraising.progress.daysLeft', 'days left')}</span>
-                  <span><strong>{formatCurrency(campaign.goalAmount, locale)}</strong>{tx(t, 'fundraising.progress.goal', 'goal')}</span>
+                  <span><strong>{formatCurrency(campaign.goalAmount, locale, campaign.currency)}</strong>{tx(t, 'fundraising.progress.goal', 'goal')}</span>
                 </div>
                 {identity ? (
                   <div className="fundraising-donate-row">
@@ -139,7 +139,7 @@ export default function PublicCampaignPage({ token }: { token: string }) {
                   <div key={`${contribution.timestampNs.toString()}-${contribution.amount.toString()}`} className="fundraising-mini-donation">
                     <span className="avatar-dot">{initial(contribution.contributorName)}</span>
                     <strong>{contribution.contributorName}</strong>
-                    <span>{formatCurrency(contribution.amount, locale)}</span>
+                    <span>{formatCurrency(contribution.amount, locale, campaign.currency)}</span>
                   </div>
                 ))}
                 {campaign.contributions.length === 0 ? <p className="fundraising-muted">{tx(t, 'fundraising.donations.noneRecent', 'No donations yet.')}</p> : null}

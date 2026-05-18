@@ -130,39 +130,40 @@ export default function KanbanColumn({
         ) : null}
       </header>
 
-      {canEdit ? (
-        <div className="kanban-add-card">
-          <input
-            aria-label={t('boards.column.addCardTo', { columnTitle: column.title })}
-            onChange={(event) => setNewCardTitle(event.currentTarget.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') addCard();
-            }}
-            placeholder={t('boards.actions.addCard')}
-            value={newCardTitle}
-          />
-          <button disabled={!newCardTitle.trim()} onClick={addCard} type="button">
-            <Plus size={15} />
-            {t('boards.actions.addCard')}
-          </button>
-        </div>
-      ) : null}
-
-      <div className="kanban-card-list" ref={setDropRef}>
-        <SortableContext items={cards.map((card) => cardKey(card.id))} strategy={verticalListSortingStrategy}>
-          {cards.map((card) => (
-            <KanbanCard
-              canEdit={canEdit}
-              card={card}
-              communityId={communityId}
-              documents={documents}
-              events={events}
-              key={card.id.toString()}
-              memberOptions={memberOptions}
-              onDelete={onDeleteCard}
-              onUpdate={onUpdateCard}
+      <div className="kanban-column-card-drop-zone" data-card-drop-target={isOver ? 'true' : undefined} ref={setDropRef}>
+        {canEdit ? (
+          <div className="kanban-add-card">
+            <input
+              aria-label={t('boards.column.addCardTo', { columnTitle: column.title })}
+              onChange={(event) => setNewCardTitle(event.currentTarget.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') addCard();
+              }}
+              placeholder={t('boards.actions.addCard')}
+              value={newCardTitle}
             />
-          ))}
+            <button disabled={!newCardTitle.trim()} onClick={addCard} type="button">
+              <Plus size={15} />
+              {t('boards.actions.addCard')}
+            </button>
+          </div>
+        ) : null}
+        <SortableContext items={cards.map((card) => cardKey(card.id))} strategy={verticalListSortingStrategy}>
+          <div className="kanban-card-list">
+            {cards.map((card) => (
+              <KanbanCard
+                canEdit={canEdit}
+                card={card}
+                communityId={communityId}
+                documents={documents}
+                events={events}
+                key={card.id.toString()}
+                memberOptions={memberOptions}
+                onDelete={onDeleteCard}
+                onUpdate={onUpdateCard}
+              />
+            ))}
+          </div>
         </SortableContext>
       </div>
     </section>

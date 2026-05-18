@@ -31,6 +31,7 @@ export default function ProposalCard({
   const [hasAlreadyVoted, setHasAlreadyVoted] = useState(false);
 
   const currentUserPrincipal = identity?.getPrincipal();
+  const creatorPrincipalText = proposal.creator.toString();
   
   // Memoize expensive computations
   const isOwnProposal = useMemo(() => {
@@ -105,16 +106,31 @@ export default function ProposalCard({
   };
 
   React.useEffect(() => {
+    let cancelled = false;
+
     const fetchCreatorName = async () => {
       try {
         const profile = await getUserProfile.mutateAsync(proposal.creator);
-        setCreatorName(profile?.name || t('proposals.card.creatorUnknown').toUpperCase());
+        if (!cancelled) {
+          setCreatorName(profile?.name || t('proposals.card.creatorUnknown').toUpperCase());
+        }
       } catch (error) {
-        setCreatorName(t('proposals.card.creatorUnknown').toUpperCase());
+        if (!cancelled) {
+          setCreatorName(t('proposals.card.creatorUnknown').toUpperCase());
+        }
       }
     };
+
+    setCreatorName('');
     fetchCreatorName();
-  }, [proposal.creator, getUserProfile, t]);
+
+    return () => {
+      cancelled = true;
+    };
+    // Do not depend on the React Query mutation object here: mutation state changes
+    // after mutateAsync resolves, which previously retriggered this effect forever.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [creatorPrincipalText, t]);
 
   const handleVote = async (voteYes: boolean) => {
     const config = getVoteButtonConfig(voteYes ? 'yes' : 'no');
