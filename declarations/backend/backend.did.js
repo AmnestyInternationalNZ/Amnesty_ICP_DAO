@@ -47,13 +47,13 @@ export const idlFactory = ({ IDL }) => {
     'impact' : IDL.Text,
     'title' : IDL.Text,
     'creatorContact' : IDL.Opt(IDL.Text),
-    'currency' : IDL.Text,
     'goalAmount' : IDL.Nat,
     'deadlineNs' : IDL.Int,
     'creatorName' : IDL.Text,
     'mediaUrl' : IDL.Opt(IDL.Text),
     'story' : IDL.Text,
     'shortDescription' : IDL.Text,
+    'currency' : IDL.Text,
     'fundsUse' : IDL.Text,
     'visibility' : CampaignVisibility,
   });
@@ -65,6 +65,11 @@ export const idlFactory = ({ IDL }) => {
   const CommunityRole = IDL.Variant({
     'member' : IDL.Null,
     'communityAdmin' : IDL.Null,
+  });
+  const RoleChangeProposalInput = IDL.Record({
+    'role' : IDL.Opt(CommunityRole),
+    'target' : IDL.Principal,
+    'reason' : IDL.Text,
   });
   const PlatformRole = IDL.Variant({ 'platformAdmin' : IDL.Null });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
@@ -192,7 +197,6 @@ export const idlFactory = ({ IDL }) => {
     'title' : IDL.Text,
     'creator' : IDL.Opt(IDL.Principal),
     'creatorContact' : IDL.Opt(IDL.Text),
-    'currency' : IDL.Text,
     'goalAmount' : IDL.Nat,
     'communityId' : IDL.Nat,
     'contributions' : IDL.Vec(CampaignContributionPayload),
@@ -207,11 +211,27 @@ export const idlFactory = ({ IDL }) => {
     'state' : CampaignState,
     'story' : IDL.Text,
     'shortDescription' : IDL.Text,
+    'currency' : IDL.Text,
     'updates' : IDL.Vec(CampaignUpdatePayload),
     'fundsUse' : IDL.Text,
     'canContribute' : IDL.Bool,
     'visibility' : CampaignVisibility,
     'archived' : IDL.Bool,
+  });
+  const ProposalLinkedResource = IDL.Variant({
+    'campaign' : IDL.Nat,
+    'communityRole' : IDL.Principal,
+  });
+  const ProposalBody = IDL.Variant({
+    'fundraising' : FundraisingCampaignInput,
+    'roleChange' : RoleChangeProposalInput,
+    'motion' : IDL.Record({ 'description' : IDL.Text }),
+  });
+  const ProposalExecutionState = IDL.Variant({
+    'pending' : IDL.Null,
+    'applied' : IDL.Null,
+    'notApplicable' : IDL.Null,
+    'failed' : IDL.Text,
   });
   const ProposalState = IDL.Variant({
     'active' : IDL.Null,
@@ -223,10 +243,13 @@ export const idlFactory = ({ IDL }) => {
     'id' : IDL.Nat,
     'no' : IDL.Nat,
     'yes' : IDL.Nat,
+    'linkedResource' : IDL.Opt(ProposalLinkedResource),
     'title' : IDL.Text,
     'creator' : IDL.Principal,
     'communityId' : IDL.Nat,
     'startNs' : IDL.Int,
+    'body' : ProposalBody,
+    'executionState' : ProposalExecutionState,
     'description' : IDL.Text,
     'endNs' : IDL.Int,
     'passPct' : IDL.Nat,
@@ -333,9 +356,29 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat],
         [],
       ),
+    'createFundraisingProposal' : IDL.Func(
+        [IDL.Nat, FundraisingCampaignInput, IDL.Opt(ProposalOverrides)],
+        [IDL.Nat],
+        [],
+      ),
+    'createMotionProposal' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Opt(ProposalOverrides)],
+        [IDL.Nat],
+        [],
+      ),
     'createProposal' : IDL.Func(
         [IDL.Nat, IDL.Text, IDL.Text, IDL.Opt(ProposalOverrides)],
         [],
+        [],
+      ),
+    'createRoleChangeProposal' : IDL.Func(
+        [
+          IDL.Nat,
+          IDL.Text,
+          RoleChangeProposalInput,
+          IDL.Opt(ProposalOverrides),
+        ],
+        [IDL.Nat],
         [],
       ),
     'deleteCommunityBoardCard' : IDL.Func([IDL.Nat, IDL.Nat, IDL.Nat], [], []),

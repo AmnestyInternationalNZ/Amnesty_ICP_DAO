@@ -8,6 +8,9 @@ type ProposalOverridesArg = [] | [{
   passPct: [] | [bigint];
 }];
 
+const MIN_PROPOSAL_WINDOW_NS = 5n * 60n * 1_000_000_000n;
+const EXPIRED_PROPOSAL_ADVANCE_MS = 5 * 60 * 1000 + 1;
+
 describe('Amnesty backend regression baseline', () => {
   let fixture: BackendFixture;
 
@@ -129,7 +132,7 @@ describe('Amnesty backend regression baseline', () => {
     );
 
     const overrides: ProposalOverridesArg = [{
-      windowNs: [1_000_000n],
+      windowNs: [MIN_PROPOSAL_WINDOW_NS],
       quorum: [1n],
       passPct: [50n],
     }];
@@ -169,7 +172,7 @@ describe('Amnesty backend regression baseline', () => {
     );
 
     const passingOverrides: ProposalOverridesArg = [{
-      windowNs: [1_000_000n],
+      windowNs: [MIN_PROPOSAL_WINDOW_NS],
       quorum: [2n],
       passPct: [60n],
     }];
@@ -190,7 +193,7 @@ describe('Amnesty backend regression baseline', () => {
     );
 
     await adminActor.voteOnProposal(0n, true);
-    await fixture.pic.advanceTime(2);
+    await fixture.pic.advanceTime(EXPIRED_PROPOSAL_ADVANCE_MS);
     await fixture.pic.tick();
     await memberActor.finalizeProposal(0n);
 
@@ -199,7 +202,7 @@ describe('Amnesty backend regression baseline', () => {
     });
 
     const failingOverrides: ProposalOverridesArg = [{
-      windowNs: [1_000_000n],
+      windowNs: [MIN_PROPOSAL_WINDOW_NS],
       quorum: [2n],
       passPct: [75n],
     }];
@@ -211,7 +214,7 @@ describe('Amnesty backend regression baseline', () => {
       failingOverrides,
     );
     await memberActor.voteOnProposal(1n, false);
-    await fixture.pic.advanceTime(2);
+    await fixture.pic.advanceTime(EXPIRED_PROPOSAL_ADVANCE_MS);
     await fixture.pic.tick();
     await adminActor.finalizeProposal(1n);
 
@@ -220,7 +223,7 @@ describe('Amnesty backend regression baseline', () => {
     });
   });
 
-  it('tracks campaign contributions and only finalizes once the goal is reached', async () => {
+  it('tracks admin-launched campaign contributions and only finalizes once the goal is reached', async () => {
     const adminActor = actorFor(fixture, fixture.adminIdentity);
     const memberActor = actorFor(fixture, fixture.memberIdentity);
     const outsiderActor = actorFor(fixture, fixture.outsiderIdentity);
@@ -236,7 +239,17 @@ describe('Amnesty backend regression baseline', () => {
     const currentTimeMs = await fixture.pic.getTime();
     const futureDeadlineNs = BigInt(currentTimeMs + 60_000) * 1_000_000n;
 
-    await memberActor.createCampaign(
+    await expect(
+      memberActor.createCampaign(
+        0n,
+        'Member-launched campaign',
+        'Members should use fundraising proposals.',
+        100n,
+        futureDeadlineNs,
+      ),
+    ).rejects.toThrow(/Only community admins or platform admins can launch campaigns directly/);
+
+    await adminActor.createCampaign(
       0n,
       'Fund campaign materials',
       'Print materials for the next action.',
@@ -253,7 +266,7 @@ describe('Amnesty backend regression baseline', () => {
 
     expect((await memberActor.getCampaignById(0n))[0].totalRaised).toBe(70n);
     expect(await memberActor.canFinalizeCampaign(0n)).toBe(false);
-    await expect(memberActor.finalizeCampaign(0n)).rejects.toThrow(
+    await expect(adminActor.finalizeCampaign(0n)).rejects.toThrow(
       /Campaign goal has not been reached yet/,
     );
 
@@ -262,19 +275,19 @@ describe('Amnesty backend regression baseline', () => {
     const contributions = await adminActor.getCampaignContributions(0n);
     expect(contributions).toHaveLength(3);
     expect((await adminActor.getCampaignById(0n))[0].totalRaised).toBe(100n);
-    expect(await memberActor.canFinalizeCampaign(0n)).toBe(true);
+    expect(await adminActor.canFinalizeCampaign(0n)).toBe(true);
 
-    await expect(adminActor.finalizeCampaign(0n)).rejects.toThrow(
+    await expect(memberActor.finalizeCampaign(0n)).rejects.toThrow(
       /Only the campaign creator can finalize the campaign/,
     );
 
-    await memberActor.finalizeCampaign(0n);
+    await adminActor.finalizeCampaign(0n);
     expect((await memberActor.getCampaignById(0n))[0].state).toEqual({
       successful: null,
     });
   });
 
-  it('supports routed fundraising metadata and privacy-safe public campaign links', async () => {
+  it('launches fundraising campaigns through passed proposals and keeps public links privacy-safe', async () => {
     const adminActor = actorFor(fixture, fixture.adminIdentity);
     const memberActor = actorFor(fixture, fixture.memberIdentity);
     const outsiderActor = actorFor(fixture, fixture.outsiderIdentity);
@@ -308,8 +321,39 @@ describe('Amnesty backend regression baseline', () => {
       visibility: { community: null },
     };
 
-    const campaignId = await memberActor.createFundraisingCampaign(0n, input);
+    await expect(
+      memberActor.createFundraisingCampaign(0n, input),
+    ).rejects.toThrow(/Only community admins or platform admins can launch campaigns directly/);
+
+    const overrides: ProposalOverridesArg = [{
+      windowNs: [MIN_PROPOSAL_WINDOW_NS],
+      quorum: [1n],
+      passPct: [50n],
+    }];
+
+    const proposalId = await memberActor.createFundraisingProposal(0n, input, overrides);
+    expect(proposalId).toBe(0n);
+
+    const createdProposal = (await adminActor.getProposalById(proposalId))[0];
+    expect(createdProposal.body).toEqual({ fundraising: input });
+    expect(createdProposal.executionState).toEqual({ pending: null });
+
+    await memberActor.voteOnProposal(proposalId, true);
+    await fixture.pic.advanceTime(EXPIRED_PROPOSAL_ADVANCE_MS);
+    await fixture.pic.tick();
+    await memberActor.finalizeProposal(proposalId);
+    await memberActor.finalizeProposal(proposalId);
+
+    const finalizedProposal = (await adminActor.getProposalById(proposalId))[0];
+    expect(finalizedProposal.state).toEqual({ passed: null });
+    expect(finalizedProposal.executionState).toEqual({ applied: null });
+    expect(finalizedProposal.linkedResource).toEqual([{ campaign: 0n }]);
+
+    const campaignId = finalizedProposal.linkedResource[0] && 'campaign' in finalizedProposal.linkedResource[0]
+      ? finalizedProposal.linkedResource[0].campaign
+      : -1n;
     expect(campaignId).toBe(0n);
+    expect(await memberActor.listFundraisingCampaigns(0n)).toHaveLength(1);
 
     await adminActor.contributeToCampaign(campaignId, 100n);
     await memberActor.addCampaignUpdate(campaignId, 'First update.');
@@ -356,6 +400,85 @@ describe('Amnesty backend regression baseline', () => {
 
     await memberActor.setCampaignPublicLink(0n, campaignId, []);
     expect(await anonymousActor.getPublicCampaign(token)).toEqual([]);
+  });
+
+  it('applies role-change proposals and reports failed executable side effects', async () => {
+    const adminActor = actorFor(fixture, fixture.adminIdentity);
+    const memberActor = actorFor(fixture, fixture.memberIdentity);
+    const outsiderActor = actorFor(fixture, fixture.outsiderIdentity);
+
+    await adminActor.bootstrapPlatformAdmin();
+    await adminActor.createCommunity('Role Proposal Community', 'Roles by vote.');
+    await adminActor.setCommunityRole(
+      0n,
+      candidPrincipal(fixture.memberIdentity),
+      [{ member: null }],
+    );
+
+    const overrides: ProposalOverridesArg = [{
+      windowNs: [MIN_PROPOSAL_WINDOW_NS],
+      quorum: [1n],
+      passPct: [50n],
+    }];
+
+    const removeLastAdminProposalId = await memberActor.createRoleChangeProposal(
+      0n,
+      'Remove final admin role',
+      {
+        target: candidPrincipal(fixture.adminIdentity),
+        role: [],
+        reason: 'This should fail because communities need an admin.',
+      },
+      overrides,
+    );
+
+    await memberActor.voteOnProposal(removeLastAdminProposalId, true);
+    await fixture.pic.advanceTime(EXPIRED_PROPOSAL_ADVANCE_MS);
+    await fixture.pic.tick();
+    await memberActor.finalizeProposal(removeLastAdminProposalId);
+
+    const failedExecutionProposal = (await adminActor.getProposalById(removeLastAdminProposalId))[0];
+    expect(failedExecutionProposal.state).toEqual({ passed: null });
+    expect(failedExecutionProposal.executionState).toEqual({
+      failed: 'Cannot remove the last community admin',
+    });
+    expect(await adminActor.getCallerCommunityRole(0n)).toEqual([{ communityAdmin: null }]);
+
+    const promoteProposalId = await memberActor.createRoleChangeProposal(
+      0n,
+      'Promote a new local admin',
+      {
+        target: candidPrincipal(fixture.memberIdentity),
+        role: [{ communityAdmin: null }],
+        reason: 'The community should have a second admin.',
+      },
+      overrides,
+    );
+
+    await memberActor.voteOnProposal(promoteProposalId, true);
+    await fixture.pic.advanceTime(EXPIRED_PROPOSAL_ADVANCE_MS);
+    await fixture.pic.tick();
+    await adminActor.finalizeProposal(promoteProposalId);
+
+    expect(await memberActor.getCallerCommunityRole(0n)).toEqual([{ communityAdmin: null }]);
+    expect((await adminActor.getProposalById(promoteProposalId))[0]).toMatchObject({
+      state: { passed: null },
+      executionState: { applied: null },
+      linkedResource: [{ communityRole: candidPrincipal(fixture.memberIdentity) }],
+    });
+
+    await expect(
+      outsiderActor.createRoleChangeProposal(
+        0n,
+        'Outsider role change',
+        {
+          target: candidPrincipal(fixture.outsiderIdentity),
+          role: [{ member: null }],
+          reason: 'Outsiders cannot create role proposals.',
+        },
+        overrides,
+      ),
+    ).rejects.toThrow(/Only community participants can create proposals/);
   });
 
   it('enforces leaveCommunity rules for members, viewers, and community admins', async () => {

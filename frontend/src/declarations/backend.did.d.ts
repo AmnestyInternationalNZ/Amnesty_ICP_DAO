@@ -155,13 +155,13 @@ export interface FundraisingCampaignInput {
   'impact' : string,
   'title' : string,
   'creatorContact' : [] | [string],
-  'currency' : string,
   'goalAmount' : bigint,
   'deadlineNs' : bigint,
   'creatorName' : string,
   'mediaUrl' : [] | [string],
   'story' : string,
   'shortDescription' : string,
+  'currency' : string,
   'fundsUse' : string,
   'visibility' : CampaignVisibility,
 }
@@ -172,7 +172,6 @@ export interface FundraisingCampaignPayload {
   'title' : string,
   'creator' : [] | [Principal],
   'creatorContact' : [] | [string],
-  'currency' : string,
   'goalAmount' : bigint,
   'communityId' : bigint,
   'contributions' : Array<CampaignContributionPayload>,
@@ -187,6 +186,7 @@ export interface FundraisingCampaignPayload {
   'state' : CampaignState,
   'story' : string,
   'shortDescription' : string,
+  'currency' : string,
   'updates' : Array<CampaignUpdatePayload>,
   'fundsUse' : string,
   'canContribute' : boolean,
@@ -224,16 +224,28 @@ export interface Proposal {
   'id' : bigint,
   'no' : bigint,
   'yes' : bigint,
+  'linkedResource' : [] | [ProposalLinkedResource],
   'title' : string,
   'creator' : Principal,
   'communityId' : bigint,
   'startNs' : bigint,
+  'body' : ProposalBody,
+  'executionState' : ProposalExecutionState,
   'description' : string,
   'endNs' : bigint,
   'passPct' : bigint,
   'state' : ProposalState,
   'quorum' : bigint,
 }
+export type ProposalBody = { 'fundraising' : FundraisingCampaignInput } |
+  { 'roleChange' : RoleChangeProposalInput } |
+  { 'motion' : { 'description' : string } };
+export type ProposalExecutionState = { 'pending' : null } |
+  { 'applied' : null } |
+  { 'notApplicable' : null } |
+  { 'failed' : string };
+export type ProposalLinkedResource = { 'campaign' : bigint } |
+  { 'communityRole' : Principal };
 export interface ProposalOverrides {
   'passPct' : [] | [bigint],
   'windowNs' : [] | [bigint],
@@ -243,6 +255,11 @@ export type ProposalState = { 'active' : null } |
   { 'pendingFinalization' : null } |
   { 'failed' : null } |
   { 'passed' : null };
+export interface RoleChangeProposalInput {
+  'role' : [] | [CommunityRole],
+  'target' : Principal,
+  'reason' : string,
+}
 export interface ShoppingItem {
   'productName' : string,
   'currency' : string,
@@ -313,9 +330,21 @@ export interface _SERVICE {
     [bigint, FundraisingCampaignInput],
     bigint
   >,
+  'createFundraisingProposal' : ActorMethod<
+    [bigint, FundraisingCampaignInput, [] | [ProposalOverrides]],
+    bigint
+  >,
+  'createMotionProposal' : ActorMethod<
+    [bigint, string, string, [] | [ProposalOverrides]],
+    bigint
+  >,
   'createProposal' : ActorMethod<
     [bigint, string, string, [] | [ProposalOverrides]],
     undefined
+  >,
+  'createRoleChangeProposal' : ActorMethod<
+    [bigint, string, RoleChangeProposalInput, [] | [ProposalOverrides]],
+    bigint
   >,
   'deleteCommunityBoardCard' : ActorMethod<[bigint, bigint, bigint], undefined>,
   'deleteCommunityBoardColumn' : ActorMethod<

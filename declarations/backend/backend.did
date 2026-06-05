@@ -42,6 +42,12 @@ type ShoppingItem =
    productName: text;
    quantity: nat;
  };
+type RoleChangeProposalInput =
+ record {
+   reason: text;
+   role: opt CommunityRole;
+   target: principal;
+ };
 type ProposalState = 
  variant {
    active;
@@ -55,13 +61,34 @@ type ProposalOverrides =
    quorum: opt nat;
    windowNs: opt nat;
  };
+type ProposalLinkedResource =
+ variant {
+   campaign: nat;
+   communityRole: principal;
+ };
+type ProposalExecutionState =
+ variant {
+   applied;
+   failed: text;
+   notApplicable;
+   pending;
+ };
+type ProposalBody =
+ variant {
+   fundraising: FundraisingCampaignInput;
+   motion: record {description: text;};
+   roleChange: RoleChangeProposalInput;
+ };
 type Proposal = 
  record {
+   body: ProposalBody;
    communityId: nat;
    creator: principal;
    description: text;
    endNs: int;
+   executionState: ProposalExecutionState;
    id: nat;
+   linkedResource: opt ProposalLinkedResource;
    no: nat;
    passPct: nat;
    quorum: nat;
@@ -347,8 +374,14 @@ service : {
    (nat);
   createFundraisingCampaign: (communityId: nat, input:
    FundraisingCampaignInput) -> (nat);
+  createFundraisingProposal: (communityId: nat, input:
+   FundraisingCampaignInput, overrides: opt ProposalOverrides) -> (nat);
+  createMotionProposal: (communityId: nat, title: text, description:
+   text, overrides: opt ProposalOverrides) -> (nat);
   createProposal: (communityId: nat, title: text, description: text,
    overrides: opt ProposalOverrides) -> ();
+  createRoleChangeProposal: (communityId: nat, title: text, input:
+   RoleChangeProposalInput, overrides: opt ProposalOverrides) -> (nat);
   deleteCommunityBoardCard: (communityId: nat, boardId: nat, cardId: 
    nat) -> ();
   deleteCommunityBoardColumn: (communityId: nat, boardId: nat, columnId:

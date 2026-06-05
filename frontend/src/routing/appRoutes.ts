@@ -1,4 +1,5 @@
 export type AppPage = 'hub' | 'community' | 'proposals' | 'fundraise' | 'workspace' | 'boards' | 'calendar' | 'admin' | 'profile' | 'publicBoard' | 'publicEvent' | 'publicCampaign';
+export type ProposalCreateType = 'motion' | 'fundraising' | 'roleChange';
 
 export interface ParsedAppRoute {
   page: AppPage;
@@ -6,6 +7,7 @@ export interface ParsedAppRoute {
   documentId?: bigint;
   proposalId?: bigint;
   proposalCreate?: boolean;
+  proposalCreateType?: ProposalCreateType;
   campaignId?: bigint;
   campaignCreate?: boolean;
   boardId?: bigint;
@@ -39,6 +41,17 @@ function splitPath(pathname: string): string[] {
     });
 }
 
+function proposalCreateTypeToPath(type: ProposalCreateType): string {
+  return type === 'roleChange' ? 'role-change' : type;
+}
+
+function parseProposalCreateType(value: string | undefined): ProposalCreateType | undefined {
+  if (value === 'motion') return 'motion';
+  if (value === 'fundraising') return 'fundraising';
+  if (value === 'role-change' || value === 'roleChange') return 'roleChange';
+  return undefined;
+}
+
 export const routePaths = {
   hub: () => '/',
   profile: () => '/profile',
@@ -46,10 +59,13 @@ export const routePaths = {
   community: (communityId: bigint) => `/communities/${communityId.toString()}`,
   proposals: (communityId: bigint) => `/communities/${communityId.toString()}/proposals`,
   newProposal: (communityId: bigint) => `/communities/${communityId.toString()}/proposals/new`,
+  newProposalOfType: (communityId: bigint, type: ProposalCreateType) =>
+    `/communities/${communityId.toString()}/proposals/new/${proposalCreateTypeToPath(type)}`,
   proposal: (communityId: bigint, proposalId: bigint) =>
     `/communities/${communityId.toString()}/proposals/${proposalId.toString()}`,
   fundraise: (communityId: bigint) => `/communities/${communityId.toString()}/fundraise`,
-  newCampaign: (communityId: bigint) => `/communities/${communityId.toString()}/fundraise/new`,
+  newCampaign: (communityId: bigint) =>
+    `/communities/${communityId.toString()}/proposals/new/fundraising`,
   campaign: (communityId: bigint, campaignId: bigint) =>
     `/communities/${communityId.toString()}/fundraise/campaigns/${campaignId.toString()}`,
   publicCampaign: (token: string) => `/campaigns/public/${encodeURIComponent(token)}`,
@@ -96,7 +112,14 @@ export function parseAppPath(pathname: string, legacyCommunityId: bigint | null 
   if (communityId === undefined) return { page: 'hub', communityId: null };
   if (segments.length === 2) return { page: 'community', communityId };
   if (segments[2] === 'proposals') {
-    if (segments[3] === 'new') return { page: 'proposals', communityId, proposalCreate: true };
+    if (segments[3] === 'new') {
+      return {
+        page: 'proposals',
+        communityId,
+        proposalCreate: true,
+        proposalCreateType: parseProposalCreateType(segments[4]),
+      };
+    }
     const proposalId = segments[3] === 'proposal'
       ? parseBigIntSegment(segments[4])
       : parseBigIntSegment(segments[3]);
@@ -105,7 +128,15 @@ export function parseAppPath(pathname: string, legacyCommunityId: bigint | null 
       : { page: 'proposals', communityId, proposalId };
   }
   if (segments[2] === 'fundraise' || segments[2] === 'campaigns') {
-    if (segments[3] === 'new') return { page: 'fundraise', communityId, campaignCreate: true };
+    if (segments[3] === 'new') {
+      return {
+        page: 'proposals',
+        communityId,
+        proposalCreate: true,
+        proposalCreateType: 'fundraising',
+        canonicalPath: routePaths.newProposalOfType(communityId, 'fundraising'),
+      };
+    }
     const campaignId = segments[3] === 'campaigns' || segments[3] === 'campaign'
       ? parseBigIntSegment(segments[4])
       : parseBigIntSegment(segments[3]);

@@ -21,6 +21,7 @@ import {
     Proposal,
     ProposalOverrides,
     Contribution,
+    RoleChangeProposalInput,
     UserProfile,
     WorkspaceRole
 } from '../backend';
@@ -340,6 +341,66 @@ export function useCreateProposal() {
     });
 }
 
+export function useCreateMotionProposal() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, title, description, overrides }: {
+            communityId: bigint;
+            title: string;
+            description: string;
+            overrides?: ProposalOverrides | null;
+        }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.createMotionProposal(communityId, title, description, overrides ?? null);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['proposals', variables.communityId.toString()] });
+        }
+    });
+}
+
+export function useCreateFundraisingProposal() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, input, overrides }: {
+            communityId: bigint;
+            input: FundraisingCampaignInput;
+            overrides?: ProposalOverrides | null;
+        }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.createFundraisingProposal(communityId, input, overrides ?? null);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['proposals', variables.communityId.toString()] });
+        }
+    });
+}
+
+export function useCreateRoleChangeProposal() {
+    const { actor } = useActor();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ communityId, title, input, overrides }: {
+            communityId: bigint;
+            title: string;
+            input: RoleChangeProposalInput;
+            overrides?: ProposalOverrides | null;
+        }) => {
+            if (!actor) throw new Error('Actor not available');
+            return actor.createRoleChangeProposal(communityId, title, input, overrides ?? null);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['proposals', variables.communityId.toString()] });
+            queryClient.invalidateQueries({ queryKey: ['communityMembers', variables.communityId.toString()] });
+        }
+    });
+}
+
 export function useListProposalsByCommunity(communityId: bigint) {
     const { actor, enabled } = useAuthedActor();
 
@@ -367,6 +428,11 @@ export function useVoteOnProposal() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['proposals'] });
             queryClient.invalidateQueries({ queryKey: ['proposal'] });
+            queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+            queryClient.invalidateQueries({ queryKey: ['fundraisingCampaigns'] });
+            queryClient.invalidateQueries({ queryKey: ['fundraisingCampaign'] });
+            queryClient.invalidateQueries({ queryKey: ['communityMembers'] });
+            queryClient.invalidateQueries({ queryKey: ['communityAccess'] });
         }
     });
 }

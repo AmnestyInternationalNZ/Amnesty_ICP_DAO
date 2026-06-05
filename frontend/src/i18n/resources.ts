@@ -21,7 +21,7 @@ export type DeepPartial<T> = T extends string
         ? { [K in keyof T]?: DeepPartial<T[K]> }
         : T;
 
-const baseLocaleCatalogs: Record<SupportedLocale, TranslationCatalog> = {
+const baseLocaleCatalogs: Record<SupportedLocale, DeepPartial<TranslationCatalog>> = {
     am,
     ar,
     en,
@@ -71,7 +71,11 @@ function mergeCatalog<T>(base: T, override: DeepPartial<T> | undefined): T {
 export const translationCatalogs = SUPPORTED_LOCALES.reduce(
     (catalogs, locale) => {
         const baseCatalog = baseLocaleCatalogs[locale] ?? baseLocaleCatalogs[DEFAULT_LOCALE];
-        catalogs[locale] = mergeCatalog(baseCatalog, reviewedLocaleOverrides[locale]);
+        const catalogWithEnglishFallback = mergeCatalog(
+            baseLocaleCatalogs[DEFAULT_LOCALE] as TranslationCatalog,
+            baseCatalog
+        );
+        catalogs[locale] = mergeCatalog(catalogWithEnglishFallback, reviewedLocaleOverrides[locale]);
         return catalogs;
     },
     {} as Record<SupportedLocale, TranslationCatalog>

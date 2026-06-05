@@ -1,18 +1,16 @@
-import { Copy, ExternalLink, HeartHandshake, Image as ImageIcon, Mail, Megaphone, Pencil, Plus, Save, Share2, Trash2, Users } from 'lucide-react';
+import { Copy, ExternalLink, HeartHandshake, Mail, Megaphone, Pencil, Plus, Save, Share2, Trash2, Users } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CampaignState, CampaignVisibility, type FundraisingCampaignPayload } from '../../backend';
 import {
   createCampaignShareToken,
-  createEmptyFundraisingDraft,
   daysLeft,
   draftFromCampaign,
   inputFromDraft,
   progressPercent,
   publicCampaignUrl,
   SUPPORTED_FUNDRAISING_CURRENCIES,
-  validateDraftStep,
   validateFullDraft,
   type FundraisingDraft,
 } from '../../fundraising/fundraisingApi';
@@ -23,7 +21,6 @@ import {
   useAddCampaignUpdate,
   useArchiveCampaign,
   useContributeToCampaign,
-  useCreateFundraisingCampaign,
   useGetCommunityAccess,
   useGetCommunityById,
   useGetFundraisingCampaign,
@@ -31,7 +28,6 @@ import {
   useSetCampaignPublicLink,
   useUpdateFundraisingCampaign,
 } from '../../hooks/useQueries';
-import { useInternetIdentity } from '../../hooks/useInternetIdentity';
 import MarkdownContent from '../MarkdownContent';
 import LoadingSpinner from '../LoadingSpinner';
 
@@ -41,37 +37,6 @@ interface CommunityFundraisingPageProps {
   initialCreate?: boolean;
   onCreateCampaignRoute?: () => void;
   onOpenCampaignRoute?: (campaignId: bigint) => void;
-}
-
-const steps = [
-  { label: 'Campaign details', body: 'Name, purpose and story' },
-  { label: 'Goal and timeline', body: 'Set your target and duration' },
-  { label: 'Funds and impact', body: 'How funds will be used' },
-  { label: 'Media', body: 'Add images and videos' },
-  { label: 'About you', body: 'Your details and campaign info' },
-  { label: 'Review', body: 'Check and launch' },
-];
-
-function draftStorageKey(communityId: bigint, principal: string | null) {
-  return `amnesty.fundraisingDraft.${principal ?? 'anonymous'}.${communityId.toString()}`;
-}
-
-function readDraft(communityId: bigint, principal: string | null, creatorName: string): FundraisingDraft {
-  const fallback = createEmptyFundraisingDraft(creatorName);
-  try {
-    const value = window.localStorage.getItem(draftStorageKey(communityId, principal));
-    return value ? { ...fallback, ...JSON.parse(value) } : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function writeDraft(communityId: bigint, principal: string | null, draft: FundraisingDraft) {
-  window.localStorage.setItem(draftStorageKey(communityId, principal), JSON.stringify(draft));
-}
-
-function clearDraft(communityId: bigint, principal: string | null) {
-  window.localStorage.removeItem(draftStorageKey(communityId, principal));
 }
 
 function principalInitial(label: string) {
@@ -99,13 +64,8 @@ export default function CommunityFundraisingPage({
   onOpenCampaignRoute,
 }: CommunityFundraisingPageProps) {
   const { t } = useTranslation();
-  const { identity } = useInternetIdentity();
-  const currentPrincipal = identity?.getPrincipal().toText() ?? null;
-  const profileName = '';
-  const [mode, setMode] = useState<'campaign' | 'create'>(initialCreate ? 'create' : 'campaign');
   const [selectedCampaignId, setSelectedCampaignId] = useState<bigint | null>(initialCampaignId ?? null);
   const [search, setSearch] = useState('');
-  const [draft, setDraft] = useState<FundraisingDraft>(() => readDraft(communityId, currentPrincipal, profileName));
 
   const community = useGetCommunityById(communityId);
   const access = useGetCommunityAccess(communityId);
@@ -126,55 +86,46 @@ export default function CommunityFundraisingPage({
 
   useEffect(() => {
     if (initialCampaignId !== undefined) {
-      setMode('campaign');
       setSelectedCampaignId(initialCampaignId);
     }
   }, [initialCampaignId]);
 
   useEffect(() => {
-    if (initialCreate) setMode('create');
-  }, [initialCreate]);
+    if (initialCreate) onCreateCampaignRoute?.();
+  }, [initialCreate, onCreateCampaignRoute]);
 
   useEffect(() => {
-    if (mode === 'create' || selectedCampaignId !== null || campaigns.length === 0) return;
+    if (selectedCampaignId !== null || campaigns.length === 0) return;
     setSelectedCampaignId(campaigns[0].id);
     onOpenCampaignRoute?.(campaigns[0].id);
-  }, [campaigns, mode, onOpenCampaignRoute, selectedCampaignId]);
-
-  useEffect(() => {
-    if (mode !== 'create') return;
-    writeDraft(communityId, currentPrincipal, draft);
-  }, [communityId, currentPrincipal, draft, mode]);
+  }, [campaigns, onOpenCampaignRoute, selectedCampaignId]);
 
   function openCampaign(campaignId: bigint) {
-    setMode('campaign');
     setSelectedCampaignId(campaignId);
     onOpenCampaignRoute?.(campaignId);
   }
 
   function openCreate() {
-    setMode('create');
-    setSelectedCampaignId(null);
     onCreateCampaignRoute?.();
   }
 
-  const canCreateCampaign = Boolean(access.data?.canCreateCampaign);
+  const canProposeCampaign = Boolean(access.data?.canCreateProposal);
   const selectedCampaign = campaignQuery.data ?? campaigns.find((campaign) => campaign.id === selectedCampaignId) ?? null;
 
   return (
     <section className="fundraising-shell">
       <aside className="fundraising-sidebar" aria-label={tx(t, 'fundraising.sidebar.aria', 'Campaign navigation')}>
         <div className="fundraising-sidebar-header">
-          <p className="amnesty-kicker">{tx(t, 'fundraising.sidebar.myCampaigns', 'My campaigns')}</p>
+          <p className="amnesty-kicker">{tx(t, 'fundraising.sidebar.liveCampaigns', 'Live campaigns')}</p>
           <button
             type="button"
             className="btn-primary rounded-full"
-            disabled={!canCreateCampaign}
+            disabled={!canProposeCampaign}
             onClick={openCreate}
-            title={!canCreateCampaign ? tx(t, 'fundraising.sidebar.createLocked', 'Only community members can create campaigns.') : undefined}
+            title={!canProposeCampaign ? tx(t, 'fundraising.sidebar.createLocked', 'Only community members can propose campaigns.') : undefined}
           >
             <Plus size={18} />
-            {tx(t, 'fundraising.actions.new', 'New campaign')}
+            {tx(t, 'fundraising.actions.newProposal', 'Propose campaign')}
           </button>
         </div>
 
@@ -197,7 +148,7 @@ export default function CommunityFundraisingPage({
               <button
                 key={campaign.id.toString()}
                 type="button"
-                className={`fundraising-list-card ${selectedCampaignId === campaign.id && mode === 'campaign' ? 'active' : ''}`}
+                className={`fundraising-list-card ${selectedCampaignId === campaign.id ? 'active' : ''}`}
                 onClick={() => openCampaign(campaign.id)}
               >
                 <span>{campaign.title}</span>
@@ -210,7 +161,7 @@ export default function CommunityFundraisingPage({
         </div>
 
         <div className="fundraising-sidebar-foot">
-          <p>{tx(t, 'fundraising.footerLine', 'People power change. Your campaign can too.')}</p>
+          <p>{tx(t, 'fundraising.footerLine', 'Approved by the community. Ready for public support.')}</p>
         </div>
       </aside>
 
@@ -219,24 +170,6 @@ export default function CommunityFundraisingPage({
           <div className="fundraising-empty">
             <LoadingSpinner size="large" />
           </div>
-        ) : mode === 'create' ? (
-          <CampaignWizard
-            canCreate={canCreateCampaign}
-            communityId={communityId}
-            communityName={community.data?.name ?? tx(t, 'fundraising.common.community', 'Community')}
-            currentPrincipal={currentPrincipal}
-            draft={draft}
-            onCancel={() => {
-              setMode('campaign');
-              if (campaigns[0]) openCampaign(campaigns[0].id);
-            }}
-            onDraftChange={setDraft}
-            onLaunch={(campaignId) => {
-              clearDraft(communityId, currentPrincipal);
-              setDraft(createEmptyFundraisingDraft(profileName));
-              openCampaign(campaignId);
-            }}
-          />
         ) : selectedCampaign ? (
           <CampaignDetailView
             campaign={selectedCampaign}
@@ -254,224 +187,16 @@ export default function CommunityFundraisingPage({
         ) : (
           <div className="fundraising-empty">
             <p className="amnesty-kicker text-amnesty-pink">{tx(t, 'fundraising.hero.kicker', 'Fundraise')}</p>
-            <h1>{tx(t, 'fundraising.empty.title', 'Create a fundraising campaign')}</h1>
-            <p>{tx(t, 'fundraising.empty.body', 'Tell your story, set a goal, and invite your community to support the change you want to see.')}</p>
-            <button type="button" className="btn-primary rounded-full" disabled={!canCreateCampaign} onClick={openCreate}>
+            <h1>{tx(t, 'fundraising.empty.title', 'No live campaigns yet')}</h1>
+            <p>{tx(t, 'fundraising.empty.body', 'Fundraising campaigns appear here after the community approves and finalizes a fundraising proposal.')}</p>
+            <button type="button" className="btn-primary rounded-full" disabled={!canProposeCampaign} onClick={openCreate}>
               <Plus size={18} />
-              {tx(t, 'fundraising.actions.createFirst', 'Create first campaign')}
+              {tx(t, 'fundraising.actions.createFirst', 'Propose a campaign')}
             </button>
           </div>
         )}
       </main>
     </section>
-  );
-}
-
-function CampaignWizard({
-  canCreate,
-  communityId,
-  communityName,
-  currentPrincipal,
-  draft,
-  onCancel,
-  onDraftChange,
-  onLaunch,
-}: {
-  canCreate: boolean;
-  communityId: bigint;
-  communityName: string;
-  currentPrincipal: string | null;
-  draft: FundraisingDraft;
-  onCancel: () => void;
-  onDraftChange: (draft: FundraisingDraft) => void;
-  onLaunch: (campaignId: bigint) => void;
-}) {
-  const { t } = useTranslation();
-  const [step, setStep] = useState(0);
-  const [message, setMessage] = useState<string | null>(null);
-  const createCampaign = useCreateFundraisingCampaign();
-
-  function update<K extends keyof FundraisingDraft>(key: K, value: FundraisingDraft[K]) {
-    setMessage(null);
-    onDraftChange({ ...draft, [key]: value });
-  }
-
-  function nextStep() {
-    const error = validateDraftStep(draft, step);
-    if (error) {
-      setMessage(error);
-      return;
-    }
-    setStep((current) => Math.min(current + 1, steps.length - 1));
-  }
-
-  async function launchCampaign() {
-    const error = validateFullDraft(draft);
-    if (error) {
-      setMessage(error);
-      return;
-    }
-    try {
-      const campaignId = await createCampaign.mutateAsync({ communityId, input: inputFromDraft(draft) });
-      onLaunch(campaignId);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : String(error));
-    }
-  }
-
-  return (
-    <div className="fundraising-wizard">
-      <div className="fundraising-wizard-steps">
-        <p className="amnesty-kicker">{tx(t, 'fundraising.wizard.newCampaign', 'New campaign')}</p>
-        {steps.map((item, index) => (
-          <button
-            key={item.label}
-            type="button"
-            className={`fundraising-step ${index === step ? 'active' : ''} ${index < step ? 'complete' : ''}`}
-            onClick={() => setStep(index)}
-          >
-            <span>{index + 1}</span>
-            <strong>{item.label}</strong>
-            <small>{item.body}</small>
-          </button>
-        ))}
-        <button
-          type="button"
-          className="btn-secondary rounded-full"
-          onClick={() => {
-            writeDraft(communityId, currentPrincipal, draft);
-            onCancel();
-          }}
-        >
-          {tx(t, 'fundraising.actions.saveDraftExit', 'Save draft and exit')}
-        </button>
-        <small>{tx(t, 'fundraising.wizard.autosave', 'Drafts are saved automatically.')}</small>
-      </div>
-
-      <div className="fundraising-wizard-content">
-        <div className="fundraising-page-heading">
-          <p className="amnesty-kicker text-amnesty-pink">{tx(t, 'fundraising.hero.kicker', 'Fundraise')}</p>
-          <h1>{tx(t, 'fundraising.wizard.title', 'Create a fundraising campaign')}</h1>
-          <p>{tx(t, 'fundraising.wizard.body', 'Tell your story, set a goal, and invite your community to support the change you want to see.')}</p>
-        </div>
-
-        {message ? <div className="fundraising-message error">{message}</div> : null}
-        {!canCreate ? (
-          <div className="fundraising-message error">{tx(t, 'fundraising.wizard.locked', 'You need a community role before creating campaigns.')}</div>
-        ) : null}
-
-        <div className="fundraising-wizard-grid">
-          <section className="fundraising-form-card">
-            {step === 0 ? (
-              <>
-                <h2>{tx(t, 'fundraising.steps.detailsTitle', 'Campaign details')}</h2>
-                <Field label={tx(t, 'fundraising.fields.title', 'Campaign title')} required>
-                  <input value={draft.title} onChange={(event) => update('title', event.target.value)} placeholder="e.g. Protect education in Myanmar" />
-                </Field>
-                <Field label={tx(t, 'fundraising.fields.shortDescription', 'Short description')} required hint={`${draft.shortDescription.length} / 120`}>
-                  <textarea rows={2} maxLength={120} value={draft.shortDescription} onChange={(event) => update('shortDescription', event.target.value)} placeholder="One sentence that explains your campaign." />
-                </Field>
-                <Field label={tx(t, 'fundraising.fields.story', 'Story')} required>
-                  <MarkdownToolbar />
-                  <textarea rows={8} value={draft.story} onChange={(event) => update('story', event.target.value)} placeholder="Write your story here..." />
-                </Field>
-              </>
-            ) : null}
-
-            {step === 1 ? (
-              <>
-                <h2>{tx(t, 'fundraising.steps.goalTitle', 'Goal and timeline')}</h2>
-                <Field label={tx(t, 'fundraising.fields.goal', 'Fundraising goal')} required>
-                  <input min="1" type="number" value={draft.goalAmount} onChange={(event) => update('goalAmount', event.target.value)} />
-                </Field>
-                <Field label={tx(t, 'fundraising.fields.currency', 'Currency')} required>
-                  <select value={draft.currency} onChange={(event) => update('currency', event.target.value)}>
-                    {SUPPORTED_FUNDRAISING_CURRENCIES.map((currency) => (
-                      <option key={currency.code} value={currency.code}>
-                        {currency.code} · {currency.label}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-                <Field label={tx(t, 'fundraising.fields.deadline', 'Campaign deadline')} required>
-                  <input type="datetime-local" value={draft.deadlineLocal} onChange={(event) => update('deadlineLocal', event.target.value)} />
-                </Field>
-                <label className="fundraising-checkbox">
-                  <input
-                    checked={draft.visibility === CampaignVisibility.publicCampaign}
-                    type="checkbox"
-                    onChange={(event) => update('visibility', event.target.checked ? CampaignVisibility.publicCampaign : CampaignVisibility.community)}
-                  />
-                  {tx(t, 'fundraising.fields.publicCampaign', 'Launch as a public campaign')}
-                </label>
-              </>
-            ) : null}
-
-            {step === 2 ? (
-              <>
-                <h2>{tx(t, 'fundraising.steps.impactTitle', 'Funds and impact')}</h2>
-                <Field label={tx(t, 'fundraising.fields.fundsUse', 'How funds will be used')} required>
-                  <textarea rows={5} value={draft.fundsUse} onChange={(event) => update('fundsUse', event.target.value)} />
-                </Field>
-                <Field label={tx(t, 'fundraising.fields.impact', 'Expected impact')} required>
-                  <textarea rows={5} value={draft.impact} onChange={(event) => update('impact', event.target.value)} />
-                </Field>
-              </>
-            ) : null}
-
-            {step === 3 ? (
-              <>
-                <h2>{tx(t, 'fundraising.steps.mediaTitle', 'Media')}</h2>
-                <Field label={tx(t, 'fundraising.fields.mediaUrl', 'Hero media URL')}>
-                  <input value={draft.mediaUrl} onChange={(event) => update('mediaUrl', event.target.value)} placeholder="https://example.org/photo.jpg" />
-                </Field>
-                <div className="fundraising-media-drop">
-                  <ImageIcon size={34} />
-                  <span>{tx(t, 'fundraising.steps.mediaHint', 'Use a direct image or video URL for this pass.')}</span>
-                </div>
-              </>
-            ) : null}
-
-            {step === 4 ? (
-              <>
-                <h2>{tx(t, 'fundraising.steps.creatorTitle', 'About you')}</h2>
-                <Field label={tx(t, 'fundraising.fields.creatorName', 'Creator display name')} required>
-                  <input value={draft.creatorName} onChange={(event) => update('creatorName', event.target.value)} placeholder="Campaign team" />
-                </Field>
-                <Field label={tx(t, 'fundraising.fields.creatorContact', 'Creator contact')}>
-                  <input value={draft.creatorContact} onChange={(event) => update('creatorContact', event.target.value)} placeholder="email@example.org" />
-                </Field>
-              </>
-            ) : null}
-
-            {step === 5 ? (
-              <>
-                <h2>{tx(t, 'fundraising.steps.reviewTitle', 'Review and launch')}</h2>
-                <ReviewList draft={draft} communityName={communityName} />
-              </>
-            ) : null}
-
-            <footer className="fundraising-form-actions">
-              <button type="button" className="btn-secondary rounded-full" onClick={step === 0 ? onCancel : () => setStep((current) => current - 1)}>
-                {step === 0 ? tx(t, 'common.actions.cancel', 'Cancel') : tx(t, 'common.actions.back', 'Back')}
-              </button>
-              {step < steps.length - 1 ? (
-                <button type="button" className="btn-primary rounded-full" onClick={nextStep}>
-                  {tx(t, 'fundraising.actions.saveContinue', 'Save and continue')}
-                </button>
-              ) : (
-                <button type="button" className="btn-primary rounded-full" disabled={createCampaign.isPending || !canCreate} onClick={launchCampaign}>
-                  <Save size={17} />
-                  {createCampaign.isPending ? tx(t, 'fundraising.actions.launching', 'Launching...') : tx(t, 'fundraising.actions.launch', 'Launch campaign')}
-                </button>
-              )}
-            </footer>
-          </section>
-
-          <CampaignPreview draft={draft} />
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -484,58 +209,6 @@ function Field({ children, hint, label, required = false }: { children: React.Re
       </span>
       {children}
     </label>
-  );
-}
-
-function MarkdownToolbar() {
-  return (
-    <div className="fundraising-markdown-toolbar" aria-hidden="true">
-      <button type="button">Paragraph</button>
-      <button type="button">B</button>
-      <button type="button"><em>I</em></button>
-      <button type="button">Link</button>
-      <button type="button">List</button>
-      <button type="button">Quote</button>
-    </div>
-  );
-}
-
-function CampaignPreview({ draft }: { draft: FundraisingDraft }) {
-  const { t } = useTranslation();
-  const { locale } = useLocalePreference();
-  const goal = BigInt(Math.max(0, Math.floor(Number(draft.goalAmount) || 0)));
-  return (
-    <aside className="fundraising-preview">
-      <p className="amnesty-kicker">{tx(t, 'fundraising.preview.kicker', 'Campaign preview')}</p>
-      <div className="fundraising-preview-media">
-        {draft.mediaUrl ? <img src={draft.mediaUrl} alt="" /> : <ImageIcon size={32} />}
-      </div>
-      <h3>{draft.title || tx(t, 'fundraising.preview.title', 'Your campaign title')}</h3>
-      <p>{draft.shortDescription || tx(t, 'fundraising.preview.body', 'Short description of your campaign will appear here.')}</p>
-      <div className="fundraising-progress-bar">
-        <span style={{ width: '0%' }} />
-      </div>
-      <div className="fundraising-preview-stats">
-        <span>{formatCurrency(0, locale, draft.currency)} {tx(t, 'fundraising.preview.raised', 'raised')}</span>
-        <span>{formatCurrency(goal, locale, draft.currency)} {tx(t, 'fundraising.preview.goal', 'goal')}</span>
-      </div>
-      <button type="button" className="btn-primary rounded-full">{tx(t, 'fundraising.actions.donate', 'Donate')}</button>
-      <small>{tx(t, 'fundraising.preview.createdBy', 'Campaign created by')} {draft.creatorName || tx(t, 'fundraising.common.you', 'You')}</small>
-    </aside>
-  );
-}
-
-function ReviewList({ communityName, draft }: { communityName: string; draft: FundraisingDraft }) {
-  const { locale } = useLocalePreference();
-  return (
-    <div className="fundraising-review-list">
-      <div><span>Community</span><strong>{communityName}</strong></div>
-      <div><span>Title</span><strong>{draft.title}</strong></div>
-      <div><span>Currency</span><strong>{draft.currency}</strong></div>
-      <div><span>Goal</span><strong>{formatCurrency(BigInt(Math.floor(Number(draft.goalAmount) || 0)), locale, draft.currency)}</strong></div>
-      <div><span>Deadline</span><strong>{formatDate(new Date(draft.deadlineLocal), locale)}</strong></div>
-      <div><span>Visibility</span><strong>{draft.visibility === CampaignVisibility.publicCampaign ? 'Public' : 'Community'}</strong></div>
-    </div>
   );
 }
 

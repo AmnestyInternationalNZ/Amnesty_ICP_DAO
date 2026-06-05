@@ -7,7 +7,7 @@ import {
   useGetCommunityById,
   useListProposalsByCommunity
 } from '../hooks/useQueries';
-import { routePaths } from '../routing/appRoutes';
+import { routePaths, type ProposalCreateType } from '../routing/appRoutes';
 import CreateProposalModal from './CreateProposalModal';
 import LoadingSpinner from './LoadingSpinner';
 import ProposalCard from './ProposalCard';
@@ -16,7 +16,8 @@ interface CommunityProposalsPageProps {
   communityId: bigint;
   initialProposalId?: bigint;
   initialCreate?: boolean;
-  onCreateProposalRoute?: () => void;
+  initialCreateType?: ProposalCreateType;
+  onCreateProposalRoute?: (type?: ProposalCreateType) => void;
   onOpenProposalRoute?: (proposalId: bigint) => void;
 }
 
@@ -85,6 +86,7 @@ function ProposalSidebarSection({
 export default function CommunityProposalsPage({
   communityId,
   initialCreate = false,
+  initialCreateType,
   initialProposalId,
   onCreateProposalRoute,
   onOpenProposalRoute,
@@ -93,6 +95,7 @@ export default function CommunityProposalsPage({
   const { identity } = useInternetIdentity();
   const currentPrincipal = identity?.getPrincipal().toText() ?? null;
   const [mode, setMode] = useState<'detail' | 'create'>(initialCreate ? 'create' : 'detail');
+  const [createType, setCreateType] = useState<ProposalCreateType | undefined>(initialCreateType);
   const [selectedProposalId, setSelectedProposalId] = useState<bigint | null>(initialProposalId ?? null);
   const [search, setSearch] = useState('');
   const { data: community, isLoading: communityLoading, error: communityError } = useGetCommunityById(communityId);
@@ -128,7 +131,8 @@ export default function CommunityProposalsPage({
 
   useEffect(() => {
     if (initialCreate) setMode('create');
-  }, [initialCreate]);
+    setCreateType(initialCreateType);
+  }, [initialCreate, initialCreateType]);
 
   useEffect(() => {
     if (mode === 'create' || selectedProposalId !== null || proposalList.length === 0) return;
@@ -136,10 +140,11 @@ export default function CommunityProposalsPage({
     onOpenProposalRoute?.(proposalList[0].id);
   }, [mode, onOpenProposalRoute, proposalList, selectedProposalId]);
 
-  function openCreate() {
+  function openCreate(type?: ProposalCreateType) {
     if (!access?.canCreateProposal) return;
     setMode('create');
-    onCreateProposalRoute?.();
+    setCreateType(type);
+    onCreateProposalRoute?.(type);
   }
 
   function openProposal(proposal: Proposal) {
@@ -188,7 +193,7 @@ export default function CommunityProposalsPage({
             type="button"
             className="btn-primary rounded-full"
             disabled={!access.canCreateProposal}
-            onClick={openCreate}
+            onClick={() => openCreate()}
             title={!access.canCreateProposal ? t('communities.portal.createProposalLockedTitle') : undefined}
           >
             <span className="text-xl leading-none">+</span>
@@ -279,7 +284,7 @@ export default function CommunityProposalsPage({
                 : t('communities.portal.emptyProposalsViewer')}
             </p>
             {access.canCreateProposal && (
-              <button type="button" onClick={openCreate} className="btn-primary mt-6 rounded-full">
+              <button type="button" onClick={() => openCreate()} className="btn-primary mt-6 rounded-full">
                 {t('common.actions.createFirstProposal')}
               </button>
             )}
@@ -311,6 +316,7 @@ export default function CommunityProposalsPage({
           isOpen={mode === 'create'}
           onClose={closeCreate}
           communityId={communityId}
+          initialCreateType={createType}
           proposals={proposalList}
         />
       )}

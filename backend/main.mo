@@ -72,6 +72,50 @@ persistent actor {
         passPct : ?Nat;
     };
 
+    public type CampaignVisibility = {
+        #community;
+        #publicCampaign;
+    };
+
+    public type FundraisingCampaignInput = {
+        title : Text;
+        shortDescription : Text;
+        story : Text;
+        fundsUse : Text;
+        impact : Text;
+        mediaUrl : ?Text;
+        creatorName : Text;
+        creatorContact : ?Text;
+        currency : Text;
+        goalAmount : Nat;
+        deadlineNs : Int;
+        visibility : CampaignVisibility;
+    };
+
+    public type ProposalExecutionState = {
+        #notApplicable;
+        #pending;
+        #applied;
+        #failed : Text;
+    };
+
+    public type RoleChangeProposalInput = {
+        target : Principal;
+        role : ?CommunityRole;
+        reason : Text;
+    };
+
+    public type ProposalBody = {
+        #motion : { description : Text };
+        #fundraising : FundraisingCampaignInput;
+        #roleChange : RoleChangeProposalInput;
+    };
+
+    public type ProposalLinkedResource = {
+        #campaign : Nat;
+        #communityRole : Principal;
+    };
+
     public type Proposal = {
         id : Nat;
         title : Text;
@@ -85,6 +129,9 @@ persistent actor {
         endNs : Int;
         quorum : Nat;
         passPct : Nat;
+        body : ProposalBody;
+        executionState : ProposalExecutionState;
+        linkedResource : ?ProposalLinkedResource;
     };
 
     public type CampaignState = {
@@ -119,26 +166,6 @@ persistent actor {
         creator : Principal;
         content : Text;
         timestampNs : Int;
-    };
-
-    public type CampaignVisibility = {
-        #community;
-        #publicCampaign;
-    };
-
-    public type FundraisingCampaignInput = {
-        title : Text;
-        shortDescription : Text;
-        story : Text;
-        fundsUse : Text;
-        impact : Text;
-        mediaUrl : ?Text;
-        creatorName : Text;
-        creatorContact : ?Text;
-        currency : Text;
-        goalAmount : Nat;
-        deadlineNs : Int;
-        visibility : CampaignVisibility;
     };
 
     public type CampaignMetadata = {
@@ -231,6 +258,10 @@ persistent actor {
     let MAX_CAMPAIGN_CREATOR_SIZE : Nat = 240;
     let MIN_PUBLIC_TOKEN_SIZE : Nat = 32;
     let MAX_PUBLIC_TOKEN_SIZE : Nat = 160;
+    let NANOSECONDS_PER_SECOND : Nat = 1_000_000_000;
+    let MIN_PROPOSAL_WINDOW_NS : Nat = 5 * 60 * NANOSECONDS_PER_SECOND;
+    let DEFAULT_PROPOSAL_WINDOW_NS : Nat = 3 * 24 * 60 * 60 * NANOSECONDS_PER_SECOND;
+    let MAX_PROPOSAL_WINDOW_NS : Nat = 30 * 24 * 60 * 60 * NANOSECONDS_PER_SECOND;
     let DEFAULT_CAMPAIGN_CURRENCY : Text = "NZD";
     let SUPPORTED_CAMPAIGN_CURRENCIES : [Text] = ["NZD", "USD", "EUR", "GBP", "AUD", "CAD", "JPY"];
 
@@ -400,6 +431,17 @@ persistent actor {
         campaign.creator == caller or access.isPlatformAdmin or isCommunityAdmin(access);
     };
 
+    func requireDirectCampaignLaunchAccess(caller : Principal, communityId : Nat) : CommunityAccess {
+        let access = getCommunityAccessForCaller(caller, communityId);
+        requireCommunityCapability(
+            caller,
+            communityId,
+            access.isPlatformAdmin or isCommunityAdmin(access),
+            "Unauthorized: Only community admins or platform admins can launch campaigns directly",
+        );
+        access;
+    };
+
     func getCampaignOrTrap(campaignId : Nat) : Campaign {
         switch (natMap.get(campaigns, campaignId)) {
             case null { Debug.trap("Campaign not found") };
@@ -551,6 +593,213 @@ persistent actor {
         if (input.deadlineNs <= Time.now()) {
             Debug.trap("Campaign deadline must be in the future");
         };
+    };
+
+    func proposalBodyDescription(body : ProposalBody) : Text {
+        switch (body) {
+            case (#motion(value)) { value.description };
+            case (#fundraising(input)) { input.story };
+            case (#roleChange(input)) { input.reason };
+        };
+    };
+
+    func initialProposalExecutionState(body : ProposalBody) : ProposalExecutionState {
+        switch (body) {
+            case (#motion(_)) { #notApplicable };
+            case _ { #pending };
+        };
+    };
+
+    func resolveProposalGovernance(overrides : ?ProposalOverrides) : (Nat, Nat, Nat) {
+        let defaultWindow = DEFAULT_PROPOSAL_WINDOW_NS;
+        let defaultQuorum = 1;
+        let defaultPassPct = 50;
+
+        let resolvedWindow = switch (overrides) {
+            case null { defaultWindow };
+            case (?value) {
+                switch (value.windowNs) {
+                    case null { defaultWindow };
+                    case (?windowNs) { windowNs };
+                };
+            };
+        };
+
+        let resolvedQuorum = switch (overrides) {
+            case null { defaultQuorum };
+            case (?value) {
+                switch (value.quorum) {
+                    case null { defaultQuorum };
+                    case (?quorum) { quorum };
+                };
+            };
+        };
+
+        let resolvedPassPct = switch (overrides) {
+            case null { defaultPassPct };
+            case (?value) {
+                switch (value.passPct) {
+                    case null { defaultPassPct };
+                    case (?passPct) { passPct };
+                };
+            };
+        };
+
+        if (resolvedWindow < MIN_PROPOSAL_WINDOW_NS) {
+            Debug.trap("Voting window must be at least 5 minutes");
+        };
+        if (resolvedWindow > MAX_PROPOSAL_WINDOW_NS) {
+            Debug.trap("Voting window must be 30 days or less");
+        };
+        if (resolvedQuorum == 0) {
+            Debug.trap("Proposal quorum must be at least one vote");
+        };
+        if (resolvedPassPct == 0 or resolvedPassPct > 100) {
+            Debug.trap("Proposal pass threshold must be between 1 and 100 percent");
+        };
+
+        (resolvedWindow, resolvedQuorum, resolvedPassPct);
+    };
+
+    func validateRoleChangeProposalInput(communityId : Nat, input : RoleChangeProposalInput) {
+        ignore getCommunityOrTrap(communityId);
+        if (Principal.isAnonymous(input.target)) {
+            Debug.trap("Role change target cannot be anonymous");
+        };
+        validateRequiredText(input.reason, MAX_CAMPAIGN_METADATA_SIZE, "Role change reason");
+    };
+
+    func createCampaignFromInput(creator : Principal, communityId : Nat, input : FundraisingCampaignInput) : Nat {
+        validateCampaignInput(input);
+
+        let now = Time.now();
+        let campaignId = nextCampaignId;
+        let campaign : Campaign = {
+            id = campaignId;
+            title = input.title;
+            description = input.story;
+            creator;
+            communityId;
+            goalAmount = input.goalAmount;
+            deadlineNs = input.deadlineNs;
+            state = #active;
+            totalRaised = 0;
+            createdNs = now;
+        };
+        let metadata : CampaignMetadata = {
+            campaignId;
+            shortDescription = input.shortDescription;
+            story = input.story;
+            fundsUse = input.fundsUse;
+            impact = input.impact;
+            mediaUrl = input.mediaUrl;
+            creatorName = input.creatorName;
+            creatorContact = input.creatorContact;
+            visibility = input.visibility;
+            archived = false;
+            updatedNs = now;
+        };
+
+        campaigns := natMap.put(campaigns, campaignId, campaign);
+        campaignMetadataByCampaign := natMap.put(campaignMetadataByCampaign, campaignId, metadata);
+        campaignCurrencyByCampaign := natMap.put(campaignCurrencyByCampaign, campaignId, input.currency);
+        contributionsByCampaign := natMap.put(contributionsByCampaign, campaignId, []);
+        nextCampaignId += 1;
+        campaignId;
+    };
+
+    func wouldRemoveLastCommunityAdmin(communityId : Nat, target : Principal, nextRole : ?CommunityRole) : Bool {
+        let currentRole = getCommunityRoleForPrincipal(target, communityId);
+        let targetIsAdmin = switch (currentRole) {
+            case (?#communityAdmin) { true };
+            case _ { false };
+        };
+        let removesAdmin = switch (nextRole) {
+            case null { true };
+            case (?#member) { true };
+            case (?#communityAdmin) { false };
+        };
+        if (not targetIsAdmin or not removesAdmin) {
+            return false;
+        };
+
+        var adminCount : Nat = 0;
+        for ((_, role) in getCommunityRoleEntries(communityId).vals()) {
+            switch (role) {
+                case (#communityAdmin) { adminCount += 1 };
+                case _ {};
+            };
+        };
+        adminCount <= 1;
+    };
+
+    func applyRoleChangeProposal(communityId : Nat, input : RoleChangeProposalInput) : ?Text {
+        ignore ensureCommunityImported(communityId);
+        if (Principal.isAnonymous(input.target)) {
+            return ?"Role change target cannot be anonymous";
+        };
+        if (wouldRemoveLastCommunityAdmin(communityId, input.target, input.role)) {
+            return ?"Cannot remove the last community admin";
+        };
+
+        Membership.setCommunityRole(membershipState, communityId, input.target, input.role);
+        syncCommunityMembersField(communityId);
+        null;
+    };
+
+    func createProposalRecord(
+        caller : Principal,
+        communityId : Nat,
+        title : Text,
+        body : ProposalBody,
+        overrides : ?ProposalOverrides,
+    ) : Nat {
+        let access = getCommunityAccessForCaller(caller, communityId);
+        requireCommunityCapability(
+            caller,
+            communityId,
+            access.canCreateProposal,
+            "Unauthorized: Only community participants can create proposals",
+        );
+
+        validateRequiredText(title, MAX_CAMPAIGN_TITLE_SIZE, "Proposal title");
+        switch (body) {
+            case (#motion(value)) {
+                validateRequiredText(value.description, MAX_CAMPAIGN_STORY_SIZE, "Proposal description");
+            };
+            case (#fundraising(input)) {
+                validateCampaignInput(input);
+            };
+            case (#roleChange(input)) {
+                validateRoleChangeProposalInput(communityId, input);
+            };
+        };
+
+        let now = Time.now();
+        let (resolvedWindow, resolvedQuorum, resolvedPassPct) = resolveProposalGovernance(overrides);
+        let proposalId = nextProposalId;
+        let proposal : Proposal = {
+            id = proposalId;
+            title;
+            description = proposalBodyDescription(body);
+            creator = caller;
+            communityId;
+            yes = 0;
+            no = 0;
+            state = #active;
+            startNs = now;
+            endNs = now + resolvedWindow;
+            quorum = resolvedQuorum;
+            passPct = resolvedPassPct;
+            body;
+            executionState = initialProposalExecutionState(body);
+            linkedResource = null;
+        };
+
+        proposals := natMap.put(proposals, proposalId, proposal);
+        votersByProposal := natMap.put(votersByProposal, proposalId, []);
+        nextProposalId += 1;
+        proposalId;
     };
 
     func toCampaignContributionPayload(contribution : Contribution, publicView : Bool) : CampaignContributionPayload {
@@ -852,67 +1101,33 @@ persistent actor {
         description : Text,
         overrides : ?ProposalOverrides,
     ) : async () {
-        let access = getCommunityAccessForCaller(caller, communityId);
-        requireCommunityCapability(
-            caller,
-            communityId,
-            access.canCreateProposal,
-            "Unauthorized: Only community participants can create proposals",
-        );
+        ignore createProposalRecord(caller, communityId, title, #motion({ description }), overrides);
+    };
 
-        let now = Time.now();
-        let defaultWindow = 3_000_000_000_000;
-        let defaultQuorum = 1;
-        let defaultPassPct = 50;
+    public shared ({ caller }) func createMotionProposal(
+        communityId : Nat,
+        title : Text,
+        description : Text,
+        overrides : ?ProposalOverrides,
+    ) : async Nat {
+        createProposalRecord(caller, communityId, title, #motion({ description }), overrides);
+    };
 
-        let resolvedWindow = switch (overrides) {
-            case null { defaultWindow };
-            case (?value) {
-                switch (value.windowNs) {
-                    case null { defaultWindow };
-                    case (?windowNs) { windowNs };
-                };
-            };
-        };
+    public shared ({ caller }) func createFundraisingProposal(
+        communityId : Nat,
+        input : FundraisingCampaignInput,
+        overrides : ?ProposalOverrides,
+    ) : async Nat {
+        createProposalRecord(caller, communityId, input.title, #fundraising(input), overrides);
+    };
 
-        let resolvedQuorum = switch (overrides) {
-            case null { defaultQuorum };
-            case (?value) {
-                switch (value.quorum) {
-                    case null { defaultQuorum };
-                    case (?quorum) { quorum };
-                };
-            };
-        };
-
-        let resolvedPassPct = switch (overrides) {
-            case null { defaultPassPct };
-            case (?value) {
-                switch (value.passPct) {
-                    case null { defaultPassPct };
-                    case (?passPct) { passPct };
-                };
-            };
-        };
-
-        let proposal : Proposal = {
-            id = nextProposalId;
-            title;
-            description;
-            creator = caller;
-            communityId;
-            yes = 0;
-            no = 0;
-            state = #active;
-            startNs = now;
-            endNs = now + resolvedWindow;
-            quorum = resolvedQuorum;
-            passPct = resolvedPassPct;
-        };
-
-        proposals := natMap.put(proposals, nextProposalId, proposal);
-        votersByProposal := natMap.put(votersByProposal, nextProposalId, []);
-        nextProposalId += 1;
+    public shared ({ caller }) func createRoleChangeProposal(
+        communityId : Nat,
+        title : Text,
+        input : RoleChangeProposalInput,
+        overrides : ?ProposalOverrides,
+    ) : async Nat {
+        createProposalRecord(caller, communityId, title, #roleChange(input), overrides);
     };
 
     public query ({ caller }) func listProposalsByCommunity(communityId : Nat) : async [Proposal] {
@@ -1001,7 +1216,7 @@ persistent actor {
                 };
 
                 if (proposal.state != #active) {
-                    Debug.trap("Proposal is not in active state");
+                    return;
                 };
 
                 let totalVotes = proposal.yes + proposal.no;
@@ -1011,15 +1226,82 @@ persistent actor {
                     (proposal.yes * 100) / totalVotes;
                 };
 
-                let newState = if (totalVotes >= proposal.quorum and totalVotes > 0 and passThreshold >= proposal.passPct) {
-                    #passed;
-                } else {
-                    #failed;
-                };
+                let passed = totalVotes >= proposal.quorum and totalVotes > 0 and passThreshold >= proposal.passPct;
 
-                let updatedProposal = {
-                    proposal with
-                    state = newState;
+                let updatedProposal = if (passed) {
+                    switch (proposal.body) {
+                        case (#motion(_)) {
+                            {
+                                proposal with
+                                state = #passed;
+                                executionState = #notApplicable;
+                            };
+                        };
+                        case (#fundraising(input)) {
+                            switch (proposal.linkedResource) {
+                                case (?#campaign(_)) {
+                                    {
+                                        proposal with
+                                        state = #passed;
+                                        executionState = #applied;
+                                    };
+                                };
+                                case _ {
+                                    if (input.deadlineNs <= Time.now()) {
+                                        {
+                                            proposal with
+                                            state = #passed;
+                                            executionState = #failed("Campaign deadline has passed before launch");
+                                        };
+                                    } else {
+                                        let campaignId = createCampaignFromInput(proposal.creator, proposal.communityId, input);
+                                        {
+                                            proposal with
+                                            state = #passed;
+                                            executionState = #applied;
+                                            linkedResource = ?#campaign(campaignId);
+                                        };
+                                    };
+                                };
+                            };
+                        };
+                        case (#roleChange(input)) {
+                            switch (proposal.linkedResource) {
+                                case (?#communityRole(_)) {
+                                    {
+                                        proposal with
+                                        state = #passed;
+                                        executionState = #applied;
+                                    };
+                                };
+                                case _ {
+                                    switch (applyRoleChangeProposal(proposal.communityId, input)) {
+                                        case null {
+                                            {
+                                                proposal with
+                                                state = #passed;
+                                                executionState = #applied;
+                                                linkedResource = ?#communityRole(input.target);
+                                            };
+                                        };
+                                        case (?message) {
+                                            {
+                                                proposal with
+                                                state = #passed;
+                                                executionState = #failed(message);
+                                            };
+                                        };
+                                    };
+                                };
+                            };
+                        };
+                    };
+                } else {
+                    {
+                        proposal with
+                        state = #failed;
+                        executionState = #notApplicable;
+                    };
                 };
                 proposals := natMap.put(proposals, proposalId, updatedProposal);
             };
@@ -1038,13 +1320,7 @@ persistent actor {
         goalAmount : Nat,
         deadlineNs : Int,
     ) : async () {
-        let access = getCommunityAccessForCaller(caller, communityId);
-        requireCommunityCapability(
-            caller,
-            communityId,
-            access.canCreateCampaign,
-            "Unauthorized: Only community participants can create campaigns",
-        );
+        ignore requireDirectCampaignLaunchAccess(caller, communityId);
 
         let now = Time.now();
         let campaign : Campaign = {
@@ -1069,49 +1345,8 @@ persistent actor {
         communityId : Nat,
         input : FundraisingCampaignInput,
     ) : async Nat {
-        let access = getCommunityAccessForCaller(caller, communityId);
-        requireCommunityCapability(
-            caller,
-            communityId,
-            access.canCreateCampaign,
-            "Unauthorized: Only community participants can create campaigns",
-        );
-        validateCampaignInput(input);
-
-        let now = Time.now();
-        let campaignId = nextCampaignId;
-        let campaign : Campaign = {
-            id = campaignId;
-            title = input.title;
-            description = input.story;
-            creator = caller;
-            communityId;
-            goalAmount = input.goalAmount;
-            deadlineNs = input.deadlineNs;
-            state = #active;
-            totalRaised = 0;
-            createdNs = now;
-        };
-        let metadata : CampaignMetadata = {
-            campaignId;
-            shortDescription = input.shortDescription;
-            story = input.story;
-            fundsUse = input.fundsUse;
-            impact = input.impact;
-            mediaUrl = input.mediaUrl;
-            creatorName = input.creatorName;
-            creatorContact = input.creatorContact;
-            visibility = input.visibility;
-            archived = false;
-            updatedNs = now;
-        };
-
-        campaigns := natMap.put(campaigns, campaignId, campaign);
-        campaignMetadataByCampaign := natMap.put(campaignMetadataByCampaign, campaignId, metadata);
-        campaignCurrencyByCampaign := natMap.put(campaignCurrencyByCampaign, campaignId, input.currency);
-        contributionsByCampaign := natMap.put(contributionsByCampaign, campaignId, []);
-        nextCampaignId += 1;
-        campaignId;
+        ignore requireDirectCampaignLaunchAccess(caller, communityId);
+        createCampaignFromInput(caller, communityId, input);
     };
 
     public query ({ caller }) func listCampaignsByCommunity(communityId : Nat) : async [Campaign] {
@@ -1392,7 +1627,7 @@ persistent actor {
                 requireCommunityCapability(
                     caller,
                     campaign.communityId,
-                    access.canCreateCampaign,
+                    access.canContributeToCampaign,
                     "Unauthorized: Only community participants can update campaigns",
                 );
 

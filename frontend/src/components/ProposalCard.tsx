@@ -2,9 +2,10 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useVoteOnProposal, useGetUserProfile, useFinalizeProposal } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { CommunityRole, Proposal, ProposalState } from '../backend';
+import { CommunityRole, Proposal, ProposalState, ProposalType } from '../backend';
 import { formatNumber } from '../i18n/format';
 import { useLocalePreference } from '../i18n/preferences';
+import { routePaths } from '../routing/appRoutes';
 import LoadingSpinner from './LoadingSpinner';
 import MarkdownContent from './MarkdownContent';
 
@@ -169,6 +170,34 @@ export default function ProposalCard({
   };
 
   const stateDisplay = getStateDisplay();
+  const typeLabel = proposal.body.type === ProposalType.fundraising
+    ? t('proposals.create.proposalTypes.fundraisingTitle')
+    : proposal.body.type === ProposalType.roleChange
+      ? t('proposals.create.proposalTypes.roleChangeTitle')
+      : t('proposals.create.proposalTypes.motionTitle');
+  const roleChangeRoleLabel = proposal.body.type === ProposalType.roleChange
+    ? proposal.body.roleChange.role === CommunityRole.communityAdmin
+      ? t('common.roles.communityAdmin')
+      : proposal.body.roleChange.role === CommunityRole.member
+        ? t('common.roles.member')
+        : t('proposals.create.roleActions.remove')
+    : '';
+  const typeSummary = proposal.body.type === ProposalType.fundraising
+    ? proposal.body.campaign.shortDescription
+    : proposal.body.type === ProposalType.roleChange
+      ? `${roleChangeRoleLabel} · ${proposal.body.roleChange.target.toText()}`
+      : proposal.body.description;
+  const executionLabel = proposal.executionState.status === 'notApplicable'
+    ? null
+    : proposal.executionState.status === 'failed'
+      ? t('proposals.card.executionFailed', { message: proposal.executionState.message })
+      : proposal.executionState.status === 'applied'
+        ? t('proposals.card.executionApplied')
+        : t('proposals.card.executionPending');
+  const launchedCampaignId = proposal.linkedResource?.type === 'campaign' ? proposal.linkedResource.campaignId : null;
+  const campaignVisibilityLabel = proposal.body.type === ProposalType.fundraising && proposal.body.campaign.visibility === 'publicCampaign'
+    ? t('proposals.create.campaignVisibilityOptions.public')
+    : t('proposals.create.campaignVisibilityOptions.community');
   const totalVotes = Number(proposal.yes) + Number(proposal.no);
   const yesPercentage = totalVotes > 0 ? Math.round((Number(proposal.yes) / totalVotes) * 100) : 0;
   const noPercentage = totalVotes > 0 ? Math.round((Number(proposal.no) / totalVotes) * 100) : 0;
@@ -217,6 +246,9 @@ export default function ProposalCard({
             <span className={`px-3 py-1 text-sm font-bold amnesty-heading ${stateDisplay.color}`}>
               {stateDisplay.text}
             </span>
+            <span className="ml-2 bg-[#fff4ba] px-3 py-1 text-sm font-bold amnesty-heading text-amnesty-ink">
+              {typeLabel}
+            </span>
             {isOwnProposal && (
               <span className="ml-2 bg-[#e9f4f8] px-3 py-1 text-sm font-bold amnesty-heading text-amnesty-ink">
                 {t('proposals.card.yourProposal')}
@@ -224,6 +256,46 @@ export default function ProposalCard({
             )}
           </div>
           <MarkdownContent className="proposal-markdown-content mb-6" text={proposal.description} />
+          {typeSummary && typeSummary !== proposal.description && (
+            <div className="mb-6 rounded-[0.75rem] border border-amnesty-line bg-[#fbfaf4] p-5">
+              <p className="amnesty-kicker mb-2 text-amnesty-ink">{t('proposals.card.details', { type: typeLabel })}</p>
+              <p className="text-base leading-7 text-amnesty-ink">{typeSummary}</p>
+            </div>
+          )}
+          {proposal.body.type === ProposalType.fundraising && (
+            <div className="mb-6 grid gap-4 rounded-[0.75rem] border border-amnesty-line bg-white p-5 md:grid-cols-3">
+              <div>
+                <p className="amnesty-kicker text-amnesty-green">{t('proposals.create.campaignGoalLabel')}</p>
+                <p className="mt-1 text-2xl amnesty-heading">{proposal.body.campaign.currency} {proposal.body.campaign.goalAmount.toString()}</p>
+              </div>
+              <div>
+                <p className="amnesty-kicker text-amnesty-green">{t('proposals.card.visibility')}</p>
+                <p className="mt-1 text-2xl amnesty-heading">{campaignVisibilityLabel}</p>
+              </div>
+              <div>
+                <p className="amnesty-kicker text-amnesty-green">{t('app.nav.campaigns')}</p>
+                {launchedCampaignId === null ? (
+                  <p className="mt-1 text-base font-bold text-[#5c727d]">{t('proposals.card.campaignPending')}</p>
+                ) : (
+                  <a
+                    className="mt-1 inline-flex rounded-full bg-amnesty-yellow px-4 py-2 font-bold text-amnesty-ink"
+                    href={routePaths.campaign(proposal.communityId, launchedCampaignId)}
+                  >
+                    {t('proposals.card.viewLaunchedCampaign')}
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+          {executionLabel && (
+            <div className={`mb-6 rounded-[0.75rem] border p-4 ${
+              proposal.executionState.status === 'failed'
+                ? 'border-amnesty-pink bg-[#fff1f4]'
+                : 'border-[#dbe7c8] bg-[#eff7e7]'
+            }`}>
+              <p className="font-bold text-amnesty-ink amnesty-heading">{executionLabel}</p>
+            </div>
+          )}
           <div className="mb-4 flex items-center space-x-6 text-lg text-[#38505d]">
             <span className="font-bold amnesty-heading">{t('common.labels.by', { name: creatorName })}</span>
             <span className="font-bold">•</span>
