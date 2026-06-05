@@ -20,7 +20,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 import LoadingSpinner from './LoadingSpinner';
 import ProfilePage from './ProfilePage';
 import SiteFooter from './SiteFooter';
-import { parseAppPath, routePaths, type AppPage, type ParsedAppRoute } from '../routing/appRoutes';
+import { parseAppPath, routePaths, type AppPage, type ParsedAppRoute, type ProposalCreateType } from '../routing/appRoutes';
 
 const communityScopedPages: AppPage[] = ['community', 'proposals', 'fundraise', 'workspace', 'boards', 'calendar'];
 const LAST_COMMUNITY_KEY = 'amnesty.lastCommunityId';
@@ -48,6 +48,7 @@ export default function MainTabs() {
   const [initialWorkspaceDocumentId, setInitialWorkspaceDocumentId] = useState<bigint | undefined>(() => readCurrentRoute().documentId);
   const [initialProposalId, setInitialProposalId] = useState<bigint | undefined>(() => readCurrentRoute().proposalId);
   const [initialProposalCreate, setInitialProposalCreate] = useState<boolean>(() => readCurrentRoute().proposalCreate ?? false);
+  const [initialProposalCreateType, setInitialProposalCreateType] = useState<ProposalCreateType | undefined>(() => readCurrentRoute().proposalCreateType);
   const [initialCampaignId, setInitialCampaignId] = useState<bigint | undefined>(() => readCurrentRoute().campaignId);
   const [initialCampaignCreate, setInitialCampaignCreate] = useState<boolean>(() => readCurrentRoute().campaignCreate ?? false);
   const [initialWorkspaceBoardId, setInitialWorkspaceBoardId] = useState<bigint | undefined>(() => readCurrentRoute().boardId);
@@ -75,6 +76,7 @@ export default function MainTabs() {
     }
     setInitialProposalId(route.page === 'proposals' ? route.proposalId : undefined);
     setInitialProposalCreate(route.page === 'proposals' ? route.proposalCreate ?? false : false);
+    setInitialProposalCreateType(route.page === 'proposals' ? route.proposalCreateType : undefined);
     setInitialCampaignId(route.page === 'fundraise' ? route.campaignId : undefined);
     setInitialCampaignCreate(route.page === 'fundraise' ? route.campaignCreate ?? false : false);
     setInitialWorkspaceDocumentId(route.page === 'workspace' ? route.documentId : undefined);
@@ -246,7 +248,7 @@ export default function MainTabs() {
                     navigateTo(routePaths.campaign(selectedCommunityId, options.campaignId));
                     return;
                   }
-                  navigateTo(options?.create ? routePaths.newCampaign(selectedCommunityId) : routePaths.fundraise(selectedCommunityId));
+                  navigateTo(options?.create ? routePaths.newProposalOfType(selectedCommunityId, 'fundraising') : routePaths.fundraise(selectedCommunityId));
                 }}
               />
             )}
@@ -255,13 +257,20 @@ export default function MainTabs() {
               <CommunityProposalsPage
                 communityId={selectedCommunityId}
                 initialCreate={initialProposalCreate}
+                initialCreateType={initialProposalCreateType}
                 initialProposalId={initialProposalId}
-                onCreateProposalRoute={() => {
+                onCreateProposalRoute={(type) => {
                   setInitialProposalCreate(true);
-                  window.history.pushState({}, '', routePaths.newProposal(selectedCommunityId));
+                  setInitialProposalCreateType(type);
+                  window.history.pushState(
+                    {},
+                    '',
+                    type ? routePaths.newProposalOfType(selectedCommunityId, type) : routePaths.newProposal(selectedCommunityId),
+                  );
                 }}
                 onOpenProposalRoute={(proposalId) => {
                   setInitialProposalCreate(false);
+                  setInitialProposalCreateType(undefined);
                   setInitialProposalId(proposalId);
                   window.history.pushState({}, '', routePaths.proposal(selectedCommunityId, proposalId));
                 }}
@@ -274,8 +283,11 @@ export default function MainTabs() {
                 initialCampaignId={initialCampaignId}
                 initialCreate={initialCampaignCreate}
                 onCreateCampaignRoute={() => {
-                  setInitialCampaignCreate(true);
-                  window.history.pushState({}, '', routePaths.newCampaign(selectedCommunityId));
+                  setActivePage('proposals');
+                  setInitialCampaignCreate(false);
+                  setInitialProposalCreate(true);
+                  setInitialProposalCreateType('fundraising');
+                  window.history.pushState({}, '', routePaths.newProposalOfType(selectedCommunityId, 'fundraising'));
                 }}
                 onOpenCampaignRoute={(campaignId) => {
                   setInitialCampaignCreate(false);

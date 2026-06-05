@@ -143,19 +143,11 @@ export default function CommunityPortal({ communityId, onBack, onOpenFundraise }
               </div>
 
               <div className="mt-8 flex flex-col gap-3">
-                {access.canCreateCampaign ? (
+                {access.canCreateProposal ? (
                   <button onClick={() => onOpenFundraise?.({ create: true })} className="btn-primary rounded-full">
-                    {t('common.actions.createCampaign')}
+                    {t('common.actions.proposeCampaign')}
                   </button>
-                ) : (
-                  <button
-                    disabled
-                    className="btn-secondary rounded-full text-white border-white opacity-50"
-                    title={t('communities.portal.createCampaignLockedTitle')}
-                  >
-                    {t('common.buttons.campaignAccessLocked')}
-                  </button>
-                )}
+                ) : null}
 
                 {access.canLeaveCommunity && (
                   <button onClick={() => setShowLeaveCommunity(true)} className="btn-secondary rounded-full text-white border-white hover:bg-white/10">
@@ -188,13 +180,13 @@ export default function CommunityPortal({ communityId, onBack, onOpenFundraise }
             <div className="border border-amnesty-line bg-[#f4f7f8] px-6 py-10 text-center">
               <h3 className="text-4xl text-amnesty-ink amnesty-heading">{t('common.empty.noCampaigns')}</h3>
               <p className="mx-auto mt-4 max-w-3xl text-lg leading-8 text-[#38505d]">
-                {access.canCreateCampaign
+                {access.canCreateProposal
                   ? t('communities.portal.emptyCampaignsAdmin')
                   : t('communities.portal.emptyCampaignsViewer')}
               </p>
-              {access.canCreateCampaign && (
+              {access.canCreateProposal && (
                 <button onClick={() => onOpenFundraise?.({ create: true })} className="btn-primary mt-8 rounded-full">
-                  {t('common.actions.createFirstCampaign')}
+                  {t('common.actions.proposeCampaign')}
                 </button>
               )}
             </div>

@@ -27,8 +27,12 @@ import type {
     KanbanColumn as CandidKanbanColumn,
     PlatformRole as CandidPlatformRole,
     Proposal as CandidProposal,
+    ProposalBody as CandidProposalBody,
+    ProposalExecutionState as CandidProposalExecutionState,
+    ProposalLinkedResource as CandidProposalLinkedResource,
     ProposalOverrides as CandidProposalOverrides,
     ProposalState as CandidProposalState,
+    RoleChangeProposalInput as CandidRoleChangeProposalInput,
     ShoppingItem as CandidShoppingItem,
     StripeConfiguration as CandidStripeConfiguration,
     StripeSessionStatus as CandidStripeSessionStatus,
@@ -77,6 +81,12 @@ export enum ProposalState {
     passed = 'passed'
 }
 
+export enum ProposalType {
+    motion = 'motion',
+    fundraising = 'fundraising',
+    roleChange = 'roleChange'
+}
+
 export enum WorkspaceRole {
     owner = 'owner',
     editor = 'editor',
@@ -102,6 +112,9 @@ export interface Proposal {
     passPct: bigint;
     state: ProposalState;
     quorum: bigint;
+    body: ProposalBody;
+    executionState: ProposalExecutionState;
+    linkedResource: ProposalLinkedResource | null;
 }
 
 export interface Campaign {
@@ -131,6 +144,27 @@ export interface FundraisingCampaignInput {
     deadlineNs: bigint;
     visibility: CampaignVisibility;
 }
+
+export interface RoleChangeProposalInput {
+    target: Principal;
+    role: CommunityRole | null;
+    reason: string;
+}
+
+export type ProposalBody =
+    | { type: ProposalType.motion; description: string }
+    | { type: ProposalType.fundraising; campaign: FundraisingCampaignInput }
+    | { type: ProposalType.roleChange; roleChange: RoleChangeProposalInput };
+
+export type ProposalExecutionState =
+    | { status: 'notApplicable' }
+    | { status: 'pending' }
+    | { status: 'applied' }
+    | { status: 'failed'; message: string };
+
+export type ProposalLinkedResource =
+    | { type: 'campaign'; campaignId: bigint }
+    | { type: 'communityRole'; target: Principal };
 
 export type CampaignContributionPayload = CandidCampaignContributionPayload;
 export type CampaignUpdatePayload = CandidCampaignUpdatePayload;
@@ -350,6 +384,20 @@ function fromProposalState(value: CandidProposalState): ProposalState {
     throw new Error('Unknown proposal state');
 }
 
+function fromProposalExecutionState(value: CandidProposalExecutionState): ProposalExecutionState {
+    if ('notApplicable' in value) return { status: 'notApplicable' };
+    if ('pending' in value) return { status: 'pending' };
+    if ('applied' in value) return { status: 'applied' };
+    if ('failed' in value) return { status: 'failed', message: value.failed };
+    throw new Error('Unknown proposal execution state');
+}
+
+function fromProposalLinkedResource(value: CandidProposalLinkedResource): ProposalLinkedResource {
+    if ('campaign' in value) return { type: 'campaign', campaignId: value.campaign };
+    if ('communityRole' in value) return { type: 'communityRole', target: value.communityRole };
+    throw new Error('Unknown proposal linked resource');
+}
+
 function fromCampaign(value: CandidCampaign): Campaign {
     return {
         ...value,
@@ -371,6 +419,23 @@ function toFundraisingCampaignInput(value: FundraisingCampaignInput): CandidFund
         goalAmount: value.goalAmount,
         deadlineNs: value.deadlineNs,
         visibility: toCampaignVisibility(value.visibility)
+    };
+}
+
+function fromFundraisingCampaignInput(value: CandidFundraisingCampaignInput): FundraisingCampaignInput {
+    return {
+        title: value.title,
+        shortDescription: value.shortDescription,
+        story: value.story,
+        fundsUse: value.fundsUse,
+        impact: value.impact,
+        mediaUrl: fromOptional(value.mediaUrl, (url) => url),
+        creatorName: value.creatorName,
+        creatorContact: fromOptional(value.creatorContact, (contact) => contact),
+        currency: value.currency,
+        goalAmount: value.goalAmount,
+        deadlineNs: value.deadlineNs,
+        visibility: fromCampaignVisibility(value.visibility)
     };
 }
 
@@ -405,10 +470,42 @@ function fromFundraisingCampaignPayload(value: CandidFundraisingCampaignPayload)
     };
 }
 
+function fromRoleChangeProposalInput(value: CandidRoleChangeProposalInput): RoleChangeProposalInput {
+    return {
+        target: value.target,
+        role: fromOptional(value.role, fromCommunityRole),
+        reason: value.reason
+    };
+}
+
+function toRoleChangeProposalInput(value: RoleChangeProposalInput): CandidRoleChangeProposalInput {
+    return {
+        target: value.target,
+        role: toOptional(value.role == null ? undefined : toCommunityRole(value.role)),
+        reason: value.reason
+    };
+}
+
+function fromProposalBody(value: CandidProposalBody): ProposalBody {
+    if ('motion' in value) {
+        return { type: ProposalType.motion, description: value.motion.description };
+    }
+    if ('fundraising' in value) {
+        return { type: ProposalType.fundraising, campaign: fromFundraisingCampaignInput(value.fundraising) };
+    }
+    if ('roleChange' in value) {
+        return { type: ProposalType.roleChange, roleChange: fromRoleChangeProposalInput(value.roleChange) };
+    }
+    throw new Error('Unknown proposal body');
+}
+
 function fromProposal(value: CandidProposal): Proposal {
     return {
         ...value,
-        state: fromProposalState(value.state)
+        state: fromProposalState(value.state),
+        body: fromProposalBody(value.body),
+        executionState: fromProposalExecutionState(value.executionState),
+        linkedResource: fromOptional(value.linkedResource, fromProposalLinkedResource)
     };
 }
 
@@ -609,7 +706,10 @@ export interface backendInterface {
     createCommunityDocument(communityId: bigint, title: string): Promise<bigint>;
     createCommunityEvent(communityId: bigint, input: CommunityEventInput): Promise<bigint>;
     createFundraisingCampaign(communityId: bigint, input: FundraisingCampaignInput): Promise<bigint>;
+    createFundraisingProposal(communityId: bigint, input: FundraisingCampaignInput, overrides: ProposalOverrides | null): Promise<bigint>;
+    createMotionProposal(communityId: bigint, title: string, description: string, overrides: ProposalOverrides | null): Promise<bigint>;
     createProposal(communityId: bigint, title: string, description: string, overrides: ProposalOverrides | null): Promise<void>;
+    createRoleChangeProposal(communityId: bigint, title: string, input: RoleChangeProposalInput, overrides: ProposalOverrides | null): Promise<bigint>;
     deleteCommunityBoardCard(communityId: bigint, boardId: bigint, cardId: bigint): Promise<void>;
     deleteCommunityBoardColumn(communityId: bigint, boardId: bigint, columnId: bigint): Promise<void>;
     finalizeCampaign(campaignId: bigint): Promise<void>;
@@ -767,9 +867,32 @@ class Backend implements backendInterface {
         return this.handle(() => this.actor.createFundraisingCampaign(communityId, toFundraisingCampaignInput(input)));
     }
 
+    async createFundraisingProposal(communityId: bigint, input: FundraisingCampaignInput, overrides: ProposalOverrides | null): Promise<bigint> {
+        return this.handle(() =>
+            this.actor.createFundraisingProposal(communityId, toFundraisingCampaignInput(input), toOptional(overrides == null ? undefined : toProposalOverrides(overrides)))
+        );
+    }
+
+    async createMotionProposal(communityId: bigint, title: string, description: string, overrides: ProposalOverrides | null): Promise<bigint> {
+        return this.handle(() =>
+            this.actor.createMotionProposal(communityId, title, description, toOptional(overrides == null ? undefined : toProposalOverrides(overrides)))
+        );
+    }
+
     async createProposal(communityId: bigint, title: string, description: string, overrides: ProposalOverrides | null): Promise<void> {
         return this.handle(() =>
             this.actor.createProposal(communityId, title, description, toOptional(overrides == null ? undefined : toProposalOverrides(overrides)))
+        );
+    }
+
+    async createRoleChangeProposal(communityId: bigint, title: string, input: RoleChangeProposalInput, overrides: ProposalOverrides | null): Promise<bigint> {
+        return this.handle(() =>
+            this.actor.createRoleChangeProposal(
+                communityId,
+                title,
+                toRoleChangeProposalInput(input),
+                toOptional(overrides == null ? undefined : toProposalOverrides(overrides))
+            )
         );
     }
 

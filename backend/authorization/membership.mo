@@ -346,7 +346,7 @@ module {
             canManageMembership = platformAdmin or communityAdmin;
             canCreateProposal = canParticipate;
             canVoteOnProposal = canParticipate;
-            canCreateCampaign = canParticipate;
+            canCreateCampaign = platformAdmin or communityAdmin;
             canContributeToCampaign = canParticipate;
             canLeaveCommunity = switch (communityRole) {
                 case (?#member) { true };

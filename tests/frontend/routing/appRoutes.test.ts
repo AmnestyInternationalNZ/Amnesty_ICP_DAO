@@ -50,16 +50,18 @@ describe('app routes', () => {
 
   it('builds and parses community-scoped fundraising campaign routes', () => {
     expect(routePaths.fundraise(3n)).toBe('/communities/3/fundraise');
-    expect(routePaths.newCampaign(3n)).toBe('/communities/3/fundraise/new');
+    expect(routePaths.newCampaign(3n)).toBe('/communities/3/proposals/new/fundraising');
     expect(routePaths.campaign(3n, 12n)).toBe('/communities/3/fundraise/campaigns/12');
     expect(parseAppPath('/communities/3/fundraise')).toMatchObject({
       page: 'fundraise',
       communityId: 3n,
     });
     expect(parseAppPath('/communities/3/fundraise/new')).toMatchObject({
-      page: 'fundraise',
+      page: 'proposals',
       communityId: 3n,
-      campaignCreate: true,
+      proposalCreate: true,
+      proposalCreateType: 'fundraising',
+      canonicalPath: '/communities/3/proposals/new/fundraising',
     });
     expect(parseAppPath('/communities/3/fundraise/campaigns/12')).toMatchObject({
       page: 'fundraise',
@@ -71,11 +73,20 @@ describe('app routes', () => {
   it('builds and parses community-scoped proposal routes', () => {
     expect(routePaths.proposals(8n)).toBe('/communities/8/proposals');
     expect(routePaths.newProposal(8n)).toBe('/communities/8/proposals/new');
+    expect(routePaths.newProposalOfType(8n, 'motion')).toBe('/communities/8/proposals/new/motion');
+    expect(routePaths.newProposalOfType(8n, 'fundraising')).toBe('/communities/8/proposals/new/fundraising');
+    expect(routePaths.newProposalOfType(8n, 'roleChange')).toBe('/communities/8/proposals/new/role-change');
     expect(routePaths.proposal(8n, 21n)).toBe('/communities/8/proposals/21');
     expect(parseAppPath('/communities/8/proposals/new')).toMatchObject({
       page: 'proposals',
       communityId: 8n,
       proposalCreate: true,
+    });
+    expect(parseAppPath('/communities/8/proposals/new/role-change')).toMatchObject({
+      page: 'proposals',
+      communityId: 8n,
+      proposalCreate: true,
+      proposalCreateType: 'roleChange',
     });
     expect(parseAppPath('/communities/8/proposals/21')).toMatchObject({
       page: 'proposals',
