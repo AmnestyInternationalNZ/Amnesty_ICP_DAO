@@ -1,4 +1,6 @@
 import React from 'react';
+import CommissionApp from './components/commission/CommissionApp';
+import { commissionMode } from './commission-api';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
 import { useGetCallerUserProfile } from './hooks/useQueries';
 import ProfileSetup from './components/ProfileSetup';
@@ -12,6 +14,10 @@ import PublicCampaignPage from './components/fundraising/PublicCampaignPage';
 import { parseAppPath } from './routing/appRoutes';
 
 export default function App() {
+  return commissionMode ? <CommissionApp /> : <LegacyApp />;
+}
+
+function LegacyApp() {
   const { identity, isInitializing } = useInternetIdentity();
   const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
 

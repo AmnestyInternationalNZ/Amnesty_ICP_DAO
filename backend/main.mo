@@ -1,3 +1,4 @@
+import Prim "mo:prim";
 import AccessControl "authorization/access-control";
 import Membership "authorization/membership";
 import Workspace "workspace/workspace";
@@ -369,6 +370,7 @@ persistent actor {
     };
 
     func getWorkspaceAccessForCaller(caller : Principal, communityId : Nat) : Workspace.CallerAccess {
+        if(Array.find<CommissionGroup>(commissionGroups,func(g){g.id==communityId})!=null and not capable(caller,communityId,"workspace")) Debug.trap("Workspace capability required");
         let access = getCommunityAccessForCaller(caller, communityId);
         {
             communityRole = access.communityRole;
@@ -1983,5 +1985,714 @@ persistent actor {
 
     public query func transform(input : OutCall.TransformationInput) : async OutCall.TransformationOutput {
         OutCall.transform(input);
+    };
+
+    // Commission records deliberately remain separate from legacy DAO membership.
+    public type CommissionRole = {
+        #lead;
+        #member;
+        #partner
+    };
+    public type CommissionAssignment = {
+        principal : Principal;
+        role : CommissionRole
+    };
+    public type CommissionGroup = {
+        id : Nat;
+        name : Text;
+        purpose : Text;
+        stage : Nat;
+        roles : [CommissionAssignment];
+        draft : Text;
+        disagreements : Text;
+        draftShared : Bool
+    };
+    public type CommissionPublicGroup = {
+        id : Nat;
+        name : Text;
+        purpose : Text;
+        stage : Nat
+    };
+    public type CommissionConsultation = {
+        id : Nat;
+        groupId : Nat;
+        title : Text;
+        purpose : Text;
+        questions : [Text];
+        audience : Text;
+        opens : Int;
+        closes : Int;
+        guidance : Text;
+        closed : Bool
+    };
+    public type CommissionInput = {
+        alias : Text;
+        language : Text;
+        answers : Text;
+        internalConsent : Bool;
+        quoteConsent : Bool;
+        attributionConsent : Bool;
+        format : Text;
+        date : Text;
+        location : Text;
+        participants : Text;
+        themes : Text;
+        tensions : Text;
+        proposals : Text
+    };
+    public type CommissionComment = {
+        author : Text;
+        body : Text;
+        at : Int
+    };
+    public type CommissionContribution = {
+        id : Nat;
+        consultationId : Nat;
+        input : CommissionInput;
+        comments : [CommissionComment];
+        withdrawn : Bool;
+        facilitated : Bool;
+        owner : ?Principal;
+        credential : Text
+    };
+    public type CommissionSubmission = {
+        canWithdraw : Bool;
+        id : Nat;
+        consultationId : Nat;
+        input : CommissionInput;
+        comments : [CommissionComment];
+        withdrawn : Bool;
+        facilitated : Bool
+    };
+    public type CommissionFinding = {
+        id : Nat;
+        groupId : Nat;
+        kind : Text;
+        body : Text;
+        sources : [Nat];
+        needsReview : Bool
+    };
+    public type CommissionPublication = {
+        groupId : Nat;
+        title : Text;
+        body : Text;
+        disagreements : Text;
+        sources : [Nat];
+        at : Int
+    };
+    var commissionGroups : [CommissionGroup] = [];
+    var commissionConsultations : [CommissionConsultation] = [];
+    var commissionContributions : [CommissionContribution] = [];
+    var commissionFindings : [CommissionFinding] = [];
+    var commissionPublications : [CommissionPublication] = [];
+    public type CommissionStageNote = {
+        id : Nat; groupId : Nat; stage : Nat; author : Text;
+        role : Text; body : Text; sharedWithAdvisors : Bool; at : Int
+    };
+    var commissionStageNotes : [CommissionStageNote] = [];
+    var commissionParticipantNames : [(Nat, Principal, Text)] = [];
+    var commissionConsultationStages : [(Nat, Nat)] = [];
+    var commissionAdvisorStages : [(Nat, Nat)] = [];
+    func participantName(caller : Principal, groupId : Nat) : Text {
+        switch (Array.find<(Nat, Principal, Text)>(commissionParticipantNames, func(x) {
+            x.0 == groupId and x.1 == caller
+        })) { case (?x) x.2; case null "Working group" }
+    };
+    public shared ({ caller }) func commissionSetDisplayName(groupId : Nat, name : Text) : async () {
+        if (cr(caller, groupId) == null) Debug.trap("Participant access required");
+        if (name.size() == 0 or name.size() > 100) Debug.trap("Invalid display name");
+        commissionParticipantNames := Array.append(Array.filter<(Nat, Principal, Text)>(commissionParticipantNames, func(x) {
+            not (x.0 == groupId and x.1 == caller)
+        }), [(groupId, caller, name)])
+    };
+    public shared query ({ caller }) func commissionDisplayName(groupId : Nat) : async Text {
+        if (cr(caller, groupId) == null) return "";
+        participantName(caller, groupId)
+    };
+    func advisorStage(groupId : Nat, stage : Nat) : Bool {
+        Array.find<(Nat, Nat)>(commissionAdvisorStages, func(x) { x.0 == groupId and x.1 == stage }) != null
+    };
+    public shared query ({ caller }) func commissionAdvisorStageShared(groupId : Nat, stage : Nat) : async Bool {
+        if (cr(caller, groupId) == null) Debug.trap("Participant access required");
+        advisorStage(groupId, stage)
+    };
+    public shared ({ caller }) func commissionShareAdvisorStage(groupId : Nat, stage : Nat, isShared : Bool) : async () {
+        lead(caller, groupId);
+        if (stage > 4) Debug.trap("Invalid stage");
+        commissionAdvisorStages := Array.filter<(Nat, Nat)>(commissionAdvisorStages, func(x) { not (x.0 == groupId and x.1 == stage) });
+        if (isShared) commissionAdvisorStages := Array.append(commissionAdvisorStages, [(groupId, stage)])
+    };
+    public shared query ({ caller }) func commissionListStageNotes(groupId : Nat, stage : Nat) : async [CommissionStageNote] {
+        let isCore = core(caller, groupId);
+        let isAdvisor = not isCore and capable(caller,groupId,"sharedParticipation") and advisorStage(groupId, stage);
+        if (not isCore and not isAdvisor) Debug.trap("Stage discussion not shared");
+        Array.filter<CommissionStageNote>(commissionStageNotes, func(n) {
+            n.groupId == groupId and n.stage == stage and (isCore or n.sharedWithAdvisors)
+        })
+    };
+    public shared ({ caller }) func commissionAddStageNote(groupId : Nat, stage : Nat, body : Text, sharedWithAdvisors : Bool) : async Nat {
+        let role = cr(caller, groupId);
+        let isCore = core(caller, groupId);
+        let isAdvisor = not isCore and capable(caller,groupId,"sharedParticipation") and advisorStage(groupId, stage);
+        if (not isCore and not isAdvisor) Debug.trap("Stage discussion not shared");
+        if (stage > 4 or body.size() == 0 or body.size() > 10000) Debug.trap("Invalid stage comment");
+        if (sharedWithAdvisors and not capable(caller,groupId,"manageGroup") and not (isAdvisor and not isCore)) Debug.trap("Only leads may share internal comments");
+        let id = commissionId();
+        commissionStageNotes := Array.append(commissionStageNotes, [{
+            id; groupId; stage; body; author = participantName(caller, groupId);
+            role = definition(roleId(caller,groupId),roleDefinitions(groupId)).name;
+            sharedWithAdvisors = sharedWithAdvisors or isAdvisor; at = Time.now()
+        }]); id
+    };
+    public shared ({ caller }) func commissionSetConsultationStage(id : Nat, stage : Nat) : async () {
+        lead(caller, cc(id).groupId);
+        if (stage > 4) Debug.trap("Invalid stage");
+        commissionConsultationStages := Array.append(Array.filter<(Nat, Nat)>(commissionConsultationStages, func(x) { x.0 != id }), [(id, stage)])
+    };
+    public shared query ({ caller }) func commissionStageConsultations(groupId : Nat, stage : Nat) : async [CommissionConsultation] {
+        ignore cg(groupId);
+        Array.filter<CommissionConsultation>(commissionConsultations, func(c) {
+            c.groupId == groupId and visibleConsultation(caller, c) and
+            (switch(Array.find<(Nat, Nat)>(commissionConsultationStages, func(x) { x.0 == c.id })) { case (?x) x.1; case null 1 }) == stage
+        })
+    };
+
+    // Additive POC configuration. Existing role assignments and return links remain valid.
+    public type CommissionRoleDefinition = { id : Text; name : Text; capabilities : [Text] };
+    public type CommissionAccess = { roleId : Text; name : Text; capabilities : [Text]; revision : Nat };
+    public type CommissionParticipant = { principal : Principal; roleId : Text; name : Text };
+    public type CommissionContributionType = { id : Text; name : Text; guidance : Text; layout : Text };
+    public type CommissionContributionDetail = { id : Nat; typeId : Text; documentReference : Text; processSuggestion : Bool; withdrawnAt : ?Int };
+    public type CommissionReviewCopy = { consultationId : Nat; title : Text; body : Text; sources : [Nat]; needsReview : Bool };
+    public type CommissionDraftEvidence = { groupId : Nat; findings : [Nat]; needsReview : Bool };
+    public type CommissionProvenanceLink = {groupId : Nat; sourceId : Nat; targetKind : Text; targetId : Nat};
+    var commissionProvenanceLinks : [CommissionProvenanceLink] = [];
+    public type CommissionPublicationMarker = { id : Nat; groupId : Nat; at : Int; sources : [Nat]; status : Text };
+    var commissionRoleDefinitions : [(Nat, [CommissionRoleDefinition])] = [];
+    var commissionRoleIds : [(Nat, Principal, Text)] = [];
+    var commissionTypeDefinitions : [(Nat, [CommissionContributionType])] = [];
+    var commissionDetails : [CommissionContributionDetail] = [];
+    var commissionReviewCopies : [CommissionReviewCopy] = [];
+    var commissionDraftEvidence : [CommissionDraftEvidence] = [];
+    var commissionPublicationMarkers : [CommissionPublicationMarker] = [];
+    var commissionAccessRevision : Nat = 0;
+    func includes(xs : [Text], value : Text) : Bool { Array.find<Text>(xs, func(x) { x == value }) != null };
+    func defaultRoles() : [CommissionRoleDefinition] { [
+        {id="lead";name="Lead";capabilities=["manageGroup","internalAccess","sharedParticipation","recordFacilitated","editSynthesis","publish","workspace"]},
+        {id="member";name="Member";capabilities=["internalAccess","sharedParticipation","recordFacilitated","editSynthesis","workspace"]},
+        {id="partner";name="Advisor";capabilities=["sharedParticipation"]},
+        {id="contributor";name="Contributor";capabilities=[]}
+    ] };
+    func roleDefinitions(groupId : Nat) : [CommissionRoleDefinition] {
+        switch (Array.find<(Nat,[CommissionRoleDefinition])>(commissionRoleDefinitions, func(x) {x.0 == groupId})) {case (?x) x.1;case null defaultRoles()}
+    };
+    func roleId(caller : Principal, groupId : Nat) : Text {
+        if (Principal.isAnonymous(caller)) return "contributor";
+        switch (Array.find<(Nat,Principal,Text)>(commissionRoleIds, func(x) {x.0 == groupId and x.1 == caller})) {
+            case (?x) x.2;
+            case null switch (cr(caller,groupId)) {case (?#lead) "lead";case (?#member) "member";case (?#partner) "partner";case null "contributor"}
+        }
+    };
+    func definition(id : Text, definitions : [CommissionRoleDefinition]) : CommissionRoleDefinition {
+        switch (Array.find<CommissionRoleDefinition>(definitions, func(x) {x.id == id})) {case (?x) x;case null ({id="contributor";name="Contributor";capabilities=[]})}
+    };
+    func capable(caller : Principal, groupId : Nat, capability : Text) : Bool {
+        not Principal.isAnonymous(caller) and roleId(caller,groupId) != "contributor" and includes(definition(roleId(caller,groupId),roleDefinitions(groupId)).capabilities,capability)
+    };
+    func requireCapability(caller : Principal, groupId : Nat, capability : Text) {
+        if (not capable(caller,groupId,capability)) Debug.trap("Permission required: " # capability)
+    };
+    func managerRemains(groupId : Nat, defs : [CommissionRoleDefinition], assignments : [CommissionAssignment]) {
+        if (Array.find<CommissionAssignment>(assignments,func(a) {includes(definition(roleId(a.principal,groupId),defs).capabilities,"manageGroup")}) == null) Debug.trap("Keep at least one lead or group manager")
+    };
+    func defaultTypes() : [CommissionContributionType] {[
+        {id="written";name="Written submission";guidance="Share your experience or proposal in your own words.";layout="written"},
+        {id="collective";name="Collective input";guidance="Describe the collective without identifying individuals. Confirm you are authorised to represent this input.";layout="collective"},
+        {id="discussion";name="Facilitated discussion";guidance="Record the discussion and preserve disagreement.";layout="event"},
+        {id="roundtable";name="Roundtable";guidance="Summarise themes, tensions and proposals from the roundtable.";layout="event"},
+        {id="harvest";name="Consultation harvest";guidance="Record the findings of a consultation without personal participant lists.";layout="event"},
+        {id="document";name="Document reference";guidance="Provide a document link or workspace document ID and explain its relevance.";layout="document"},
+        {id="other";name="Other";guidance="Describe the format and share your input.";layout="written"}
+    ]};
+    func contributionTypes(groupId : Nat) : [CommissionContributionType] {
+        switch(Array.find<(Nat,[CommissionContributionType])>(commissionTypeDefinitions,func(x){x.0==groupId})) {case (?x) x.1;case null defaultTypes()}
+    };
+    func ensureCommissionSettings(groupId : Nat) {
+        ignore cg(groupId);
+        if(Array.find<(Nat,[CommissionRoleDefinition])>(commissionRoleDefinitions,func(x){x.0==groupId})==null) commissionRoleDefinitions:=Array.append(commissionRoleDefinitions,[(groupId,defaultRoles())]);
+        if(Array.find<(Nat,[CommissionContributionType])>(commissionTypeDefinitions,func(x){x.0==groupId})==null) commissionTypeDefinitions:=Array.append(commissionTypeDefinitions,[(groupId,defaultTypes())]);
+    };
+    public shared ({caller}) func commissionInitializeSettings(groupId : Nat) : async () {lead(caller,groupId);ensureCommissionSettings(groupId)};
+    public shared query ({caller}) func commissionAccess(groupId : Nat) : async CommissionAccess {
+        ignore cg(groupId);let id=roleId(caller,groupId);let d=definition(id,roleDefinitions(groupId));{roleId=id;name=d.name;capabilities=if(Principal.isAnonymous(caller) or id=="contributor") [] else d.capabilities;revision=commissionAccessRevision}
+    };
+    public shared query ({caller}) func commissionRoles(groupId : Nat) : async [CommissionRoleDefinition] {lead(caller,groupId);roleDefinitions(groupId)};
+    public shared query ({caller}) func commissionParticipants(groupId : Nat) : async [CommissionParticipant] {
+        lead(caller,groupId);Array.map<CommissionAssignment,CommissionParticipant>(cg(groupId).roles,func(a){{principal=a.principal;roleId=roleId(a.principal,groupId);name=participantName(a.principal,groupId)}})
+    };
+    public shared ({caller}) func commissionSaveRole(groupId : Nat, input : CommissionRoleDefinition, isNew : Bool) : async Text {
+        lead(caller,groupId);ensureCommissionSettings(groupId);
+        if(input.name.size()==0 or input.name.size() > 100) Debug.trap("Role name is required (maximum 100 characters)");
+        let allowed=["manageGroup","internalAccess","sharedParticipation","recordFacilitated","editSynthesis","publish","workspace"];
+        for(c in input.capabilities.vals()) {if(not includes(allowed,c)) Debug.trap("Unknown capability")};
+        if((includes(input.capabilities,"editSynthesis") or includes(input.capabilities,"publish")) and not includes(input.capabilities,"internalAccess")) Debug.trap("Synthesis and publication require internal access");
+        let id=if(isNew) "role-" # Nat.toText(commissionId()) else input.id;
+        if(not isNew and Array.find<CommissionRoleDefinition>(roleDefinitions(groupId),func(r){r.id==id})==null) Debug.trap("Role not found");
+        if(id=="contributor" and input.capabilities.size() > 0) Debug.trap("Public contributors retain submission-scoped access only");
+        let d={input with id};let defs=Array.append(Array.filter<CommissionRoleDefinition>(roleDefinitions(groupId),func(r){r.id!=id}),[d]);
+        managerRemains(groupId,defs,cg(groupId).roles);
+        commissionRoleDefinitions:=Array.append(Array.filter<(Nat,[CommissionRoleDefinition])>(commissionRoleDefinitions,func(x){x.0!=groupId}),[(groupId,defs)]);
+        for(a in cg(groupId).roles.vals()) {Membership.setCommunityRole(membershipState,groupId,a.principal,if(capable(a.principal,groupId,"workspace")) (if(capable(a.principal,groupId,"manageGroup")) ?#communityAdmin else ?#member) else null)};
+        syncCommunityMembersField(groupId);commissionAccessRevision+=1; id
+    };
+    func assignCommissionRole(caller : Principal, groupId : Nat, principal : Principal, id : ?Text) {
+        lead(caller,groupId);ensureCommissionSettings(groupId);
+        if(Principal.isAnonymous(principal)) Debug.trap("A signed-in principal is required");
+        switch(id) {case (?value) {if(value=="contributor" or Array.find<CommissionRoleDefinition>(roleDefinitions(groupId),func(r){r.id==value})==null) Debug.trap("Choose a signed-in role")};case null {}};
+        let g=cg(groupId);let others=Array.filter<CommissionAssignment>(g.roles,func(a){a.principal!=principal});
+        commissionRoleIds:=Array.filter<(Nat,Principal,Text)>(commissionRoleIds,func(x){not(x.0==groupId and x.1==principal)});
+        let roles=switch(id){case (?value) {commissionRoleIds:=Array.append(commissionRoleIds,[(groupId,principal,value)]);Array.append(others,[{principal;role=if(value=="lead") #lead else if(value=="partner") #partner else #member}])};case null others};
+        managerRemains(groupId,roleDefinitions(groupId),roles);
+        commissionGroups:=Array.map<CommissionGroup,CommissionGroup>(commissionGroups,func(x){if(x.id==groupId) ({x with roles}) else x});
+        Membership.setCommunityRole(membershipState,groupId,principal,if(capable(principal,groupId,"workspace")) (if(capable(principal,groupId,"manageGroup")) ?#communityAdmin else ?#member) else null);
+        syncCommunityMembersField(groupId);commissionAccessRevision+=1
+    };
+    public shared ({caller}) func commissionAssignConfiguredRole(groupId : Nat, principal : Principal, id : ?Text) : async () {assignCommissionRole(caller,groupId,principal,id)};
+    public shared query func commissionContributionTypes(groupId : Nat) : async [CommissionContributionType] {ignore cg(groupId);contributionTypes(groupId)};
+    public shared ({caller}) func commissionSaveContributionType(groupId : Nat, input : CommissionContributionType, isNew : Bool) : async Text {
+        lead(caller,groupId);ensureCommissionSettings(groupId);
+        if(input.name.size()==0 or input.name.size() > 100 or input.guidance.size() > 10000 or not includes(["written","collective","event","document"],input.layout)) Debug.trap("Invalid contribution type");
+        let id=if(isNew) "type-" # Nat.toText(commissionId()) else input.id;
+        if(not isNew and Array.find<CommissionContributionType>(contributionTypes(groupId),func(t){t.id==id})==null) Debug.trap("Contribution type not found");
+        let types=Array.append(Array.filter<CommissionContributionType>(contributionTypes(groupId),func(t){t.id!=id}),[{input with id}]);
+        commissionTypeDefinitions:=Array.append(Array.filter<(Nat,[CommissionContributionType])>(commissionTypeDefinitions,func(x){x.0!=groupId}),[(groupId,types)]);id
+    };
+    func rememberSources(groupId : Nat,sources : [Nat],targetKind : Text,targetId : Nat) {
+        for(sourceId in sources.vals()) {if(Array.find<CommissionProvenanceLink>(commissionProvenanceLinks,func(x){x.sourceId==sourceId and x.targetKind==targetKind and x.targetId==targetId})==null) commissionProvenanceLinks:=Array.append(commissionProvenanceLinks,[{groupId;sourceId;targetKind;targetId}])}
+    };
+    public shared query ({caller}) func commissionSourceProvenance(groupId : Nat) : async [CommissionProvenanceLink] {requireCore(caller,groupId);Array.filter<CommissionProvenanceLink>(commissionProvenanceLinks,func(x){x.groupId==groupId})};
+    func sourcesOfDraft(groupId : Nat) : [Nat] {
+        var sources : [Nat]=[];
+        for(id in draftEvidence(groupId).findings.vals()) {switch(Array.find<CommissionFinding>(commissionFindings,func(f){f.id==id and f.groupId==groupId})) {case (?f) {for(n in f.sources.vals()){if(Array.find<Nat>(sources,func(x){x==n})==null) sources:=Array.append(sources,[n])}};case null {}}};sources
+    };
+    func contributionDetail(id : Nat) : CommissionContributionDetail {
+        switch(Array.find<CommissionContributionDetail>(commissionDetails,func(x){x.id==id})) {case (?x) x;case null ({id;typeId=if(cs(id).facilitated) "discussion" else "written";documentReference="";processSuggestion=false;withdrawnAt=null})}
+    };
+    public shared query ({caller}) func commissionContributionDetail(id : Nat, credential : Text) : async CommissionContributionDetail {
+        let c=cs(id);if(not core(caller,cc(c.consultationId).groupId) and not owns(caller,c,credential)) Debug.trap("Private submission");contributionDetail(id)
+    };
+    public shared query ({caller}) func commissionSubmissionTypes(id : Nat, credential : Text) : async [CommissionContributionType] {
+        let c=cs(id);let groupId=cc(c.consultationId).groupId;
+        if(not core(caller,groupId) and not owns(caller,c,credential)) Debug.trap("Private submission");
+        contributionTypes(groupId)
+    };
+    public shared query ({caller}) func commissionGroupSources(groupId : Nat) : async [CommissionSubmission] {
+        requireCore(caller,groupId);Array.map<CommissionContribution,CommissionSubmission>(Array.filter<CommissionContribution>(commissionContributions,func(c){cc(c.consultationId).groupId==groupId}),func(c){submissionView(c,caller,"")})
+    };
+    public shared ({caller}) func commissionSubmitFlexible(consultationId : Nat, input : CommissionInput, credential : Text, typeId : Text, reference : Text, processSuggestion : Bool, collectiveAuthority : Bool) : async Nat {
+        let groupId=cc(consultationId).groupId;
+        let t=switch(Array.find<CommissionContributionType>(contributionTypes(groupId),func(t){t.id==typeId})){case (?x) x;case null Debug.trap("Contribution type not found")};
+        if(reference.size() > 2000) Debug.trap("Document reference is too long");
+        if(t.layout=="document" and not processSuggestion and not (Text.startsWith(reference,#text "https://") or Text.startsWith(reference,#text "workspace:"))) Debug.trap("Use an HTTPS document link or workspace:document-id reference");
+        if(Text.startsWith(reference,#text "workspace:")) {requireCapability(caller,groupId,"workspace"); let id=switch(Nat.fromText(Text.trimStart(reference,#text "workspace:"))){case (?n) n;case null Debug.trap("Invalid workspace reference")};switch(Workspace.getDocument(workspaceState,caller,groupId,getWorkspaceAccessForCaller(caller,groupId),id)){case null Debug.trap("Workspace document access required");case (?_) {}}};
+        if(t.layout=="collective" and not processSuggestion and (not collectiveAuthority or input.participants.size()==0)) Debug.trap("Confirm authority and describe the collective");
+        let facilitated=t.layout=="event" and not processSuggestion;
+        let id=submitCommission(caller,consultationId,{input with format=t.name},credential,facilitated);
+        commissionDetails:=Array.append(commissionDetails,[{id;typeId;documentReference=reference;processSuggestion;withdrawnAt=null}]);id
+    };
+    public shared query ({caller}) func commissionReviewCopy(consultationId : Nat) : async ?CommissionReviewCopy {
+        if(not visibleConsultation(caller,cc(consultationId))) Debug.trap("Consultation access required");
+        Array.find<CommissionReviewCopy>(commissionReviewCopies,func(x){x.consultationId==consultationId})
+    };
+    public shared ({caller}) func commissionSaveReviewCopy(input : CommissionReviewCopy) : async () {
+        let groupId=cc(input.consultationId).groupId;lead(caller,groupId);
+        if(input.title.size()==0 or input.body.size()==0 or input.body.size() > 100000) Debug.trap("A title and selected review text are required");
+        validSources(groupId,input.sources,true);
+        commissionReviewCopies:=Array.append(Array.filter<CommissionReviewCopy>(commissionReviewCopies,func(x){x.consultationId!=input.consultationId}),[{input with needsReview=false}]);
+        rememberSources(groupId,input.sources,"reviewCopy",input.consultationId)
+    };
+    func draftEvidence(groupId : Nat) : CommissionDraftEvidence {
+        switch(Array.find<CommissionDraftEvidence>(commissionDraftEvidence,func(x){x.groupId==groupId})){case (?x) x;case null ({groupId;findings=[];needsReview=false})}
+    };
+    public shared query ({caller}) func commissionDraftEvidenceState(groupId : Nat) : async CommissionDraftEvidence {requireCore(caller,groupId);draftEvidence(groupId)};
+    public shared ({caller}) func commissionSaveDraftEvidence(groupId : Nat, findingIds : [Nat], confirmReview : Bool) : async () {saveDraftEvidence(caller,groupId,findingIds,confirmReview)};
+    func saveDraftEvidence(caller : Principal, groupId : Nat, findingIds : [Nat], confirmReview : Bool) {
+        requireCapability(caller,groupId,"editSynthesis");
+        for(id in findingIds.vals()) {switch(Array.find<CommissionFinding>(commissionFindings,func(f){f.id==id and f.groupId==groupId})){case null Debug.trap("Finding not found in this group");case (?f) {if(f.needsReview) Debug.trap("Review source-linked findings first")}}};
+        let prior=draftEvidence(groupId);if(prior.needsReview and not confirmReview) Debug.trap("Confirm review of the recommendation after withdrawal");
+        commissionDraftEvidence:=Array.append(Array.filter<CommissionDraftEvidence>(commissionDraftEvidence,func(x){x.groupId!=groupId}),[{groupId;findings=findingIds;needsReview=false}]);
+        rememberSources(groupId,sourcesOfDraft(groupId),"recommendation",groupId)
+    };
+    public shared ({caller}) func commissionSaveRecommendation(groupId : Nat,draft : Text,disagreements : Text,findingIds : [Nat],confirmReview : Bool) : async () {
+        requireCapability(caller,groupId,"editSynthesis");
+        if(draft.size() > 100000 or disagreements.size() > 100000) Debug.trap("Recommendation text is too long");
+        saveDraftEvidence(caller,groupId,findingIds,confirmReview);
+        commissionGroups:=Array.map<CommissionGroup,CommissionGroup>(commissionGroups,func(g){if(g.id==groupId) ({g with draft;disagreements;draftShared=false}) else g})
+    };
+    public shared query ({caller}) func commissionPublicationStatus(groupId : Nat) : async [CommissionPublicationMarker] {requireCore(caller,groupId);Array.filter<CommissionPublicationMarker>(commissionPublicationMarkers,func(x){x.groupId==groupId})};
+
+    var commissionNextId : Nat = 0;
+    func commissionId() : Nat {
+        let id = commissionNextId;
+        commissionNextId += 1;
+        id
+    };
+    func cg(id : Nat) : CommissionGroup {
+        switch (Array.find<CommissionGroup>(commissionGroups, func(g) {
+            g.id == id
+        })) {
+            case (?g) g;
+            case null Debug.trap("Working group not found")
+        }
+    };
+    func cc(id : Nat) : CommissionConsultation {
+        switch (Array.find<CommissionConsultation>(commissionConsultations, func(c) {
+            c.id == id
+        })) {
+            case (?c) c;
+            case null Debug.trap("Consultation not found")
+        }
+    };
+    func cs(id : Nat) : CommissionContribution {
+        switch (Array.find<CommissionContribution>(commissionContributions, func(c) {
+            c.id == id
+        })) {
+            case (?c) c;
+            case null Debug.trap("Submission not found")
+        }
+    };
+    func cr(caller : Principal, id : Nat) : ?CommissionRole {
+        if (Principal.isAnonymous(caller)) return null;
+        switch (Array.find<CommissionAssignment>(cg(id).roles, func(r) {
+            r.principal == caller
+        })) {
+            case (?r) ?r.role;
+            case null null
+        }
+    };
+    func core(caller : Principal, id : Nat) : Bool {capable(caller,id,"internalAccess")};
+    func lead(caller : Principal, id : Nat) {if(not capable(caller,id,"manageGroup")) Debug.trap("Only the group lead or manager can do this")};
+    func requireCore(caller : Principal, id : Nat) {
+        if (not core(caller, id)) Debug.trap("Working group access required")
+    };
+    func visibleConsultation(caller : Principal, c : CommissionConsultation) : Bool {
+        c.audience == "public" or core(caller, c.groupId) or (c.audience == "partners" and capable(caller,c.groupId,"sharedParticipation"))
+    };
+    func submissionView(c : CommissionContribution, caller : Principal, credential : Text) : CommissionSubmission {
+        {
+            canWithdraw = owns(caller, c, credential) or (c.facilitated and core(caller, cc(c.consultationId).groupId));
+            id = c.id;
+            consultationId = c.consultationId;
+            input = c.input;
+            comments = c.comments;
+            withdrawn = c.withdrawn;
+            facilitated = c.facilitated
+        }
+    };
+    func owns(caller : Principal, c : CommissionContribution, credential : Text) : Bool {
+        (not Principal.isAnonymous(caller) and c.owner == ?caller) or (credential.size() >= 64 and credential == c.credential)
+    };
+    func validSources(groupId : Nat, sources : [Nat], publication : Bool) {
+        for (id in sources.vals()) {
+            let c = cs(id);
+            if (cc(c.consultationId).groupId != groupId or c.withdrawn or not c.input.internalConsent) Debug.trap("Unavailable source");
+            if (publication and not c.input.quoteConsent) Debug.trap("Publication sources require quotation consent")
+        }
+    };
+    public shared query func commissionListGroups() : async [CommissionPublicGroup] {
+        Array.map<CommissionGroup, CommissionPublicGroup>(commissionGroups, func(g) {
+            {
+                id = g.id;
+                name = g.name;
+                purpose = g.purpose;
+                stage = g.stage
+            }
+        })
+    };
+    public shared query ({ caller }) func commissionRole(groupId : Nat) : async ?CommissionRole {
+        cr(caller, groupId)
+    };
+    public shared query ({ caller }) func commissionGetGroup(groupId : Nat) : async CommissionGroup {
+        if(not core(caller,groupId) and not capable(caller,groupId,"manageGroup")) Debug.trap("Working group access required");
+        let g=cg(groupId);if(core(caller,groupId)) g else ({g with draft="";disagreements="";draftShared=false})
+    };
+    public shared ({caller}) func commissionSaveGroupDetails(groupId : Nat,name : Text,purpose : Text,stage : Nat) : async () {
+        lead(caller,groupId);if(name.size()==0 or stage > 4) Debug.trap("Invalid group settings");
+        commissionGroups:=Array.map<CommissionGroup,CommissionGroup>(commissionGroups,func(g){if(g.id==groupId) ({g with name;purpose;stage}) else g});
+        let community=getCommunityOrTrap(groupId);communities:=natMap.put(communities,groupId,{community with name;policy=purpose})
+    };
+    public shared query ({ caller }) func commissionSharedDraft(groupId : Nat) : async Text {
+        let g = cg(groupId);
+        if (not core(caller, groupId) and not (capable(caller,groupId,"sharedParticipation") and g.draftShared)) Debug.trap("Draft not shared");
+        g.draft
+    };
+    public shared ({ caller }) func commissionSaveGroup(groupId : Nat, name : Text, purpose : Text, stage : Nat, draft : Text, disagreements : Text, draftShared : Bool) : async () {
+        let g = cg(groupId);
+        if(draft != g.draft or disagreements != g.disagreements) requireCapability(caller,groupId,"editSynthesis");
+        if(not core(caller,groupId) and not capable(caller,groupId,"manageGroup")) Debug.trap("Working group access required");
+        if (name != g.name or purpose != g.purpose or stage != g.stage or draftShared != g.draftShared) lead(caller, groupId);
+        if (stage > 4 or name.size() == 0) Debug.trap("Invalid group settings");
+        commissionGroups := Array.map<CommissionGroup, CommissionGroup>(commissionGroups, func(x) {
+            if (x.id == groupId) {
+                {
+                    x with name;
+                    purpose;
+                    stage;
+                    draft;
+                    disagreements;
+                    draftShared
+                }
+            } else x
+        });
+        let community = getCommunityOrTrap(groupId);
+        communities := natMap.put(communities, groupId, { community with name; policy = purpose });
+    };
+    public shared ({caller}) func commissionAssignRole(groupId : Nat, principal : Principal, role : ?CommissionRole) : async () {
+        assignCommissionRole(caller,groupId,principal,switch(role){case (?#lead) ?"lead";case (?#member) ?"member";case (?#partner) ?"partner";case null null})
+    };
+    public shared query ({ caller }) func commissionListConsultations(groupId : Nat) : async [CommissionConsultation] {
+        ignore cg(groupId);
+        Array.filter<CommissionConsultation>(commissionConsultations, func(c) {
+            c.groupId == groupId and visibleConsultation(caller, c)
+        })
+    };
+    public shared ({ caller }) func commissionSaveConsultation(input : CommissionConsultation, isNew : Bool) : async Nat {
+        lead(caller,input.groupId);
+        if (input.title.size() == 0 or input.questions.size() == 0 or input.closes <= input.opens or (input.audience != "public" and input.audience != "partners" and input.audience != "core")) Debug.trap("Invalid consultation");
+        let id = if (isNew) commissionId() else input.id;
+        if (not isNew and cc(id).groupId != input.groupId) Debug.trap("Wrong group");
+        let c = {
+            input with id
+        };
+        if (isNew) {
+            commissionConsultations := Array.append(commissionConsultations, [c]);
+            commissionConsultationStages := Array.append(commissionConsultationStages, [(id, cg(input.groupId).stage)])
+        } else {
+            commissionConsultations := Array.map<CommissionConsultation, CommissionConsultation>(commissionConsultations, func(x) {
+                if (x.id == id) c else x
+            })
+        };
+        id
+    };
+    public shared ({caller}) func commissionSubmit(consultationId : Nat, input : CommissionInput, credential : Text, facilitated : Bool) : async Nat {submitCommission(caller,consultationId,input,credential,facilitated)};
+    func submitCommission(caller : Principal, consultationId : Nat, input : CommissionInput, credential : Text, facilitated : Bool) : Nat {
+        let c = cc(consultationId);
+        if (not visibleConsultation(caller, c)) Debug.trap("Consultation access required");
+        if (c.closed or Time.now() < c.opens or Time.now() > c.closes) Debug.trap("Consultation is closed");
+        if (facilitated) {if(not capable(caller,c.groupId,"recordFacilitated")) Debug.trap("Working group access required for facilitated recording")};
+        if (not input.internalConsent or input.answers.size() == 0 or input.answers.size() > 100000 or credential.size() != 64) Debug.trap("Answers, internal consent and a private return credential are required");
+        if (Array.find<CommissionContribution>(commissionContributions, func(s) {
+            s.credential == credential
+        }) != null) Debug.trap("Return credential already used");
+        let id = commissionId();
+        commissionContributions := Array.append(commissionContributions, [{
+            id;
+            consultationId;
+            input;
+            credential;
+            comments = [];
+            withdrawn = false;
+            facilitated;
+            owner = if (Principal.isAnonymous(caller)) null else ?caller
+        }]);
+        id
+    };
+    public shared query ({ caller }) func commissionListSubmissions(consultationId : Nat) : async [CommissionSubmission] {
+        requireCore(caller, cc(consultationId).groupId);
+        Array.map<CommissionContribution, CommissionSubmission>(Array.filter<CommissionContribution>(commissionContributions, func(s) {
+            s.consultationId == consultationId and not s.withdrawn
+        }), func(s) { submissionView(s, caller, "") })
+    };
+    public shared query ({ caller }) func commissionGetSubmission(id : Nat, credential : Text) : async CommissionSubmission {
+        let s = cs(id);
+        if (not core(caller, cc(s.consultationId).groupId) and not owns(caller, s, credential)) Debug.trap("Private submission");
+        submissionView(s, caller, credential)
+    };
+    public shared ({ caller }) func commissionComment(id : Nat, credential : Text, body : Text) : async () {
+        let s = cs(id);
+        let groupId = cc(s.consultationId).groupId;
+        let staff = core(caller, groupId);
+        if (not staff and not owns(caller, s, credential)) Debug.trap("Private submission");
+        if (s.withdrawn or body.size() == 0 or body.size() > 10000) Debug.trap("Cannot add comment");
+        let comment = {
+            author = if (staff) (if (participantName(caller, groupId) == "Working group") "Working group" else participantName(caller, groupId) # " · Working Group") else if (s.input.alias == "") "Contributor" else s.input.alias;
+            body;
+            at = Time.now()
+        };
+        commissionContributions := Array.map<CommissionContribution, CommissionContribution>(commissionContributions, func(x) {
+            if (x.id == id) {
+                {
+                    x with comments = Array.append(x.comments, [comment])
+                }
+            } else x
+        })
+    };
+    public shared ({ caller }) func commissionWithdraw(id : Nat, credential : Text) : async () {
+        let s = cs(id);
+        if (not owns(caller, s, credential) and not (s.facilitated and core(caller, cc(s.consultationId).groupId))) Debug.trap("Only the contributor may withdraw");
+        if(s.withdrawn) return;
+        for(p in commissionPublications.vals()) {
+            if(Array.find<Nat>(p.sources,func(n){n==id})!=null and Array.find<CommissionPublicationMarker>(commissionPublicationMarkers,func(m){m.groupId==p.groupId and m.at==p.at})==null) commissionPublicationMarkers:=Array.append(commissionPublicationMarkers,[{id=commissionId();groupId=p.groupId;at=p.at;sources=p.sources;status="withheld"}])
+        };
+        let blank : CommissionInput = {
+            alias = "";
+            language = "";
+            answers = "";
+            internalConsent = false;
+            quoteConsent = false;
+            attributionConsent = false;
+            format = "";
+            date = "";
+            location = "";
+            participants = "";
+            themes = "";
+            tensions = "";
+            proposals = ""
+        };
+        commissionContributions := Array.map<CommissionContribution, CommissionContribution>(commissionContributions, func(x) {
+            if (x.id == id) {
+                {
+                    x with input = blank;
+                    comments = [];
+                    withdrawn = true;
+                    owner = null
+                }
+            } else x
+        });
+        commissionFindings := Array.map<CommissionFinding, CommissionFinding>(commissionFindings, func(f) {
+            if (Array.find<Nat>(f.sources, func(n) {
+                n == id
+            }) != null) {
+                {
+                    f with needsReview = true
+                }
+            } else f
+        });
+        commissionPublications := Array.filter<CommissionPublication>(commissionPublications, func(p) {
+            Array.find<Nat>(p.sources, func(n) {
+                n == id
+            }) == null
+        });
+        let info=contributionDetail(id);
+        commissionDetails:=Array.append(Array.filter<CommissionContributionDetail>(commissionDetails,func(x){x.id!=id}),[{info with documentReference="";withdrawnAt=?Time.now()}]);
+        let groupId=cc(s.consultationId).groupId;let prior=draftEvidence(groupId);
+        let affectsDraft=prior.findings.size()==0 or Array.find<Nat>(prior.findings,func(fid){Array.find<CommissionFinding>(commissionFindings,func(f){f.id==fid and Array.find<Nat>(f.sources,func(n){n==id})!=null})!=null})!=null;
+        if(affectsDraft) commissionDraftEvidence:=Array.append(Array.filter<CommissionDraftEvidence>(commissionDraftEvidence,func(x){x.groupId!=groupId}),[{prior with needsReview=true}]);
+        commissionPublicationMarkers:=Array.map<CommissionPublicationMarker,CommissionPublicationMarker>(commissionPublicationMarkers,func(m){if(Array.find<Nat>(m.sources,func(n){n==id})!=null) ({m with status="withheld"}) else m});
+        commissionReviewCopies:=Array.map<CommissionReviewCopy,CommissionReviewCopy>(commissionReviewCopies,func(r){if(Array.find<Nat>(r.sources,func(n){n==id})!=null) ({r with title="Review copy withheld";body="";needsReview=true}) else r})
+
+    };
+    public shared query ({ caller }) func commissionListFindings(groupId : Nat) : async [CommissionFinding] {
+        requireCore(caller, groupId);
+        Array.filter<CommissionFinding>(commissionFindings, func(f) {
+            f.groupId == groupId
+        })
+    };
+    public shared ({ caller }) func commissionSaveFinding(input : CommissionFinding, isNew : Bool) : async Nat {
+        requireCapability(caller,input.groupId,"editSynthesis");
+        if (input.body.size() == 0 or (input.kind != "insight" and input.kind != "tension" and input.kind != "proposal")) Debug.trap("Invalid finding");
+        validSources(input.groupId, input.sources, false);
+        let id = if (isNew) commissionId() else input.id;
+        if (not isNew) {
+            switch (Array.find<CommissionFinding>(commissionFindings, func(f) {
+                f.id == id and f.groupId == input.groupId
+            })) {
+                case null Debug.trap("Finding not found");
+                case _ {
+                }
+            }
+        };
+        let f = {
+            input with id;
+            needsReview = false
+        };
+        rememberSources(input.groupId,input.sources,"finding",id);
+        commissionFindings := if (isNew) Array.append(commissionFindings, [f]) else Array.map<CommissionFinding, CommissionFinding>(commissionFindings, func(x) {
+            if (x.id == id) f else x
+        });
+        id
+    };
+    public shared ({ caller }) func commissionPublish(input : CommissionPublication) : async () {
+        if(not capable(caller,input.groupId,"publish")) Debug.trap("Only the group lead or publication role can publish");
+        validSources(input.groupId,input.sources,true);
+        if(draftEvidence(input.groupId).needsReview) Debug.trap("Review the recommendation after withdrawal before publishing");
+        if (input.title.size() == 0 or input.body.size() == 0) Debug.trap("Publication needs a title and body");
+        validSources(input.groupId, input.sources, true);
+        var sources=input.sources;
+        for(n in sourcesOfDraft(input.groupId).vals()){if(Array.find<Nat>(sources,func(x){x==n})==null) sources:=Array.append(sources,[n])};
+        validSources(input.groupId,sources,true);
+        let p = {input with at = Time.now();sources};
+        let publicationId=commissionId();rememberSources(input.groupId,sources,"publication",publicationId);
+        commissionPublicationMarkers:=Array.map<CommissionPublicationMarker,CommissionPublicationMarker>(commissionPublicationMarkers,func(m){if(m.groupId==input.groupId and m.status=="published") ({m with status="superseded"}) else m});
+        commissionPublicationMarkers:=Array.append(commissionPublicationMarkers,[{id=publicationId;groupId=input.groupId;at=p.at;sources;status="published"}]);
+        commissionPublications := Array.append(Array.filter<CommissionPublication>(commissionPublications, func(x) {
+            x.groupId != input.groupId
+        }), [p])
+    };
+    public shared query func commissionPublicationsList() : async [CommissionPublication] {
+        commissionPublications
+    };
+    public shared ({ caller }) func commissionSetupDemo() : async [Nat] {
+        requireAuthenticated(caller);
+        if (not Prim.isController(caller)) requirePlatformAdmin(caller);
+        if (commissionGroups.size() > 0) return Array.map<CommissionGroup, Nat>(commissionGroups, func(g) {
+            g.id
+        });
+        var ids : [Nat] = [];
+        for (name in ["Accountability Mechanisms", "Digital Futures"].vals()) {
+            let id = nextCommunityId;
+            nextCommunityId += 1;
+            let purpose = "Illustrative 2048 rehearsal working group. Pilot topics are not yet confirmed.";
+            communities := natMap.put(communities, id, {
+                id;
+                name;
+                policy = purpose;
+                admin = caller;
+                members = [caller]
+            });
+            Membership.setCommunityRole(membershipState, id, caller, ?#communityAdmin);
+            commissionGroups := Array.append(commissionGroups, [{
+                id;
+                name;
+                purpose;
+                stage = 0;
+                roles = [{
+                    principal = caller;
+                    role = #lead
+                }];
+                draft = "";
+                disagreements = "";
+                draftShared = false
+            }]);
+            let cid = commissionId();
+            commissionConsultations := Array.append(commissionConsultations, [{
+                id = cid;
+                groupId = id;
+                title = "Community perspectives — fictional rehearsal";
+                purpose = "Explore experiences, accountability and proposals for change.";
+                questions = ["What harms need to be named?", "What historical roots shape these harms?", "Where is governance failing?", "Who holds power and who is excluded?", "What would meaningful accountability look like?", "What repair or transformation is needed?", "What risks or co-option should we avoid?", "What is your vision for 2048?", "What concrete proposals or demands do you have?", "What cautions should movements share?"];
+                audience = "public";
+                opens = 0;
+                closes = 4102444800000000000;
+                guidance = "Use fictional information only. Your submission and discussion are private; published quotations require separate consent.";
+                closed = false
+            }]);
+            let exampleId = commissionId();
+            let exampleInput : CommissionInput = {
+                alias = "Fictional community facilitator"; language = "en";
+                answers = "FICTIONAL REHEARSAL INPUT: Accountability should include a clear route for affected communities to question how recommendations represent their experience.";
+                internalConsent = true; quoteConsent = true; attributionConsent = false;
+                format = "public event"; date = "Fictional rehearsal"; location = "Illustrative community";
+                participants = "Three fictional participants, no personal information";
+                themes = "Representation and accountability"; tensions = "Speed of drafting versus time for community review";
+                proposals = "Return a draft to participants and preserve their disagreements";
+            };
+            commissionContributions := Array.append(commissionContributions, [{
+                id = exampleId; consultationId = cid; input = exampleInput; comments = [];
+                withdrawn = false; facilitated = true; owner = ?caller; credential = "";
+            }]);
+            ids := Array.append(ids, [id])
+        };
+        ids
     };
 }

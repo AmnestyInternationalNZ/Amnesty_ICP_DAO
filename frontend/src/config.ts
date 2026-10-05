@@ -16,7 +16,7 @@ interface Config {
 }
 
 const LOCAL_BACKEND_CANISTER_ID = 't63gs-up777-77776-aaaba-cai';
-const LOCAL_INTERNET_IDENTITY_CANISTER_ID = 'rdmx6-jaaaa-aaaaa-aaadq-cai';
+const LOCAL_INTERNET_IDENTITY_CANISTER_ID = 'uqzsh-gqaaa-aaaaq-qaada-cai';
 export const RUNTIME_CONFIG_PATH = '/env.json';
 
 let configCache: Config | null = null;

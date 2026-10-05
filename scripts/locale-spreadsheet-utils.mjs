@@ -128,7 +128,7 @@ export function mergeDeep(base, override) {
 
 export function resolvedCatalogs(baseCatalogs = readBaseCatalogs(), overrides = readReviewedOverrides()) {
   return Object.fromEntries(
-    supportedLocales.map((locale) => [locale, mergeDeep(baseCatalogs[locale], overrides[locale])])
+    supportedLocales.map((locale) => [locale, mergeDeep(mergeDeep(baseCatalogs.en, baseCatalogs[locale]), overrides[locale])])
   );
 }
 

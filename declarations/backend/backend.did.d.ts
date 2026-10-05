@@ -39,6 +39,150 @@ export interface CampaignUpdatePayload {
 }
 export type CampaignVisibility = { 'publicCampaign' : null } |
   { 'community' : null };
+export interface CommissionAccess {
+  'capabilities' : Array<string>,
+  'name' : string,
+  'roleId' : string,
+  'revision' : bigint,
+}
+export interface CommissionAssignment {
+  'principal' : Principal,
+  'role' : CommissionRole,
+}
+export interface CommissionComment {
+  'at' : bigint,
+  'body' : string,
+  'author' : string,
+}
+export interface CommissionConsultation {
+  'id' : bigint,
+  'closed' : boolean,
+  'closes' : bigint,
+  'title' : string,
+  'opens' : bigint,
+  'audience' : string,
+  'groupId' : bigint,
+  'questions' : Array<string>,
+  'guidance' : string,
+  'purpose' : string,
+}
+export interface CommissionContributionDetail {
+  'id' : bigint,
+  'processSuggestion' : boolean,
+  'documentReference' : string,
+  'typeId' : string,
+  'withdrawnAt' : [] | [bigint],
+}
+export interface CommissionContributionType {
+  'id' : string,
+  'name' : string,
+  'layout' : string,
+  'guidance' : string,
+}
+export interface CommissionDraftEvidence {
+  'groupId' : bigint,
+  'findings' : Array<bigint>,
+  'needsReview' : boolean,
+}
+export interface CommissionFinding {
+  'id' : bigint,
+  'body' : string,
+  'kind' : string,
+  'groupId' : bigint,
+  'sources' : Array<bigint>,
+  'needsReview' : boolean,
+}
+export interface CommissionGroup {
+  'id' : bigint,
+  'disagreements' : string,
+  'name' : string,
+  'stage' : bigint,
+  'draftShared' : boolean,
+  'draft' : string,
+  'purpose' : string,
+  'roles' : Array<CommissionAssignment>,
+}
+export interface CommissionInput {
+  'participants' : string,
+  'alias' : string,
+  'date' : string,
+  'answers' : string,
+  'internalConsent' : boolean,
+  'quoteConsent' : boolean,
+  'language' : string,
+  'themes' : string,
+  'attributionConsent' : boolean,
+  'proposals' : string,
+  'tensions' : string,
+  'location' : string,
+  'format' : string,
+}
+export interface CommissionParticipant {
+  'principal' : Principal,
+  'name' : string,
+  'roleId' : string,
+}
+export interface CommissionProvenanceLink {
+  'sourceId' : bigint,
+  'groupId' : bigint,
+  'targetKind' : string,
+  'targetId' : bigint,
+}
+export interface CommissionPublicGroup {
+  'id' : bigint,
+  'name' : string,
+  'stage' : bigint,
+  'purpose' : string,
+}
+export interface CommissionPublication {
+  'at' : bigint,
+  'title' : string,
+  'disagreements' : string,
+  'body' : string,
+  'groupId' : bigint,
+  'sources' : Array<bigint>,
+}
+export interface CommissionPublicationMarker {
+  'at' : bigint,
+  'id' : bigint,
+  'status' : string,
+  'groupId' : bigint,
+  'sources' : Array<bigint>,
+}
+export interface CommissionReviewCopy {
+  'title' : string,
+  'body' : string,
+  'consultationId' : bigint,
+  'sources' : Array<bigint>,
+  'needsReview' : boolean,
+}
+export type CommissionRole = { 'member' : null } |
+  { 'lead' : null } |
+  { 'partner' : null };
+export interface CommissionRoleDefinition {
+  'id' : string,
+  'capabilities' : Array<string>,
+  'name' : string,
+}
+export interface CommissionStageNote {
+  'at' : bigint,
+  'id' : bigint,
+  'sharedWithAdvisors' : boolean,
+  'body' : string,
+  'role' : string,
+  'author' : string,
+  'stage' : bigint,
+  'groupId' : bigint,
+}
+export interface CommissionSubmission {
+  'id' : bigint,
+  'consultationId' : bigint,
+  'canWithdraw' : boolean,
+  'input' : CommissionInput,
+  'comments' : Array<CommissionComment>,
+  'facilitated' : boolean,
+  'withdrawn' : boolean,
+}
 export interface Community {
   'id' : bigint,
   'members' : Array<Principal>,
@@ -312,6 +456,127 @@ export interface _SERVICE {
   'archiveCommunityEvent' : ActorMethod<[bigint, bigint], undefined>,
   'bootstrapPlatformAdmin' : ActorMethod<[], undefined>,
   'canFinalizeCampaign' : ActorMethod<[bigint], boolean>,
+  'commissionAccess' : ActorMethod<[bigint], CommissionAccess>,
+  'commissionAddStageNote' : ActorMethod<
+    [bigint, bigint, string, boolean],
+    bigint
+  >,
+  'commissionAdvisorStageShared' : ActorMethod<[bigint, bigint], boolean>,
+  'commissionAssignConfiguredRole' : ActorMethod<
+    [bigint, Principal, [] | [string]],
+    undefined
+  >,
+  'commissionAssignRole' : ActorMethod<
+    [bigint, Principal, [] | [CommissionRole]],
+    undefined
+  >,
+  'commissionComment' : ActorMethod<[bigint, string, string], undefined>,
+  'commissionContributionDetail' : ActorMethod<
+    [bigint, string],
+    CommissionContributionDetail
+  >,
+  'commissionContributionTypes' : ActorMethod<
+    [bigint],
+    Array<CommissionContributionType>
+  >,
+  'commissionDisplayName' : ActorMethod<[bigint], string>,
+  'commissionDraftEvidenceState' : ActorMethod<
+    [bigint],
+    CommissionDraftEvidence
+  >,
+  'commissionGetGroup' : ActorMethod<[bigint], CommissionGroup>,
+  'commissionGetSubmission' : ActorMethod<
+    [bigint, string],
+    CommissionSubmission
+  >,
+  'commissionGroupSources' : ActorMethod<[bigint], Array<CommissionSubmission>>,
+  'commissionInitializeSettings' : ActorMethod<[bigint], undefined>,
+  'commissionListConsultations' : ActorMethod<
+    [bigint],
+    Array<CommissionConsultation>
+  >,
+  'commissionListFindings' : ActorMethod<[bigint], Array<CommissionFinding>>,
+  'commissionListGroups' : ActorMethod<[], Array<CommissionPublicGroup>>,
+  'commissionListStageNotes' : ActorMethod<
+    [bigint, bigint],
+    Array<CommissionStageNote>
+  >,
+  'commissionListSubmissions' : ActorMethod<
+    [bigint],
+    Array<CommissionSubmission>
+  >,
+  'commissionParticipants' : ActorMethod<
+    [bigint],
+    Array<CommissionParticipant>
+  >,
+  'commissionPublicationStatus' : ActorMethod<
+    [bigint],
+    Array<CommissionPublicationMarker>
+  >,
+  'commissionPublicationsList' : ActorMethod<[], Array<CommissionPublication>>,
+  'commissionPublish' : ActorMethod<[CommissionPublication], undefined>,
+  'commissionReviewCopy' : ActorMethod<[bigint], [] | [CommissionReviewCopy]>,
+  'commissionRole' : ActorMethod<[bigint], [] | [CommissionRole]>,
+  'commissionRoles' : ActorMethod<[bigint], Array<CommissionRoleDefinition>>,
+  'commissionSaveConsultation' : ActorMethod<
+    [CommissionConsultation, boolean],
+    bigint
+  >,
+  'commissionSaveContributionType' : ActorMethod<
+    [bigint, CommissionContributionType, boolean],
+    string
+  >,
+  'commissionSaveDraftEvidence' : ActorMethod<
+    [bigint, Array<bigint>, boolean],
+    undefined
+  >,
+  'commissionSaveFinding' : ActorMethod<[CommissionFinding, boolean], bigint>,
+  'commissionSaveGroup' : ActorMethod<
+    [bigint, string, string, bigint, string, string, boolean],
+    undefined
+  >,
+  'commissionSaveGroupDetails' : ActorMethod<
+    [bigint, string, string, bigint],
+    undefined
+  >,
+  'commissionSaveRecommendation' : ActorMethod<
+    [bigint, string, string, Array<bigint>, boolean],
+    undefined
+  >,
+  'commissionSaveReviewCopy' : ActorMethod<[CommissionReviewCopy], undefined>,
+  'commissionSaveRole' : ActorMethod<
+    [bigint, CommissionRoleDefinition, boolean],
+    string
+  >,
+  'commissionSetConsultationStage' : ActorMethod<[bigint, bigint], undefined>,
+  'commissionSetDisplayName' : ActorMethod<[bigint, string], undefined>,
+  'commissionSetupDemo' : ActorMethod<[], Array<bigint>>,
+  'commissionShareAdvisorStage' : ActorMethod<
+    [bigint, bigint, boolean],
+    undefined
+  >,
+  'commissionSharedDraft' : ActorMethod<[bigint], string>,
+  'commissionSourceProvenance' : ActorMethod<
+    [bigint],
+    Array<CommissionProvenanceLink>
+  >,
+  'commissionStageConsultations' : ActorMethod<
+    [bigint, bigint],
+    Array<CommissionConsultation>
+  >,
+  'commissionSubmissionTypes' : ActorMethod<
+    [bigint, string],
+    Array<CommissionContributionType>
+  >,
+  'commissionSubmit' : ActorMethod<
+    [bigint, CommissionInput, string, boolean],
+    bigint
+  >,
+  'commissionSubmitFlexible' : ActorMethod<
+    [bigint, CommissionInput, string, string, string, boolean, boolean],
+    bigint
+  >,
+  'commissionWithdraw' : ActorMethod<[bigint, string], undefined>,
   'contributeToCampaign' : ActorMethod<[bigint, bigint], undefined>,
   'contributeToPublicCampaign' : ActorMethod<[string, bigint], undefined>,
   'createCampaign' : ActorMethod<

@@ -17,7 +17,10 @@
     "import:locale-spreadsheet": "node scripts/import-locale-spreadsheet.mjs",
     "check:locales": "node scripts/check-locales.mjs",
     "test:backend": "pnpm exec icp build backend && vitest run --config vitest.config.ts",
-    "test:frontend": "vitest run --config vitest.frontend.config.ts"
+    "test:frontend": "vitest run --config vitest.frontend.config.ts",
+    "backend:bindings": "node scripts/generate-backend-bindings.mjs",
+    "rehearsal:2048:setup": "node scripts/setup-2048-accountability-rehearsal.mjs",
+    "rehearsal:2048:flexible": "node scripts/setup-2048-flexible-rehearsal.mjs"
   },
   "dependencies": {
     "@dfinity/auth-client": "3.4.3",

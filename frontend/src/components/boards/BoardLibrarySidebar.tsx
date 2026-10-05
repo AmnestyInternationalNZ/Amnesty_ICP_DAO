@@ -45,6 +45,7 @@ function BoardRow({
         {t('boards.sidebar.meta', {
           cards: board.cardCount.toString(),
           columns: board.columnCount.toString(),
+          role: roleName(board.role),
           owner: memberLabel(members, board.owner),
         })}
       </span>

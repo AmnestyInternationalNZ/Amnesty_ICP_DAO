@@ -1,0 +1,350 @@
+.commission {
+  min-height: 100vh;
+  background: #f5f3ec;
+  color: #192723;
+  font-family: Arial, sans-serif;
+}
+.commission button {
+  color: #192723;
+  cursor: pointer;
+  border: 1px solid #bec8c1;
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  background: white;
+  text-align: start;
+}
+.commission button:hover {
+  background: #edf2ed;
+}
+.commission button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+.c-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 4%;
+  background: #173c32;
+  color: white;
+  align-items: center;
+}
+.c-header .c-brand {
+  background: transparent;
+  border: 0;
+  color: #ffe500;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+.c-brand span {
+  font-size: 0.9rem;
+  color: white;
+  margin-inline-start: 1rem;
+}
+.c-header-actions {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.c-rehearsal {
+  background: #ffe500;
+  text-align: center;
+  padding: 0.55rem;
+  font-size: 0.8rem;
+}
+.c-main {
+  max-width: 1160px;
+  margin: auto;
+  padding: 2rem 1.25rem 4rem;
+}
+.commission h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0.4rem 0 1rem;
+}
+.commission h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+.commission h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 1rem 0 0.6rem;
+}
+.commission p {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+.c-intro {
+  max-width: 760px;
+  margin: 1rem 0 2.5rem;
+}
+.c-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: #427360;
+}
+.c-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+.commission .c-group-card {
+  padding: 2rem;
+  background: white;
+  min-height: 240px;
+  box-shadow: 0 6px 24px #173c320b;
+  border-top: 5px solid #427360;
+}
+.c-group-card h2 {
+  margin: 0.9rem 0;
+}
+.c-panel {
+  background: #fff;
+  border: 1px solid #d5dcd5;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+}
+.c-back {
+  margin-bottom: 1.5rem;
+}
+.c-stages {
+  display: flex;
+  gap: 0.5rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+.c-stages button {
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+.c-stages .active,
+.c-tabs .active {
+  background: #173c32;
+  color: white;
+}
+.c-stages button.active:disabled {
+  opacity: 1;
+}
+.c-stages span {
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  padding: 0.2rem 0.5rem;
+}
+.c-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.8rem;
+}
+.c-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.c-field input,
+.c-field textarea,
+.c-field select,
+.c-receipt input {
+  width: 100%;
+  border: 1px solid #afbeb3;
+  border-radius: 5px;
+  padding: 0.7rem;
+  background: #fff;
+  color: #192723;
+  font-weight: 400;
+}
+.c-check {
+  display: block;
+  margin: 1rem 0;
+  line-height: 1.5;
+}
+.c-check input {
+  margin-inline-end: 0.5rem;
+}
+.c-section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.c-section-head h2 {
+  margin: 0;
+}
+.c-stats {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+.c-consult-card {
+  width: 100%;
+}
+.c-consult-card.selected {
+  outline: 2px solid #427360;
+}
+.c-submission-row {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+.c-pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.c-comment {
+  background: #eef3ee;
+  border-inline-start: 3px solid #427360;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+.c-comment time {
+  display: block;
+  font-size: 0.75rem;
+  color: #587365;
+  margin-top: 0.3rem;
+}
+.c-comment p {
+  margin-top: 0.6rem;
+  margin-bottom: 0;
+}
+.c-receipt {
+  background: #fff7cf;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+.c-receipt button {
+  margin-top: 0.7rem;
+}
+.c-withdraw {
+  border-top: 1px solid #ddd;
+  margin-top: 2rem;
+  padding-top: 1rem;
+}
+.c-finding {
+  border-bottom: 1px solid #d5dcd5;
+  padding: 1rem 0;
+}
+.c-finding.review {
+  background: #fff7cf;
+  padding: 1rem;
+}
+.c-finding button {
+  display: block;
+  margin-top: 0.5rem;
+}
+.c-member {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: center;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid #ddd;
+}
+.c-member code {
+  overflow-wrap: anywhere;
+}
+.c-error {
+  border: 1px solid #cc644f;
+  background: #fff1ed;
+  padding: 1rem;
+  overflow-wrap: anywhere;
+  margin-bottom: 1rem;
+}
+.c-menu {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.8rem 4%;
+  gap: 0.5rem;
+  background: #e4ebe5;
+  flex-wrap: wrap;
+}
+.c-footer {
+  border-top: 1px solid #d5dcd5;
+  padding: 1.5rem 4%;
+  font-size: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.c-footer code {
+  overflow-wrap: anywhere;
+}
+.c-publications {
+  margin-top: 2rem;
+}
+.commission dt {
+  font-weight: bold;
+}
+.commission dd {
+  margin-bottom: 0.7rem;
+  white-space: pre-wrap;
+}
+@media (max-width: 700px) {
+  .c-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .c-brand span {
+    display: block;
+    margin-inline-start: 0;
+  }
+  .commission h1 {
+    font-size: 1.7rem;
+  }
+  .c-panel {
+    padding: 1rem;
+  }
+  .c-stages button {
+    min-width: 125px;
+  }
+  .c-header-actions {
+    width: 100%;
+  }
+  .c-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.c-persona-bar { display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:14px 18px; margin-bottom:24px; background:#e6eee8; border-left:5px solid #173d32; }
+.c-persona-bar select { padding:8px; max-width:100%; }
+.c-stage-comment { background:#edf3ed; border-left:4px solid #547868; padding:16px; margin:16px 0; }
+.c-role-label { font-size:.85rem; color:#52675c; margin-inline-start:8px; }
+.c-stage-activity .c-consult-card { display:block; width:100%; padding:14px; margin:12px 0; text-align:start; }
+/* Compact configuration and evidence controls share the consultation visual language. */
+.commission { font-family: 'Amnesty Trade Gothic', Arial, sans-serif; }
+.commission fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.commission fieldset:disabled { opacity: .65; }
+.commission input,.commission textarea,.commission select { max-width: 100%; }
+.commission input:focus-visible,.commission textarea:focus-visible,.commission select:focus-visible,.commission button:focus-visible,.commission summary:focus-visible { outline: 3px solid #427360; outline-offset: 3px; }
+.commission .c-source-picker { border: 1px solid #d5dcd5; padding: 1rem; margin: 1rem 0; border-radius: 6px; max-height: 300px; overflow-y: auto; }
+.c-source-picker legend { font-weight: 700; padding: 0 .3rem; }
+.c-source-picker .c-check { align-items: flex-start; }
+.c-source-picker input { flex-shrink: 0; margin-top: .3rem; }
+.c-member { flex-wrap: wrap; }
+.c-member small { display: block; overflow-wrap: anywhere; font-size: .7rem; color: #52665d; margin-top: .3rem; }
+.c-member span:first-child { min-width: 0; flex: 1; }
+.c-review-copy { background: #eef4f0; border-inline-start: 4px solid #427360; padding: 1.25rem; margin: 1.5rem 0; }
+.c-review-editor { border: 1px solid #d5dcd5; padding: 1rem; border-radius: 6px; margin: 1rem 0; }
+.c-review-editor summary,.commission details summary { cursor: pointer; font-weight: 600; }
+.c-success { background: #e7f3ea; color: #174329; padding: .75rem 1rem; border-inline-start: 4px solid #427360; }
+.c-warning { background: #fff8ce; padding: 1rem; border-inline-start: 4px solid #e0ba00; }
+.commission form button { margin-inline-end: .5rem; margin-block-end: .5rem; }
+.commission .c-pre { overflow-wrap: anywhere; }
+@media (max-width:600px) { .c-member { align-items:flex-start; gap:.5rem; } .c-member span:first-child { flex-basis:100%; } .c-review-copy { padding:1rem; } .c-main { padding-inline:.8rem; } }

@@ -290,3 +290,8 @@ export function InternetIdentityProvider({
 
     return createElement(InternetIdentityReactContext.Provider, { value, children });
 }
+
+/** Scoped identity for local Commission rehearsal tools; normal provider behavior is unchanged. */
+export function InternetIdentityOverride({ value, children }: PropsWithChildren<{ value: InternetIdentityContext }>) {
+    return createElement(InternetIdentityReactContext.Provider, { value }, children);
+}

@@ -8,7 +8,7 @@ const targetNetwork =
   process.env.ICP_ENVIRONMENT ||
   process.argv[2] ||
   'local';
-const DEFAULT_LOCAL_II_CANISTER_ID = 'rdmx6-jaaaa-aaaaa-aaadq-cai';
+const DEFAULT_LOCAL_II_FRONTEND_CANISTER_ID = 'uqzsh-gqaaa-aaaaq-qaada-cai';
 const candidateMappingDirs = [
   path.join(projectRoot, '.icp', 'data', 'mappings'),
   path.join(projectRoot, '.icp', 'cache', 'mappings'),
@@ -116,12 +116,12 @@ function resolveBackendHost() {
 }
 
 function resolveLocalIiUrl() {
-  let iiCanisterId = findCanisterId('internet_identity');
+  let iiCanisterId = findCanisterId('internet_identity_frontend');
 
   if (!iiCanisterId && fs.existsSync(localTopologyPath)) {
     const topology = JSON.parse(fs.readFileSync(localTopologyPath, 'utf8'));
     if (topology?.icp_features?.ii === 'DefaultConfig') {
-      iiCanisterId = DEFAULT_LOCAL_II_CANISTER_ID;
+      iiCanisterId = DEFAULT_LOCAL_II_FRONTEND_CANISTER_ID;
     }
   }
 

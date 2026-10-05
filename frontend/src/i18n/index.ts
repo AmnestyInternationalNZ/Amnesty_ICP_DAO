@@ -1,4 +1,5 @@
 import i18n from 'i18next';
+import { commissionCatalog } from './commissionTranslations';
 import { initReactI18next } from 'react-i18next';
 import { resolveLocalePreference } from './preferences';
 import { resources } from './resources';
@@ -20,7 +21,7 @@ export function applyDocumentLocaleSettings(locale: string | null | undefined): 
 }
 
 void i18n.use(initReactI18next).init({
-    resources,
+    resources: Object.fromEntries(Object.entries(resources).map(([locale, value]) => [locale, { ...value, commission: commissionCatalog(locale) }])),
     lng: resolveLocalePreference(),
     fallbackLng: DEFAULT_LOCALE,
     interpolation: {

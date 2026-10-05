@@ -1,27 +1,27 @@
-type WorkspaceRole = 
+type WorkspaceRole =
  variant {
    editor;
    owner;
    viewer;
  };
-type WorkspaceAccessEntry = 
+type WorkspaceAccessEntry =
  record {
    role: WorkspaceRole;
    user: principal;
  };
 type UserProfile = record {name: text;};
-type TransformationOutput = 
+type TransformationOutput =
  record {
    body: blob;
    headers: vec Header;
    status: nat;
  };
-type TransformationInput = 
+type TransformationInput =
  record {
    context: blob;
    response: TransformationOutput;
  };
-type StripeSessionStatus = 
+type StripeSessionStatus =
  variant {
    completed: record {
                 response: text;
@@ -29,12 +29,12 @@ type StripeSessionStatus =
               };
    failed: record {error: text;};
  };
-type StripeConfiguration = 
+type StripeConfiguration =
  record {
    allowedCountries: vec text;
    secretKey: text;
  };
-type ShoppingItem = 
+type ShoppingItem =
  record {
    currency: text;
    priceInCents: nat;
@@ -48,14 +48,14 @@ type RoleChangeProposalInput =
    role: opt CommunityRole;
    target: principal;
  };
-type ProposalState = 
+type ProposalState =
  variant {
    active;
    failed;
    passed;
    pendingFinalization;
  };
-type ProposalOverrides = 
+type ProposalOverrides =
  record {
    passPct: opt nat;
    quorum: opt nat;
@@ -79,7 +79,7 @@ type ProposalBody =
    motion: record {description: text;};
    roleChange: RoleChangeProposalInput;
  };
-type Proposal = 
+type Proposal =
  record {
    body: ProposalBody;
    communityId: nat;
@@ -98,13 +98,13 @@ type Proposal =
    yes: nat;
  };
 type PlatformRole = variant {platformAdmin;};
-type KanbanColumn = 
+type KanbanColumn =
  record {
    cardIds: vec nat;
    id: nat;
    title: text;
  };
-type KanbanCardInput = 
+type KanbanCardInput =
  record {
    assignedTo: vec principal;
    description: opt text;
@@ -113,7 +113,7 @@ type KanbanCardInput =
    eventId: opt nat;
    title: text;
  };
-type KanbanCard = 
+type KanbanCard =
  record {
    assignedTo: vec principal;
    createdAt: int;
@@ -126,12 +126,12 @@ type KanbanCard =
    title: text;
    updatedAt: int;
  };
-type Header = 
+type Header =
  record {
    name: text;
    value: text;
  };
-type FundraisingCampaignPayload = 
+type FundraisingCampaignPayload =
  record {
    archived: bool;
    canContribute: bool;
@@ -160,7 +160,7 @@ type FundraisingCampaignPayload =
    updates: vec CampaignUpdatePayload;
    visibility: CampaignVisibility;
  };
-type FundraisingCampaignInput = 
+type FundraisingCampaignInput =
  record {
    creatorContact: opt text;
    creatorName: text;
@@ -175,24 +175,24 @@ type FundraisingCampaignInput =
    title: text;
    visibility: CampaignVisibility;
  };
-type Contribution = 
+type Contribution =
  record {
    amount: nat;
    contributor: principal;
    timestampNs: int;
  };
-type CommunityRole = 
+type CommunityRole =
  variant {
    communityAdmin;
    member;
  };
-type CommunityMember = 
+type CommunityMember =
  record {
    "principal": principal;
    profile: opt UserProfile;
    role: CommunityRole;
  };
-type CommunityEventPayload = 
+type CommunityEventPayload =
  record {
    access: vec WorkspaceAccessEntry;
    allDay: bool;
@@ -211,7 +211,7 @@ type CommunityEventPayload =
    title: text;
    updatedAt: int;
  };
-type CommunityEventInput = 
+type CommunityEventInput =
  record {
    allDay: bool;
    description: opt text;
@@ -220,7 +220,7 @@ type CommunityEventInput =
    startUtc: int;
    title: text;
  };
-type CommunityDocumentSummary = 
+type CommunityDocumentSummary =
  record {
    archived: bool;
    communityId: nat;
@@ -234,7 +234,7 @@ type CommunityDocumentSummary =
    updatedAt: int;
    version: nat;
  };
-type CommunityDocumentPayload = 
+type CommunityDocumentPayload =
  record {
    access: vec WorkspaceAccessEntry;
    archived: bool;
@@ -251,7 +251,7 @@ type CommunityDocumentPayload =
    updates: vec blob;
    version: nat;
  };
-type CommunityBoardSummary = 
+type CommunityBoardSummary =
  record {
    archived: bool;
    cardCount: nat;
@@ -265,7 +265,7 @@ type CommunityBoardSummary =
    title: text;
    updatedAt: int;
  };
-type CommunityBoardPayload = 
+type CommunityBoardPayload =
  record {
    access: vec WorkspaceAccessEntry;
    archived: bool;
@@ -281,7 +281,7 @@ type CommunityBoardPayload =
    title: text;
    updatedAt: int;
  };
-type CommunityAccess = 
+type CommunityAccess =
  record {
    canContributeToCampaign: bool;
    canCreateCampaign: bool;
@@ -292,7 +292,7 @@ type CommunityAccess =
    communityRole: opt CommunityRole;
    isPlatformAdmin: bool;
  };
-type Community = 
+type Community =
  record {
    admin: principal;
    id: nat;
@@ -300,12 +300,178 @@ type Community =
    name: text;
    policy: text;
  };
-type CampaignVisibility = 
+type CommissionSubmission =
+ record {
+   canWithdraw: bool;
+   comments: vec CommissionComment;
+   consultationId: nat;
+   facilitated: bool;
+   id: nat;
+   input: CommissionInput;
+   withdrawn: bool;
+ };
+type CommissionStageNote =
+ record {
+   at: int;
+   author: text;
+   body: text;
+   groupId: nat;
+   id: nat;
+   role: text;
+   sharedWithAdvisors: bool;
+   stage: nat;
+ };
+type CommissionRoleDefinition =
+ record {
+   capabilities: vec text;
+   id: text;
+   name: text;
+ };
+type CommissionRole =
+ variant {
+   lead;
+   member;
+   partner;
+ };
+type CommissionReviewCopy =
+ record {
+   body: text;
+   consultationId: nat;
+   needsReview: bool;
+   sources: vec nat;
+   title: text;
+ };
+type CommissionPublicationMarker =
+ record {
+   at: int;
+   groupId: nat;
+   id: nat;
+   sources: vec nat;
+   status: text;
+ };
+type CommissionPublication =
+ record {
+   at: int;
+   body: text;
+   disagreements: text;
+   groupId: nat;
+   sources: vec nat;
+   title: text;
+ };
+type CommissionPublicGroup =
+ record {
+   id: nat;
+   name: text;
+   purpose: text;
+   stage: nat;
+ };
+type CommissionProvenanceLink =
+ record {
+   groupId: nat;
+   sourceId: nat;
+   targetId: nat;
+   targetKind: text;
+ };
+type CommissionParticipant =
+ record {
+   name: text;
+   "principal": principal;
+   roleId: text;
+ };
+type CommissionInput =
+ record {
+   alias: text;
+   answers: text;
+   attributionConsent: bool;
+   date: text;
+   format: text;
+   internalConsent: bool;
+   language: text;
+   location: text;
+   participants: text;
+   proposals: text;
+   quoteConsent: bool;
+   tensions: text;
+   themes: text;
+ };
+type CommissionGroup =
+ record {
+   disagreements: text;
+   draft: text;
+   draftShared: bool;
+   id: nat;
+   name: text;
+   purpose: text;
+   roles: vec CommissionAssignment;
+   stage: nat;
+ };
+type CommissionFinding =
+ record {
+   body: text;
+   groupId: nat;
+   id: nat;
+   kind: text;
+   needsReview: bool;
+   sources: vec nat;
+ };
+type CommissionDraftEvidence =
+ record {
+   findings: vec nat;
+   groupId: nat;
+   needsReview: bool;
+ };
+type CommissionContributionType =
+ record {
+   guidance: text;
+   id: text;
+   layout: text;
+   name: text;
+ };
+type CommissionContributionDetail =
+ record {
+   documentReference: text;
+   id: nat;
+   processSuggestion: bool;
+   typeId: text;
+   withdrawnAt: opt int;
+ };
+type CommissionConsultation =
+ record {
+   audience: text;
+   closed: bool;
+   closes: int;
+   groupId: nat;
+   guidance: text;
+   id: nat;
+   opens: int;
+   purpose: text;
+   questions: vec text;
+   title: text;
+ };
+type CommissionComment =
+ record {
+   at: int;
+   author: text;
+   body: text;
+ };
+type CommissionAssignment =
+ record {
+   "principal": principal;
+   role: CommissionRole;
+ };
+type CommissionAccess =
+ record {
+   capabilities: vec text;
+   name: text;
+   revision: nat;
+   roleId: text;
+ };
+type CampaignVisibility =
  variant {
    community;
    publicCampaign;
  };
-type CampaignUpdatePayload = 
+type CampaignUpdatePayload =
  record {
    campaignId: nat;
    content: text;
@@ -313,7 +479,7 @@ type CampaignUpdatePayload =
    id: nat;
    timestampNs: int;
  };
-type CampaignUpdate = 
+type CampaignUpdate =
  record {
    campaignId: nat;
    content: text;
@@ -321,20 +487,20 @@ type CampaignUpdate =
    id: nat;
    timestampNs: int;
  };
-type CampaignState = 
+type CampaignState =
  variant {
    active;
    expired;
    failed;
    successful;
  };
-type CampaignContributionPayload = 
+type CampaignContributionPayload =
  record {
    amount: nat;
    contributorName: text;
    timestampNs: int;
  };
-type Campaign = 
+type Campaign =
  record {
    communityId: nat;
    createdNs: int;
@@ -361,6 +527,78 @@ service : {
   archiveCommunityEvent: (communityId: nat, eventId: nat) -> ();
   bootstrapPlatformAdmin: () -> ();
   canFinalizeCampaign: (campaignId: nat) -> (bool) query;
+  commissionAccess: (groupId: nat) -> (CommissionAccess) query;
+  commissionAddStageNote: (groupId: nat, stage: nat, body: text,
+   sharedWithAdvisors: bool) -> (nat);
+  commissionAdvisorStageShared: (groupId: nat, stage: nat) -> (bool) query;
+  commissionAssignConfiguredRole: (groupId: nat, "principal": principal, id:
+   opt text) -> ();
+  commissionAssignRole: (groupId: nat, "principal": principal, role:
+   opt CommissionRole) -> ();
+  commissionComment: (id: nat, credential: text, body: text) -> ();
+  commissionContributionDetail: (id: nat, credential: text) ->
+   (CommissionContributionDetail) query;
+  commissionContributionTypes: (groupId: nat) ->
+   (vec CommissionContributionType) query;
+  commissionDisplayName: (groupId: nat) -> (text) query;
+  commissionDraftEvidenceState: (groupId: nat) ->
+   (CommissionDraftEvidence) query;
+  commissionGetGroup: (groupId: nat) -> (CommissionGroup) query;
+  commissionGetSubmission: (id: nat, credential: text) ->
+   (CommissionSubmission) query;
+  commissionGroupSources: (groupId: nat) -> (vec CommissionSubmission) query;
+  commissionInitializeSettings: (groupId: nat) -> ();
+  commissionListConsultations: (groupId: nat) ->
+   (vec CommissionConsultation) query;
+  commissionListFindings: (groupId: nat) -> (vec CommissionFinding) query;
+  commissionListGroups: () -> (vec CommissionPublicGroup) query;
+  commissionListStageNotes: (groupId: nat, stage: nat) ->
+   (vec CommissionStageNote) query;
+  commissionListSubmissions: (consultationId: nat) ->
+   (vec CommissionSubmission) query;
+  commissionParticipants: (groupId: nat) -> (vec CommissionParticipant) query;
+  commissionPublicationStatus: (groupId: nat) ->
+   (vec CommissionPublicationMarker) query;
+  commissionPublicationsList: () -> (vec CommissionPublication) query;
+  commissionPublish: (input: CommissionPublication) -> ();
+  commissionReviewCopy: (consultationId: nat) ->
+   (opt CommissionReviewCopy) query;
+  commissionRole: (groupId: nat) -> (opt CommissionRole) query;
+  commissionRoles: (groupId: nat) -> (vec CommissionRoleDefinition) query;
+  commissionSaveConsultation: (input: CommissionConsultation, isNew:
+   bool) -> (nat);
+  commissionSaveContributionType: (groupId: nat, input:
+   CommissionContributionType, isNew: bool) -> (text);
+  commissionSaveDraftEvidence: (groupId: nat, findingIds: vec nat,
+   confirmReview: bool) -> ();
+  commissionSaveFinding: (input: CommissionFinding, isNew: bool) -> (nat);
+  commissionSaveGroup: (groupId: nat, name: text, purpose: text, stage:
+   nat, draft: text, disagreements: text, draftShared: bool) -> ();
+  commissionSaveGroupDetails: (groupId: nat, name: text, purpose: text,
+   stage: nat) -> ();
+  commissionSaveRecommendation: (groupId: nat, draft: text, disagreements:
+   text, findingIds: vec nat, confirmReview: bool) -> ();
+  commissionSaveReviewCopy: (input: CommissionReviewCopy) -> ();
+  commissionSaveRole: (groupId: nat, input: CommissionRoleDefinition, isNew:
+   bool) -> (text);
+  commissionSetConsultationStage: (id: nat, stage: nat) -> ();
+  commissionSetDisplayName: (groupId: nat, name: text) -> ();
+  commissionSetupDemo: () -> (vec nat);
+  commissionShareAdvisorStage: (groupId: nat, stage: nat, isShared: bool) ->
+   ();
+  commissionSharedDraft: (groupId: nat) -> (text) query;
+  commissionSourceProvenance: (groupId: nat) ->
+   (vec CommissionProvenanceLink) query;
+  commissionStageConsultations: (groupId: nat, stage: nat) ->
+   (vec CommissionConsultation) query;
+  commissionSubmissionTypes: (id: nat, credential: text) ->
+   (vec CommissionContributionType) query;
+  commissionSubmit: (consultationId: nat, input: CommissionInput, credential:
+   text, facilitated: bool) -> (nat);
+  commissionSubmitFlexible: (consultationId: nat, input: CommissionInput,
+   credential: text, typeId: text, reference: text, processSuggestion:
+   bool, collectiveAuthority: bool) -> (nat);
+  commissionWithdraw: (id: nat, credential: text) -> ();
   contributeToCampaign: (campaignId: nat, amount: nat) -> ();
   contributeToPublicCampaign: (token: text, amount: nat) -> ();
   createCampaign: (communityId: nat, title: text, description: text,
@@ -382,7 +620,7 @@ service : {
    overrides: opt ProposalOverrides) -> ();
   createRoleChangeProposal: (communityId: nat, title: text, input:
    RoleChangeProposalInput, overrides: opt ProposalOverrides) -> (nat);
-  deleteCommunityBoardCard: (communityId: nat, boardId: nat, cardId: 
+  deleteCommunityBoardCard: (communityId: nat, boardId: nat, cardId:
    nat) -> ();
   deleteCommunityBoardColumn: (communityId: nat, boardId: nat, columnId:
    nat) -> ();
@@ -433,7 +671,7 @@ service : {
   moveCommunityBoardCard: (communityId: nat, boardId: nat, cardId: nat,
    toColumnId: nat, toIndex: nat) -> ();
   renameCommunityBoard: (communityId: nat, boardId: nat, title: text) -> ();
-  renameCommunityBoardColumn: (communityId: nat, boardId: nat, columnId: 
+  renameCommunityBoardColumn: (communityId: nat, boardId: nat, columnId:
    nat, title: text) -> ();
   renameCommunityDocument: (communityId: nat, documentId: nat, title:
    text) -> ();
@@ -467,7 +705,7 @@ service : {
   setPlatformAdmin: (user: principal, enabled: bool) -> ();
   setStripeConfiguration: (config: StripeConfiguration) -> ();
   transform: (input: TransformationInput) -> (TransformationOutput) query;
-  updateCommunityBoardCard: (communityId: nat, boardId: nat, cardId: 
+  updateCommunityBoardCard: (communityId: nat, boardId: nat, cardId:
    nat, input: KanbanCardInput) -> ();
   updateCommunityEvent: (communityId: nat, eventId: nat, input:
    CommunityEventInput) -> ();

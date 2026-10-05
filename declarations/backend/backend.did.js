@@ -24,6 +24,152 @@ export const idlFactory = ({ IDL }) => {
     'title' : IDL.Text,
     'cardIds' : IDL.Vec(IDL.Nat),
   });
+  const CommissionAccess = IDL.Record({
+    'capabilities' : IDL.Vec(IDL.Text),
+    'name' : IDL.Text,
+    'roleId' : IDL.Text,
+    'revision' : IDL.Nat,
+  });
+  const CommissionRole = IDL.Variant({
+    'member' : IDL.Null,
+    'lead' : IDL.Null,
+    'partner' : IDL.Null,
+  });
+  const CommissionContributionDetail = IDL.Record({
+    'id' : IDL.Nat,
+    'processSuggestion' : IDL.Bool,
+    'documentReference' : IDL.Text,
+    'typeId' : IDL.Text,
+    'withdrawnAt' : IDL.Opt(IDL.Int),
+  });
+  const CommissionContributionType = IDL.Record({
+    'id' : IDL.Text,
+    'name' : IDL.Text,
+    'layout' : IDL.Text,
+    'guidance' : IDL.Text,
+  });
+  const CommissionDraftEvidence = IDL.Record({
+    'groupId' : IDL.Nat,
+    'findings' : IDL.Vec(IDL.Nat),
+    'needsReview' : IDL.Bool,
+  });
+  const CommissionAssignment = IDL.Record({
+    'principal' : IDL.Principal,
+    'role' : CommissionRole,
+  });
+  const CommissionGroup = IDL.Record({
+    'id' : IDL.Nat,
+    'disagreements' : IDL.Text,
+    'name' : IDL.Text,
+    'stage' : IDL.Nat,
+    'draftShared' : IDL.Bool,
+    'draft' : IDL.Text,
+    'purpose' : IDL.Text,
+    'roles' : IDL.Vec(CommissionAssignment),
+  });
+  const CommissionInput = IDL.Record({
+    'participants' : IDL.Text,
+    'alias' : IDL.Text,
+    'date' : IDL.Text,
+    'answers' : IDL.Text,
+    'internalConsent' : IDL.Bool,
+    'quoteConsent' : IDL.Bool,
+    'language' : IDL.Text,
+    'themes' : IDL.Text,
+    'attributionConsent' : IDL.Bool,
+    'proposals' : IDL.Text,
+    'tensions' : IDL.Text,
+    'location' : IDL.Text,
+    'format' : IDL.Text,
+  });
+  const CommissionComment = IDL.Record({
+    'at' : IDL.Int,
+    'body' : IDL.Text,
+    'author' : IDL.Text,
+  });
+  const CommissionSubmission = IDL.Record({
+    'id' : IDL.Nat,
+    'consultationId' : IDL.Nat,
+    'canWithdraw' : IDL.Bool,
+    'input' : CommissionInput,
+    'comments' : IDL.Vec(CommissionComment),
+    'facilitated' : IDL.Bool,
+    'withdrawn' : IDL.Bool,
+  });
+  const CommissionConsultation = IDL.Record({
+    'id' : IDL.Nat,
+    'closed' : IDL.Bool,
+    'closes' : IDL.Int,
+    'title' : IDL.Text,
+    'opens' : IDL.Int,
+    'audience' : IDL.Text,
+    'groupId' : IDL.Nat,
+    'questions' : IDL.Vec(IDL.Text),
+    'guidance' : IDL.Text,
+    'purpose' : IDL.Text,
+  });
+  const CommissionFinding = IDL.Record({
+    'id' : IDL.Nat,
+    'body' : IDL.Text,
+    'kind' : IDL.Text,
+    'groupId' : IDL.Nat,
+    'sources' : IDL.Vec(IDL.Nat),
+    'needsReview' : IDL.Bool,
+  });
+  const CommissionPublicGroup = IDL.Record({
+    'id' : IDL.Nat,
+    'name' : IDL.Text,
+    'stage' : IDL.Nat,
+    'purpose' : IDL.Text,
+  });
+  const CommissionStageNote = IDL.Record({
+    'at' : IDL.Int,
+    'id' : IDL.Nat,
+    'sharedWithAdvisors' : IDL.Bool,
+    'body' : IDL.Text,
+    'role' : IDL.Text,
+    'author' : IDL.Text,
+    'stage' : IDL.Nat,
+    'groupId' : IDL.Nat,
+  });
+  const CommissionParticipant = IDL.Record({
+    'principal' : IDL.Principal,
+    'name' : IDL.Text,
+    'roleId' : IDL.Text,
+  });
+  const CommissionPublicationMarker = IDL.Record({
+    'at' : IDL.Int,
+    'id' : IDL.Nat,
+    'status' : IDL.Text,
+    'groupId' : IDL.Nat,
+    'sources' : IDL.Vec(IDL.Nat),
+  });
+  const CommissionPublication = IDL.Record({
+    'at' : IDL.Int,
+    'title' : IDL.Text,
+    'disagreements' : IDL.Text,
+    'body' : IDL.Text,
+    'groupId' : IDL.Nat,
+    'sources' : IDL.Vec(IDL.Nat),
+  });
+  const CommissionReviewCopy = IDL.Record({
+    'title' : IDL.Text,
+    'body' : IDL.Text,
+    'consultationId' : IDL.Nat,
+    'sources' : IDL.Vec(IDL.Nat),
+    'needsReview' : IDL.Bool,
+  });
+  const CommissionRoleDefinition = IDL.Record({
+    'id' : IDL.Text,
+    'capabilities' : IDL.Vec(IDL.Text),
+    'name' : IDL.Text,
+  });
+  const CommissionProvenanceLink = IDL.Record({
+    'sourceId' : IDL.Nat,
+    'groupId' : IDL.Nat,
+    'targetKind' : IDL.Text,
+    'targetId' : IDL.Nat,
+  });
   const ShoppingItem = IDL.Record({
     'productName' : IDL.Text,
     'currency' : IDL.Text,
@@ -331,6 +477,196 @@ export const idlFactory = ({ IDL }) => {
     'archiveCommunityEvent' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
     'bootstrapPlatformAdmin' : IDL.Func([], [], []),
     'canFinalizeCampaign' : IDL.Func([IDL.Nat], [IDL.Bool], ['query']),
+    'commissionAccess' : IDL.Func([IDL.Nat], [CommissionAccess], ['query']),
+    'commissionAddStageNote' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Text, IDL.Bool],
+        [IDL.Nat],
+        [],
+      ),
+    'commissionAdvisorStageShared' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Bool],
+        ['query'],
+      ),
+    'commissionAssignConfiguredRole' : IDL.Func(
+        [IDL.Nat, IDL.Principal, IDL.Opt(IDL.Text)],
+        [],
+        [],
+      ),
+    'commissionAssignRole' : IDL.Func(
+        [IDL.Nat, IDL.Principal, IDL.Opt(CommissionRole)],
+        [],
+        [],
+      ),
+    'commissionComment' : IDL.Func([IDL.Nat, IDL.Text, IDL.Text], [], []),
+    'commissionContributionDetail' : IDL.Func(
+        [IDL.Nat, IDL.Text],
+        [CommissionContributionDetail],
+        ['query'],
+      ),
+    'commissionContributionTypes' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(CommissionContributionType)],
+        ['query'],
+      ),
+    'commissionDisplayName' : IDL.Func([IDL.Nat], [IDL.Text], ['query']),
+    'commissionDraftEvidenceState' : IDL.Func(
+        [IDL.Nat],
+        [CommissionDraftEvidence],
+        ['query'],
+      ),
+    'commissionGetGroup' : IDL.Func([IDL.Nat], [CommissionGroup], ['query']),
+    'commissionGetSubmission' : IDL.Func(
+        [IDL.Nat, IDL.Text],
+        [CommissionSubmission],
+        ['query'],
+      ),
+    'commissionGroupSources' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(CommissionSubmission)],
+        ['query'],
+      ),
+    'commissionInitializeSettings' : IDL.Func([IDL.Nat], [], []),
+    'commissionListConsultations' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(CommissionConsultation)],
+        ['query'],
+      ),
+    'commissionListFindings' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(CommissionFinding)],
+        ['query'],
+      ),
+    'commissionListGroups' : IDL.Func(
+        [],
+        [IDL.Vec(CommissionPublicGroup)],
+        ['query'],
+      ),
+    'commissionListStageNotes' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Vec(CommissionStageNote)],
+        ['query'],
+      ),
+    'commissionListSubmissions' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(CommissionSubmission)],
+        ['query'],
+      ),
+    'commissionParticipants' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(CommissionParticipant)],
+        ['query'],
+      ),
+    'commissionPublicationStatus' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(CommissionPublicationMarker)],
+        ['query'],
+      ),
+    'commissionPublicationsList' : IDL.Func(
+        [],
+        [IDL.Vec(CommissionPublication)],
+        ['query'],
+      ),
+    'commissionPublish' : IDL.Func([CommissionPublication], [], []),
+    'commissionReviewCopy' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Opt(CommissionReviewCopy)],
+        ['query'],
+      ),
+    'commissionRole' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Opt(CommissionRole)],
+        ['query'],
+      ),
+    'commissionRoles' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(CommissionRoleDefinition)],
+        ['query'],
+      ),
+    'commissionSaveConsultation' : IDL.Func(
+        [CommissionConsultation, IDL.Bool],
+        [IDL.Nat],
+        [],
+      ),
+    'commissionSaveContributionType' : IDL.Func(
+        [IDL.Nat, CommissionContributionType, IDL.Bool],
+        [IDL.Text],
+        [],
+      ),
+    'commissionSaveDraftEvidence' : IDL.Func(
+        [IDL.Nat, IDL.Vec(IDL.Nat), IDL.Bool],
+        [],
+        [],
+      ),
+    'commissionSaveFinding' : IDL.Func(
+        [CommissionFinding, IDL.Bool],
+        [IDL.Nat],
+        [],
+      ),
+    'commissionSaveGroup' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Nat, IDL.Text, IDL.Text, IDL.Bool],
+        [],
+        [],
+      ),
+    'commissionSaveGroupDetails' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Nat],
+        [],
+        [],
+      ),
+    'commissionSaveRecommendation' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Vec(IDL.Nat), IDL.Bool],
+        [],
+        [],
+      ),
+    'commissionSaveReviewCopy' : IDL.Func([CommissionReviewCopy], [], []),
+    'commissionSaveRole' : IDL.Func(
+        [IDL.Nat, CommissionRoleDefinition, IDL.Bool],
+        [IDL.Text],
+        [],
+      ),
+    'commissionSetConsultationStage' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
+    'commissionSetDisplayName' : IDL.Func([IDL.Nat, IDL.Text], [], []),
+    'commissionSetupDemo' : IDL.Func([], [IDL.Vec(IDL.Nat)], []),
+    'commissionShareAdvisorStage' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Bool],
+        [],
+        [],
+      ),
+    'commissionSharedDraft' : IDL.Func([IDL.Nat], [IDL.Text], ['query']),
+    'commissionSourceProvenance' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(CommissionProvenanceLink)],
+        ['query'],
+      ),
+    'commissionStageConsultations' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Vec(CommissionConsultation)],
+        ['query'],
+      ),
+    'commissionSubmissionTypes' : IDL.Func(
+        [IDL.Nat, IDL.Text],
+        [IDL.Vec(CommissionContributionType)],
+        ['query'],
+      ),
+    'commissionSubmit' : IDL.Func(
+        [IDL.Nat, CommissionInput, IDL.Text, IDL.Bool],
+        [IDL.Nat],
+        [],
+      ),
+    'commissionSubmitFlexible' : IDL.Func(
+        [
+          IDL.Nat,
+          CommissionInput,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Bool,
+          IDL.Bool,
+        ],
+        [IDL.Nat],
+        [],
+      ),
+    'commissionWithdraw' : IDL.Func([IDL.Nat, IDL.Text], [], []),
     'contributeToCampaign' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
     'contributeToPublicCampaign' : IDL.Func([IDL.Text, IDL.Nat], [], []),
     'createCampaign' : IDL.Func(
